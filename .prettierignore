@@ -1,0 +1,7 @@
+dist/
+.astro/
+.vercel/
+node_modules/
+.claude/
+demo_design/
+package-lock.json
