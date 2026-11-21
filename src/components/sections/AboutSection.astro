@@ -1,6 +1,7 @@
 ---
 import { getMissionVision } from '../../lib/data';
 import { Container, Icon, IconTile, SectionHeader, type IconName } from '../ui';
+import KeyMetrics from './KeyMetrics.astro';
 
 interface StatementCard {
   icon: IconName;
@@ -60,5 +61,7 @@ const cards: StatementCard[] = [
         </li>
       ))}
     </ul>
+
+    <KeyMetrics />
   </Container>
 </section>
