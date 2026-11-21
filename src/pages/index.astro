@@ -1,6 +1,7 @@
 ---
 import SiteFooter from '../components/layout/SiteFooter.astro';
 import SiteHeader from '../components/layout/SiteHeader.astro';
+import AboutSection from '../components/sections/AboutSection.astro';
 import HeroSection from '../components/sections/HeroSection.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCompanyInfo } from '../lib/data';
@@ -12,7 +13,7 @@ const { legalName } = getCompanyInfo();
   <SiteHeader slot="header" />
   {/* Section anchors in page order; each one is replaced by its section component (Epic 03). */}
   <HeroSection />
-  <section id="about"></section>
+  <AboutSection />
   <section id="products"></section>
   <section id="engineering"></section>
   <section id="why-us"></section>

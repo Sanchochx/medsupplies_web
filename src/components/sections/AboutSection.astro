@@ -1,0 +1,64 @@
+---
+import { getMissionVision } from '../../lib/data';
+import { Container, Icon, IconTile, SectionHeader, type IconName } from '../ui';
+
+interface StatementCard {
+  icon: IconName;
+  title: string;
+  text: string;
+  footerIcon: IconName;
+  footer: string;
+}
+
+const HEADING_ID = 'about-heading';
+
+const { mission, vision } = getMissionVision();
+
+const cards: StatementCard[] = [
+  {
+    icon: 'flag',
+    title: 'Our Mission',
+    text: mission,
+    footerIcon: 'task-alt',
+    footer: 'Clinical biosafety standards',
+  },
+  {
+    icon: 'visibility',
+    title: 'Our Vision',
+    text: vision,
+    footerIcon: 'military-tech',
+    footer: 'Leadership in hospital technology management',
+  },
+];
+---
+
+<section
+  id="about"
+  aria-labelledby={HEADING_ID}
+  class="w-full bg-surface-container-low py-space-xl lg:py-24"
+>
+  <Container class="flex flex-col gap-space-xl">
+    <SectionHeader
+      headingId={HEADING_ID}
+      eyebrow="About Medsupplies Ingeniería"
+      heading="Committed to health and rigor in biomedical engineering"
+      lead="A Colombian company dedicated to raising the standards of the healthcare sector through the timely supply of medical devices, hospital supplies and medicines, complemented by preventive and corrective biomedical engineering services and equipment calibration."
+    />
+
+    <ul class="grid grid-cols-1 gap-gutter md:grid-cols-2">
+      {cards.map(({ icon, title, text, footerIcon, footer }) => (
+        <li class="flex flex-col justify-between rounded-2xl bg-surface-container-lowest p-space-lg shadow-sm transition-shadow duration-200 hover:shadow-md">
+          <div class="flex flex-col gap-space-sm">
+            <IconTile icon={icon} size="lg" class="mb-2" />
+            <h3 class="font-heading text-headline-sm font-bold text-on-surface">{title}</h3>
+            <p class="text-body-md leading-relaxed text-on-surface-variant">{text}</p>
+          </div>
+          <p class="mt-space-md flex items-center gap-2 pt-space-sm text-label-md text-primary">
+            <Icon name={footerIcon} size={18} />
+            {footer}
+          </p>
+        </li>
+      ))}
+    </ul>
+  </Container>
+</section>
