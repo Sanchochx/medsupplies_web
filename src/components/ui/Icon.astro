@@ -1,0 +1,58 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import type { IconName } from './iconNames';
+
+export interface IconProps extends Omit<HTMLAttributes<'svg'>, 'width' | 'height' | 'viewBox'> {
+  name: IconName;
+  /** Rendered width and height in pixels. */
+  size?: number;
+  /**
+   * Accessible name. Omit it for decorative icons next to visible text (the default), so screen
+   * readers skip the icon; provide it only when the icon conveys meaning on its own.
+   */
+  label?: string;
+}
+
+type Props = IconProps;
+
+interface IconSource {
+  viewBox: string;
+  body: string;
+}
+
+// Inlined at build time: the SVG markup ships inside the HTML, with no runtime request.
+const rawIcons = import.meta.glob<string>('../../assets/icons/*.svg', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
+
+function parseIcon(raw: string): IconSource {
+  const viewBox = /viewBox="([^"]+)"/.exec(raw)?.[1] ?? '0 0 24 24';
+  const body = /<svg[^>]*>([\s\S]*)<\/svg>/.exec(raw)?.[1] ?? '';
+  return { viewBox, body };
+}
+
+const { name, size = 24, label, class: className, ...attrs } = Astro.props;
+
+const raw = rawIcons[`../../assets/icons/${name}.svg`];
+if (raw === undefined) {
+  throw new Error(`Icon "${name}" not found in src/assets/icons. Run \`npm run icons:generate\`.`);
+}
+const { viewBox, body } = parseIcon(raw);
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox={viewBox}
+  width={size}
+  height={size}
+  fill="currentColor"
+  focusable="false"
+  class:list={['shrink-0', className]}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  {...attrs}
+  set:html={body}
+/>

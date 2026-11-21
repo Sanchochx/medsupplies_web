@@ -1,0 +1,42 @@
+---
+import Icon from './Icon.astro';
+import type { IconName } from './iconNames';
+
+export type IconTileSize = 'md' | 'lg';
+export type IconTileTone = 'light' | 'solid';
+
+export interface IconTileProps {
+  icon: IconName;
+  /** `md` = 40px square, `lg` = 48px square. */
+  size?: IconTileSize;
+  tone?: IconTileTone;
+  class?: string;
+}
+
+type Props = IconTileProps;
+
+const SIZE_CLASSES: Record<IconTileSize, string> = {
+  md: 'size-10 rounded-lg',
+  lg: 'size-12 rounded-xl',
+};
+
+const ICON_SIZES: Record<IconTileSize, number> = { md: 22, lg: 24 };
+
+const TONE_CLASSES: Record<IconTileTone, string> = {
+  light: 'bg-surface-container-high text-primary',
+  solid: 'bg-primary-container text-on-primary',
+};
+
+const { icon, size = 'md', tone = 'light', class: className } = Astro.props;
+---
+
+<span
+  class:list={[
+    'inline-flex shrink-0 items-center justify-center',
+    SIZE_CLASSES[size],
+    TONE_CLASSES[tone],
+    className,
+  ]}
+>
+  <Icon name={icon} size={ICON_SIZES[size]} />
+</span>

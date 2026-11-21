@@ -1,0 +1,85 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import Icon from './Icon.astro';
+import type { IconName } from './iconNames';
+
+export type ButtonVariant = 'primary' | 'neutral' | 'soft' | 'link';
+export type ButtonSize = 'sm' | 'md' | 'lg';
+
+export interface ButtonBaseProps {
+  variant?: ButtonVariant;
+  /** Padding scale; ignored by the `link` variant. */
+  size?: ButtonSize;
+  iconStart?: IconName;
+  /** Defaults to `arrow-forward` for the `link` variant. */
+  iconEnd?: IconName;
+  fullWidth?: boolean;
+}
+
+/** Rendered as `<a>`. */
+export interface ButtonLinkProps
+  extends ButtonBaseProps, Omit<HTMLAttributes<'a'>, 'href' | 'type'> {
+  href: string;
+  type?: never;
+}
+
+/** Rendered as `<button>`; `type` defaults to `button` so it never submits a form by accident. */
+export interface ButtonNativeProps extends ButtonBaseProps, Omit<HTMLAttributes<'button'>, 'href'> {
+  href?: undefined;
+}
+
+export type ButtonProps = ButtonLinkProps | ButtonNativeProps;
+
+type Props = ButtonProps;
+
+const VARIANT_CLASSES: Record<ButtonVariant, string> = {
+  primary:
+    'rounded-lg bg-primary text-on-primary shadow-sm hover:bg-secondary hover:shadow-md active:scale-95',
+  neutral:
+    'rounded-lg bg-surface-container-lowest text-on-surface shadow-sm hover:bg-surface-container-high',
+  soft: 'rounded-lg bg-surface-container-high text-primary hover:bg-primary hover:text-on-primary',
+  link: 'rounded-sm text-primary underline-offset-4 hover:text-secondary hover:underline',
+};
+
+const SIZE_CLASSES: Record<ButtonSize, string> = {
+  sm: 'px-space-md py-space-sm',
+  md: 'px-space-lg py-3',
+  lg: 'px-6 py-3.5',
+};
+
+const {
+  variant = 'primary',
+  size = 'md',
+  iconStart,
+  iconEnd = variant === 'link' ? 'arrow-forward' : undefined,
+  fullWidth = false,
+  type = 'button',
+  class: className,
+  ...attrs
+} = Astro.props;
+
+const iconSize = variant === 'link' || variant === 'soft' ? 18 : 20;
+const classes = [
+  'inline-flex items-center justify-center gap-2 text-label-lg transition duration-200 ease-out',
+  'disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100',
+  VARIANT_CLASSES[variant],
+  variant !== 'link' && SIZE_CLASSES[size],
+  fullWidth && 'w-full',
+  className,
+];
+const isLink = typeof attrs.href === 'string';
+---
+
+{isLink ? (
+  <a class:list={classes} {...attrs}>
+    {iconStart && <Icon name={iconStart} size={iconSize} />}
+    <slot />
+    {iconEnd && <Icon name={iconEnd} size={iconSize} />}
+  </a>
+) : (
+  <button type={type} class:list={[classes, 'cursor-pointer']} {...attrs}>
+    {iconStart && <Icon name={iconStart} size={iconSize} />}
+    <slot />
+    {iconEnd && <Icon name={iconEnd} size={iconSize} />}
+  </button>
+)}

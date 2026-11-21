@@ -1,0 +1,85 @@
+---
+export type SectionHeaderAlign = 'start' | 'center';
+export type SectionHeaderTone = 'light' | 'dark';
+export type SectionHeadingLevel = 'h1' | 'h2' | 'h3';
+
+export interface SectionHeaderProps {
+  heading: string;
+  eyebrow?: string;
+  lead?: string;
+  /** Heading element; `h2` for regular page sections. */
+  as?: SectionHeadingLevel;
+  /** Lets the parent section reference the heading via `aria-labelledby`. */
+  headingId?: string;
+  align?: SectionHeaderAlign;
+  /** `dark` for sections on the navy `inverse-surface` background. */
+  tone?: SectionHeaderTone;
+  leadSize?: 'md' | 'lg';
+  class?: string;
+}
+
+type Props = SectionHeaderProps;
+
+const TONE_CLASSES: Record<SectionHeaderTone, { eyebrow: string; heading: string; lead: string }> =
+  {
+    light: { eyebrow: 'text-primary', heading: 'text-on-surface', lead: 'text-on-surface-variant' },
+    dark: {
+      eyebrow: 'text-primary-fixed',
+      heading: 'text-surface-bright',
+      lead: 'text-surface-variant/80',
+    },
+  };
+
+const {
+  heading,
+  eyebrow,
+  lead,
+  as: Heading = 'h2',
+  headingId,
+  align = 'start',
+  tone = 'light',
+  leadSize = 'lg',
+  class: className,
+} = Astro.props;
+
+const toneClasses = TONE_CLASSES[tone];
+---
+
+<div
+  class:list={[
+    'flex max-w-3xl flex-col',
+    align === 'center' && 'mx-auto items-center text-center',
+    className,
+  ]}
+>
+  {eyebrow && (
+    <p
+      class:list={[
+        'mb-2 text-label-md font-semibold tracking-widest uppercase',
+        toneClasses.eyebrow,
+      ]}
+    >
+      {eyebrow}
+    </p>
+  )}
+  <Heading
+    id={headingId}
+    class:list={[
+      'font-heading text-headline-xl-mobile tracking-tight md:text-headline-xl',
+      toneClasses.heading,
+    ]}
+  >
+    {heading}
+  </Heading>
+  {lead && (
+    <p
+      class:list={[
+        'leading-relaxed',
+        leadSize === 'lg' ? 'mt-space-sm text-body-lg' : 'mt-2 text-body-md',
+        toneClasses.lead,
+      ]}
+    >
+      {lead}
+    </p>
+  )}
+</div>
