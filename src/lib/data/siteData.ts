@@ -46,6 +46,10 @@ export interface CompanyInfo {
   description: string;
   /** Small badge shown in the footer. */
   complianceBadge: string;
+  /** Intro text of the footer's social links column. */
+  socialIntro: string;
+  /** Shown in the copyright notice. */
+  country: string;
 }
 
 export interface Metric {
@@ -117,6 +121,8 @@ export const SITE_DATA: SiteData = {
     description:
       'Advanced solutions in biomedical technology, hospital equipment and specialized technical support with high standards of quality and institutional rigor.',
     complianceBadge: 'Operating under INVIMA standards',
+    socialIntro: 'Connect with our technical and engineering team through official channels.',
+    country: 'Colombia',
   },
   navItems: [
     { label: 'Home', href: '/#home' },

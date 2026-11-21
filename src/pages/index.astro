@@ -1,4 +1,5 @@
 ---
+import SiteFooter from '../components/layout/SiteFooter.astro';
 import SiteHeader from '../components/layout/SiteHeader.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCompanyInfo } from '../lib/data';
@@ -15,4 +16,5 @@ const { legalName } = getCompanyInfo();
   <section id="engineering"></section>
   <section id="why-us"></section>
   <section id="contact"></section>
+  <SiteFooter slot="footer" />
 </BaseLayout>

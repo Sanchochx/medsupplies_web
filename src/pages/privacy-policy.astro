@@ -1,0 +1,26 @@
+---
+import SiteFooter from '../components/layout/SiteFooter.astro';
+import SiteHeader from '../components/layout/SiteHeader.astro';
+import { Container, Icon } from '../components/ui';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCompanyInfo } from '../lib/data';
+
+const TITLE = 'Personal Data Processing Policy';
+
+const { legalName } = getCompanyInfo();
+---
+
+{/* PLACEHOLDER (D-08): no legal text is written here; the final policy comes from the company. */}
+<BaseLayout title={`${TITLE} | ${legalName}`}>
+  <SiteHeader slot="header" />
+  <Container as="section" class="flex flex-col gap-space-lg py-space-xl">
+    <h1 class="font-heading text-headline-xl-mobile text-on-surface md:text-headline-xl">
+      {TITLE}
+    </h1>
+    <p class="flex max-w-2xl items-start gap-space-sm rounded-xl border border-dashed border-outline bg-surface-container-low p-space-md text-body-md text-on-surface-variant">
+      <Icon name="policy" size={20} class="mt-0.5 text-primary" />
+      Placeholder — the final policy text will be provided by {legalName}
+    </p>
+  </Container>
+  <SiteFooter slot="footer" />
+</BaseLayout>
