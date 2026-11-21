@@ -100,8 +100,9 @@ describe('ContactSection', () => {
     expect(html).toMatch(/<div class="lg:col-span-7">\s*<form id="slot-probe"><\/form>\s*<\/div>/);
   });
 
-  it('renders exactly one WhatsApp link on the home page: no floating button', async () => {
-    const page = await renderAstro(IndexPage);
+  it('renders exactly one visible WhatsApp link on the home page: no floating button', async () => {
+    // <template> content is inert: the form's error message only shows its link after a failure.
+    const page = (await renderAstro(IndexPage)).replace(/<template[\s\S]*?<\/template>/g, '');
 
     expect(page.match(/href="https:\/\/wa\.me\//g)).toHaveLength(1);
     expect(page).toContain('<section id="contact"');

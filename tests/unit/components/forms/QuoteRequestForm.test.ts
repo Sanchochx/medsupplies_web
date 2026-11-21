@@ -43,7 +43,7 @@ describe('QuoteRequestForm', () => {
       'Fill out the form below and a sales engineer will contact you shortly.',
     );
     expect(html).toMatch(
-      /<form id="quote-request-form" method="post" aria-labelledby="quote-form-title"/,
+      /<form id="quote-request-form" data-quote-form method="post" aria-labelledby="quote-form-title"/,
     );
   });
 
@@ -158,6 +158,28 @@ describe('QuoteRequestForm', () => {
     const rows = [...html.matchAll(/<div class="grid grid-cols-1 gap-space-sm sm:grid-cols-2">/g)];
 
     expect(rows).toHaveLength(2);
+  });
+
+  it('renders an empty polite live region and inert status templates before the button', async () => {
+    const html = await renderForm();
+
+    expect(html).toContain('<div data-form-status role="status" aria-live="polite"></div>');
+    expect(html).toMatch(/<template data-status="success">[\s\S]*Request sent!/);
+    expect(html).toMatch(/<template data-status="error">[\s\S]*href="https:\/\/wa\.me\//);
+    expect(
+      text(/<template data-status="error">([\s\S]*?)<\/template>/.exec(html)?.[1] ?? ''),
+    ).toMatch(/write to us on WhatsApp \(opens WhatsApp in a new tab\)\.$/);
+    expect(html.indexOf('data-form-status')).toBeLessThan(html.lastIndexOf('<button'));
+  });
+
+  it('renders a hidden error slot after every control', async () => {
+    const html = await renderForm();
+
+    for (const id of [...REQUIRED_FIELDS, 'message']) {
+      expect(html).toMatch(
+        new RegExp(`<p id="${id}-error" class="[^"]*\\btext-error\\b[^"]*" hidden></p>`),
+      );
+    }
   });
 
   it('ends with a full-width primary submit button', async () => {

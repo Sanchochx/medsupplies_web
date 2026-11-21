@@ -1,6 +1,6 @@
 ---
 export interface FormFieldProps {
-  /** `id` of the control in the default slot; the label points at it. */
+  /** `id` (and `name`) of the control in the default slot; the label points at it. */
   for: string;
   label: string;
   required?: boolean;
@@ -19,4 +19,6 @@ const { for: controlId, label, required = false, class: className } = Astro.prop
     {required && <span aria-hidden="true"> *</span>}
   </label>
   <slot />
+  {/* Filled by the form script, which links it to the control with `aria-describedby`. */}
+  <p id={`${controlId}-error`} class="text-label-md text-error" hidden></p>
 </div>

@@ -1,0 +1,31 @@
+---
+import { getConsentNotice } from '../../lib/data';
+
+const { beforeLink, afterLink, policyLink } = getConsentNotice();
+---
+
+<div class="flex flex-col gap-1.5 pt-1">
+  <div class="flex items-start gap-2.5">
+    <input
+      id="consent"
+      name="consent"
+      type="checkbox"
+      required
+      class="mt-0.5 size-4 shrink-0 cursor-pointer accent-primary"
+    />
+    <label for="consent" class="cursor-pointer text-body-sm leading-snug text-on-surface-variant">
+      {beforeLink}{' '}
+      {/* New tab so following the link never discards what the visitor already typed. */}
+      <a
+        href={policyLink.href}
+        target="_blank"
+        class="rounded-sm text-primary underline underline-offset-2 hover:text-secondary"
+      >
+        {policyLink.label}
+        <span class="sr-only"> (opens in a new tab)</span>
+      </a>{' '}
+      {afterLink}
+    </label>
+  </div>
+  <p id="consent-error" class="pl-6.5 text-label-md text-error" hidden></p>
+</div>

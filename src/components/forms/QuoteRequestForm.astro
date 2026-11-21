@@ -1,9 +1,11 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
-import { getConsentNotice, getRequestTypes } from '../../lib/data';
+import { getRequestTypes } from '../../lib/data';
 import { Button } from '../ui';
 import { FIELD_CONTROL_CLASSES, FIELD_SINGLE_LINE_CLASSES } from './fieldStyles';
+import ConsentField from './ConsentField.astro';
 import FormField from './FormField.astro';
+import SubmitStatus from './SubmitStatus.astro';
 
 interface TextFieldSpec {
   name: string;
@@ -52,7 +54,6 @@ const TEXT_FIELD_ROWS: readonly (readonly [TextFieldSpec, TextFieldSpec])[] = [
 ];
 
 const requestTypes = getRequestTypes();
-const { beforeLink, afterLink, policyLink } = getConsentNotice();
 ---
 
 <div class="rounded-2xl bg-surface-container-lowest p-space-lg shadow-sm lg:p-space-xl">
@@ -65,9 +66,10 @@ const { beforeLink, afterLink, policyLink } = getConsentNotice();
     </p>
   </div>
 
-  {/* POST keeps personal data out of the URL; US-FRM-002 takes over submission with JS (D-15). */}
+  {/* POST keeps personal data out of the URL if the script fails; the script submits via JS (D-15). */}
   <form
     id="quote-request-form"
+    data-quote-form
     method="post"
     aria-labelledby={TITLE_ID}
     class="flex flex-col gap-space-sm"
@@ -111,31 +113,18 @@ const { beforeLink, afterLink, policyLink } = getConsentNotice();
       ></textarea>
     </FormField>
 
-    <div class="flex items-start gap-2.5 pt-1">
-      <input
-        id="consent"
-        name="consent"
-        type="checkbox"
-        required
-        class="mt-0.5 size-4 shrink-0 cursor-pointer accent-primary"
-      />
-      <label for="consent" class="cursor-pointer text-body-sm leading-snug text-on-surface-variant">
-        {beforeLink}{' '}
-        {/* New tab so following the link never discards what the visitor already typed. */}
-        <a
-          href={policyLink.href}
-          target="_blank"
-          class="rounded-sm text-primary underline underline-offset-2 hover:text-secondary"
-        >
-          {policyLink.label}
-          <span class="sr-only"> (opens in a new tab)</span>
-        </a>{' '}
-        {afterLink}
-      </label>
-    </div>
+    <ConsentField />
+
+    <SubmitStatus />
 
     <Button type="submit" size="lg" iconStart="send" fullWidth class="mt-2 active:scale-[0.99]">
-      Send request
+      <span data-submit-label>Send request</span>
     </Button>
   </form>
 </div>
+
+<script>
+  import { initQuoteForm } from '../../lib/contact/quoteForm';
+
+  initQuoteForm();
+</script>
