@@ -1,0 +1,74 @@
+---
+import { getNavItems } from '../../lib/data';
+import { Button, Icon } from '../ui';
+
+const DRAWER_ID = 'mobile-nav-drawer';
+const TITLE_ID = 'mobile-nav-drawer-title';
+
+const navItems = getNavItems();
+---
+
+<button
+  type="button"
+  data-mobile-drawer-toggle
+  aria-label="Open menu"
+  aria-expanded="false"
+  aria-controls={DRAWER_ID}
+  class="inline-flex size-11 cursor-pointer items-center justify-center rounded-lg text-on-surface transition-colors duration-150 hover:bg-surface-container-high xl:hidden"
+>
+  <Icon name="menu" />
+</button>
+
+{/*
+  The panel slides with `translate` only. `transition-discrete` keeps `display`/`overlay` alive
+  until the slide-out ends, and `starting:` gives the slide-in its first frame. Browsers without
+  @starting-style simply show/hide it instantly; reduced motion is handled globally and here.
+*/}
+<dialog
+  id={DRAWER_ID}
+  data-mobile-drawer
+  aria-labelledby={TITLE_ID}
+  class="fixed inset-y-0 right-0 left-auto m-0 h-dvh max-h-none w-full max-w-xs translate-x-full bg-surface-container-lowest text-on-surface shadow-xl transition-[translate,overlay,display] transition-discrete duration-300 ease-out backdrop:bg-inverse-surface/60 backdrop:opacity-0 backdrop:transition-[opacity,overlay,display] backdrop:transition-discrete backdrop:duration-300 open:translate-x-0 open:backdrop:opacity-100 motion-reduce:transition-none motion-reduce:backdrop:transition-none starting:open:translate-x-full starting:open:backdrop:opacity-0"
+>
+  <div class="flex h-full flex-col gap-space-lg overflow-y-auto p-space-lg">
+    <div class="flex items-center justify-between">
+      <p id={TITLE_ID} class="font-heading text-headline-sm text-on-surface">
+        Menu
+      </p>
+      <button
+        type="button"
+        data-mobile-drawer-close
+        aria-label="Close menu"
+        class="inline-flex size-11 cursor-pointer items-center justify-center rounded-lg text-on-surface-variant transition-colors duration-150 hover:bg-surface-container-high hover:text-on-surface"
+      >
+        <Icon name="close" />
+      </button>
+    </div>
+
+    <nav aria-label="Main">
+      <ul class="flex flex-col gap-space-xs">
+        {navItems.map(({ label, href }) => (
+          <li>
+            <a
+              href={href}
+              data-section-link
+              class="flex min-h-11 items-center rounded-lg px-space-md text-body-lg font-semibold text-on-surface-variant transition-colors duration-150 not-aria-[current=true]:hover:bg-surface-container-low not-aria-[current=true]:hover:text-primary aria-[current=true]:bg-primary-container aria-[current=true]:text-on-primary"
+            >
+              {label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <Button href="/#contact" variant="primary" size="md" fullWidth class="mt-auto">
+      Request a quote
+    </Button>
+  </div>
+</dialog>
+
+<script>
+  import { initMobileDrawer } from '../../lib/navigation/mobileDrawer';
+
+  initMobileDrawer();
+</script>

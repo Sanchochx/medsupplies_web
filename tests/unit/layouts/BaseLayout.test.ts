@@ -20,7 +20,7 @@ describe('BaseLayout', () => {
   it('renders an English document with the given title', async () => {
     const html = await renderLayout();
 
-    expect(html).toContain('<html lang="en">');
+    expect(html).toContain('<html lang="en" class="data-scroll-locked:overflow-hidden">');
     expect(html).toContain('<meta charset="utf-8">');
     expect(html).toContain('<title>Test title</title>');
   });

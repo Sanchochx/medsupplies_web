@@ -10,9 +10,10 @@ export interface BaseLayoutProps {
 type Props = BaseLayoutProps;
 
 const { title } = Astro.props;
+// <html> gets `data-scroll-locked` from the mobile drawer while it is open (lib/navigation/mobileDrawer.ts).
 ---
 
-<html lang="en">
+<html lang="en" class="data-scroll-locked:overflow-hidden">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

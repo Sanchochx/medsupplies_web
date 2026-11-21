@@ -4,6 +4,7 @@ import logoPlaceholder from '../../assets/images/placeholders/logo-placeholder.s
 import { getCompanyInfo } from '../../lib/data';
 import { Button, Container } from '../ui';
 import MainNav from './MainNav.astro';
+import MobileNav from './MobileNav.astro';
 
 const { legalName, wordmark, wordmarkSuffix } = getCompanyInfo();
 ---
@@ -39,6 +40,7 @@ const { legalName, wordmark, wordmarkSuffix } = getCompanyInfo();
           Request a quote
         </Button>
       </div>
+      <MobileNav />
     </div>
   </Container>
 </header>

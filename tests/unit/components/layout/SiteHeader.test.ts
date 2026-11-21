@@ -71,7 +71,7 @@ describe('SiteHeader', () => {
 
     const missing = classes.filter((className) => {
       // CSS-escape the class as Tailwind emits it, then regex-escape that selector text.
-      const selector = `.${className.replace(/[:/.[\]()=]/g, (char) => `\\${char}`)}`;
+      const selector = `.${className.replace(/[:/.[\]()=,]/g, (char) => `\\${char}`)}`;
       const pattern = selector.replace(/[\\^$.*+?()[\]{}|]/g, (char) => `\\${char}`);
       return !new RegExp(`${pattern}[\\s:{,[]`).test(css);
     });
