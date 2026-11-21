@@ -1,0 +1,35 @@
+---
+import { getWhyUsPillars } from '../../lib/data';
+import { Container, IconTile, SectionHeader } from '../ui';
+
+const HEADING_ID = 'why-us-heading';
+
+const pillars = getWhyUsPillars();
+---
+
+<section
+  id="why-us"
+  aria-labelledby={HEADING_ID}
+  class="w-full bg-surface-container-low py-space-xl lg:py-24"
+>
+  <Container class="flex flex-col gap-space-xl">
+    <SectionHeader
+      headingId={HEADING_ID}
+      align="center"
+      eyebrow="Key Differentiators"
+      heading="Why choose Medsupplies Ingeniería"
+      lead="Operational assurance, technical solvency and strict adherence to Colombian public health guidelines."
+    />
+
+    <ul class="grid grid-cols-1 gap-gutter md:grid-cols-2 lg:grid-cols-4">
+      {pillars.map(({ icon, title, text }) => (
+        // The lift is motion-safe only: under reduced motion the card must not move at all.
+        <li class="flex flex-col gap-space-sm rounded-2xl bg-surface-container-lowest p-space-lg shadow-sm transition-transform duration-200 motion-safe:hover:-translate-y-1">
+          <IconTile icon={icon} size="lg" />
+          <h3 class="mt-2 font-heading text-headline-sm font-bold text-on-surface">{title}</h3>
+          <p class="text-body-sm leading-relaxed text-on-surface-variant">{text}</p>
+        </li>
+      ))}
+    </ul>
+  </Container>
+</section>

@@ -1,0 +1,103 @@
+---
+import { getContactChannels, getWhatsAppUrl } from '../../lib/data';
+import { Container, Icon, IconTile, SectionHeader, type IconName } from '../ui';
+
+interface ChannelLine {
+  text: string;
+  href?: string;
+  /** Highlighted secondary line (shipping coverage). */
+  accent?: boolean;
+}
+
+interface Channel {
+  icon: IconName;
+  title: string;
+  lines: readonly ChannelLine[];
+}
+
+const HEADING_ID = 'contact-heading';
+
+const { address, phones, emails, hours } = getContactChannels();
+const whatsAppUrl = getWhatsAppUrl();
+
+const toLinks = (links: typeof phones): ChannelLine[] =>
+  links.map(({ label, href }) => ({ text: label, href }));
+
+const channels: Channel[] = [
+  {
+    icon: 'location-on',
+    title: 'Operations Address',
+    lines: [{ text: address.text }, { text: address.note, accent: true }],
+  },
+  { icon: 'call', title: 'Phone Lines', lines: toLinks(phones) },
+  { icon: 'mail', title: 'Email', lines: toLinks(emails) },
+  {
+    icon: 'schedule',
+    title: 'Business Hours',
+    lines: [{ text: hours.text }, { text: hours.note }],
+  },
+];
+---
+
+<section id="contact" aria-labelledby={HEADING_ID} class="w-full bg-surface py-space-xl lg:py-24">
+  <Container>
+    <div class="grid grid-cols-1 items-start gap-12 lg:grid-cols-12">
+      <div class="flex flex-col gap-space-lg lg:col-span-5">
+        <SectionHeader
+          headingId={HEADING_ID}
+          eyebrow="Institutional Channel"
+          heading="Contact Us"
+          lead="Personalized service for hospitals, clinics, clinical laboratories and specialized centers across Colombia."
+          leadSize="md"
+        />
+
+        <ul class="flex flex-col gap-space-md">
+          {channels.map(({ icon, title, lines }) => (
+            <li class="flex items-start gap-4 rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
+              <IconTile icon={icon} />
+              <div class="flex min-w-0 flex-col">
+                <h3 class="text-label-md text-on-surface">{title}</h3>
+                {lines.map(({ text, href, accent }) =>
+                  href ? (
+                    <a
+                      href={href}
+                      class="self-start rounded-sm text-body-sm wrap-anywhere text-on-surface-variant underline-offset-4 hover:text-primary hover:underline"
+                    >
+                      {text}
+                    </a>
+                  ) : (
+                    <p
+                      class:list={[
+                        'text-body-sm',
+                        accent ? 'mt-0.5 font-medium text-primary' : 'text-on-surface-variant',
+                      ]}
+                    >
+                      {text}
+                    </p>
+                  ),
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        {/* The only WhatsApp entry point on the site (D-14): no floating button. */}
+        <a
+          href={whatsAppUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center justify-center gap-3 rounded-xl bg-surface-container-lowest px-space-lg py-3.5 text-label-lg text-on-surface shadow-sm transition-colors duration-200 hover:bg-surface-container"
+        >
+          <Icon name="chat" size={24} class="text-primary" />
+          <span>
+            Chat on WhatsApp<span class="sr-only"> (opens WhatsApp in a new tab)</span>
+          </span>
+        </a>
+      </div>
+
+      <div class="lg:col-span-7">
+        <slot name="form" />
+      </div>
+    </div>
+  </Container>
+</section>
