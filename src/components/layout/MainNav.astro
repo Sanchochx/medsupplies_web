@@ -1,0 +1,23 @@
+---
+import { getNavItems } from '../../lib/data';
+
+const navItems = getNavItems();
+---
+
+<nav aria-label="Main" class="hidden items-center gap-space-md xl:flex">
+  {navItems.map(({ label, href }) => (
+    <a
+      href={href}
+      data-section-link
+      class="rounded-lg px-space-sm py-space-xs text-label-lg text-on-surface-variant transition-colors duration-150 not-aria-[current=true]:hover:text-primary aria-[current=true]:bg-primary-container aria-[current=true]:text-on-primary"
+    >
+      {label}
+    </a>
+  ))}
+</nav>
+
+<script>
+  import { trackActiveSection } from '../../lib/navigation/trackActiveSection';
+
+  trackActiveSection();
+</script>
