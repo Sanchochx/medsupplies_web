@@ -1,4 +1,5 @@
 ---
+import QuoteRequestForm from '../components/forms/QuoteRequestForm.astro';
 import SiteFooter from '../components/layout/SiteFooter.astro';
 import SiteHeader from '../components/layout/SiteHeader.astro';
 import AboutSection from '../components/sections/AboutSection.astro';
@@ -20,6 +21,8 @@ const { legalName } = getCompanyInfo();
   <ProductsSection />
   <EngineeringSection />
   <WhyUsSection />
-  <ContactSection />
+  <ContactSection>
+    <QuoteRequestForm slot="form" />
+  </ContactSection>
   <SiteFooter slot="footer" />
 </BaseLayout>

@@ -1,0 +1,22 @@
+---
+export interface FormFieldProps {
+  /** `id` of the control in the default slot; the label points at it. */
+  for: string;
+  label: string;
+  required?: boolean;
+  class?: string;
+}
+
+type Props = FormFieldProps;
+
+const { for: controlId, label, required = false, class: className } = Astro.props;
+---
+
+<div class:list={['flex flex-col gap-1.5', className]}>
+  <label for={controlId} class="text-label-sm font-semibold text-on-surface">
+    {label}
+    {/* Visual marker only: assistive tech announces the control's `required` attribute. */}
+    {required && <span aria-hidden="true"> *</span>}
+  </label>
+  <slot />
+</div>

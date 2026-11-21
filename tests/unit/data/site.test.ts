@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  getConsentNotice,
   getContactChannels,
   getMetrics,
   getNavItems,
@@ -64,6 +65,20 @@ describe('getContactChannels', () => {
     for (const { href } of phones) expect(href).toMatch(/^tel:\+\d+$/);
     expect(emails).toHaveLength(2);
     for (const { label, href } of emails) expect(href).toBe(`mailto:${label}`);
+  });
+});
+
+describe('getConsentNotice', () => {
+  it('splits the consent sentence around the privacy policy link', () => {
+    const { beforeLink, afterLink, policyLink } = getConsentNotice();
+
+    expect(policyLink).toEqual({
+      label: 'Personal Data Processing Policy',
+      href: '/privacy-policy',
+    });
+    expect(`${beforeLink} ${policyLink.label} ${afterLink}`).toBe(
+      'I accept the processing of my personal data under the Personal Data Processing Policy and authorize Medsupplies Ingeniería S.A.S. to contact me.',
+    );
   });
 });
 

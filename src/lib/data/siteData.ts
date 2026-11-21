@@ -52,6 +52,15 @@ export interface CompanyInfo {
   country: string;
 }
 
+/**
+ * Quote form consent sentence, split around the privacy policy link.
+ * PLACEHOLDER (D-08): pending legal review.
+ */
+export interface ConsentCopy {
+  beforeLink: string;
+  afterLink: string;
+}
+
 export interface Metric {
   value: string;
   label: string;
@@ -111,6 +120,7 @@ export interface SiteData {
   hero: HeroCopy;
   trustBadges: readonly Highlight[];
   whyUsPillars: readonly Highlight[];
+  consent: ConsentCopy;
 }
 
 export const SITE_DATA: SiteData = {
@@ -207,4 +217,9 @@ export const SITE_DATA: SiteData = {
       text: 'A multidisciplinary team of biomedical engineers with immediate response capacity to ensure continuity of care.',
     },
   ],
+  // PLACEHOLDER (D-08): consent wording pending legal review.
+  consent: {
+    beforeLink: 'I accept the processing of my personal data under the',
+    afterLink: 'and authorize Medsupplies Ingeniería S.A.S. to contact me.',
+  },
 };

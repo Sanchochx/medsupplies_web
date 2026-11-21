@@ -2,6 +2,7 @@ import {
   REQUEST_TYPES,
   SITE_DATA,
   type CompanyInfo,
+  type ConsentCopy,
   type HeroCopy,
   type Highlight,
   type LegalLink,
@@ -16,6 +17,13 @@ export interface ContactLink {
   label: string;
   href: `tel:${string}` | `mailto:${string}`;
 }
+
+/** Consent sentence of the quote form, with the privacy policy link between its two halves. */
+export interface ConsentNotice extends ConsentCopy {
+  policyLink: LegalLink;
+}
+
+const PRIVACY_POLICY_HREF = '/privacy-policy';
 
 export interface ContactChannels {
   address: { text: string; note: string };
@@ -86,4 +94,13 @@ export function getTrustBadges(): readonly Highlight[] {
 
 export function getWhyUsPillars(): readonly Highlight[] {
   return SITE_DATA.whyUsPillars;
+}
+
+/** Throws (failing the build) if the privacy policy is missing from the legal links. */
+export function getConsentNotice(): ConsentNotice {
+  const policyLink = SITE_DATA.legalLinks.find(({ href }) => href === PRIVACY_POLICY_HREF);
+  if (!policyLink) {
+    throw new Error(`The legal links must include the privacy policy (${PRIVACY_POLICY_HREF}).`);
+  }
+  return { ...SITE_DATA.consent, policyLink };
 }
