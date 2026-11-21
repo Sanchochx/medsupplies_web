@@ -1,6 +1,7 @@
 ---
 import { getEngineeringServices } from '../../lib/data';
 import { Container, SectionHeader } from '../ui';
+import EngineeringCallout from './EngineeringCallout.astro';
 import ServiceCard from './ServiceCard.astro';
 
 const HEADING_ID = 'engineering-heading';
@@ -34,5 +35,7 @@ const services = await getEngineeringServices();
         </li>
       ))}
     </ul>
+
+    <EngineeringCallout />
   </Container>
 </section>

@@ -1,0 +1,32 @@
+---
+import type { RequestTypeId } from '../../lib/data';
+import { Button, Icon } from '../ui';
+
+const REQUEST_TYPE: RequestTypeId = 'engineering-services';
+---
+
+<div class="flex flex-col items-center justify-between gap-space-md rounded-2xl bg-surface-container-lowest/5 p-space-lg text-center backdrop-blur-sm sm:flex-row sm:text-start">
+  <div class="flex flex-col items-center gap-4 sm:flex-row">
+    <span class="inline-flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-on-primary">
+      <Icon name="support-agent" size={24} />
+    </span>
+    <div class="flex flex-col">
+      <h3 class="font-heading text-headline-sm font-bold text-surface-bright">
+        Need a diagnostic for your biomedical equipment?
+      </h3>
+      <p class="text-body-sm text-surface-variant/80">
+        Our engineers in Colombia assess your equipment according to regulatory protocols.
+      </p>
+    </div>
+  </div>
+
+  {/* data-request-type preselects engineering services in the quote form (D-13, US-FRM-002). */}
+  <Button
+    href="/#contact"
+    variant="primary"
+    class="shrink-0 whitespace-nowrap"
+    data-request-type={REQUEST_TYPE}
+  >
+    Request a technical audit
+  </Button>
+</div>
