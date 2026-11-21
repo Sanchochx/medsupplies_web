@@ -1,17 +1,16 @@
 ---
-import { Font } from 'astro:assets';
-import '../styles/global.css';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCompanyInfo } from '../lib/data';
+
+const { legalName } = getCompanyInfo();
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Medsupplies Ingeniería</title>
-    <Font cssVariable="--font-inter" preload={[{ weight: 400 }]} />
-    <Font cssVariable="--font-plus-jakarta-sans" preload={[{ weight: 700 }]} />
-  </head>
-  <body>
-    <h1 class="font-heading text-headline-xl">Medsupplies Ingeniería</h1>
-  </body>
-</html>
+<BaseLayout title={legalName}>
+  {/* Section anchors in page order; each one is replaced by its section component (Epic 03). */}
+  <section id="home"></section>
+  <section id="about"></section>
+  <section id="products"></section>
+  <section id="engineering"></section>
+  <section id="why-us"></section>
+  <section id="contact"></section>
+</BaseLayout>
