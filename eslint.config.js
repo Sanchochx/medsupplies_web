@@ -21,4 +21,27 @@ export default defineConfig(
       'no-console': 'error',
     },
   },
+  {
+    // The data access layer is the only entry point to content (CLAUDE.md rule 5).
+    files: ['src/pages/**', 'src/layouts/**', 'src/components/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'astro:content',
+              message: 'Read content through the data access layer (src/lib/data) instead.',
+            },
+          ],
+          patterns: [
+            {
+              regex: '(^|/)lib/data/(?!index$).+',
+              message: 'Import from the data access layer entry point (src/lib/data) only.',
+            },
+          ],
+        },
+      ],
+    },
+  },
 );

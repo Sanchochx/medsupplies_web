@@ -1,0 +1,11 @@
+{
+  "title": "Supplies & Surgical Materials",
+  "lineBadge": "Surgical Line",
+  "description": "Hospital consumables, sterile materials, biological protection and specialized supplies for operating rooms and laboratories.",
+  "tags": ["Biocompatibility", "Sterile Packaging", "Immediate Availability"],
+  "ctaLabel": "Request supplies",
+  "requestType": "surgical-supplies",
+  "image": "../../assets/images/placeholders/product-surgical-supplies.webp",
+  "imageAlt": "Placeholder image for the supplies and surgical materials line",
+  "order": 3
+}

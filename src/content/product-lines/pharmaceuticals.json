@@ -1,0 +1,11 @@
+{
+  "title": "Pharmaceutical Products",
+  "lineBadge": "Pharmaceutical Line",
+  "description": "Hospital-use medicines, clinical specialties and therapeutic solutions with strict temperature control and traceability.",
+  "tags": ["Cold Chain", "Good Storage Practices (GSP)", "Verified Batches"],
+  "ctaLabel": "Browse catalog",
+  "requestType": "pharmaceuticals",
+  "image": "../../assets/images/placeholders/product-pharmaceuticals.webp",
+  "imageAlt": "Placeholder image for the pharmaceutical products line",
+  "order": 2
+}

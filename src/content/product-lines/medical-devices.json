@@ -1,0 +1,11 @@
+{
+  "title": "Medical Devices",
+  "lineBadge": "Biomedical Line",
+  "description": "Monitoring, clinical diagnostics, imaging and biomedical technology equipment for critical care areas, ICUs and general wards.",
+  "tags": ["Clinical Grade", "Health Registration", "After-Sales Support"],
+  "ctaLabel": "Ask about references",
+  "requestType": "medical-devices",
+  "image": "../../assets/images/placeholders/product-medical-devices.webp",
+  "imageAlt": "Placeholder image for the medical devices line",
+  "order": 1
+}
