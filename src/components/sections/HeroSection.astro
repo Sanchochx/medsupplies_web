@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import heroImage from '../../assets/images/placeholders/hero-laboratory.webp';
 import { getHeroCopy } from '../../lib/data';
 import { Button, Chip, Container, IconTile } from '../ui';
+import TrustBadgeBar from './TrustBadgeBar.astro';
 
 const HEADING_ID = 'hero-heading';
 // Floating badge positions over the image, in data order (top-left, then bottom-right).
@@ -100,5 +101,7 @@ const { microSpecs, badges } = getHeroCopy();
         </div>
       </div>
     </div>
+
+    <TrustBadgeBar />
   </Container>
 </section>
