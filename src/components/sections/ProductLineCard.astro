@@ -1,0 +1,59 @@
+---
+import { Image } from 'astro:assets';
+import type { ProductLine } from '../../lib/data';
+import { Button, Chip } from '../ui';
+
+export interface ProductLineCardProps {
+  line: ProductLine;
+}
+
+type Props = ProductLineCardProps;
+
+const { line } = Astro.props;
+const { title, lineBadge, description, tags, ctaLabel, requestType, image, imageAlt } = line;
+---
+
+<article class="group flex h-full flex-col overflow-hidden rounded-2xl bg-surface-container-lowest shadow-sm transition-shadow duration-200 hover:shadow-md">
+  <div class="relative h-56 w-full overflow-hidden bg-surface-container">
+    {/* PLACEHOLDER (D-12): local image at the final size until the real photo is delivered. */}
+    <Image
+      src={image}
+      alt={imageAlt}
+      width={800}
+      height={448}
+      widths={[400, 800]}
+      sizes="(min-width: 1024px) 33vw, 100vw"
+      loading="lazy"
+      class="size-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+    />
+    <p class="absolute top-3 left-3 rounded-md bg-surface-container-lowest/90 px-2.5 py-1 text-label-sm font-semibold text-primary backdrop-blur-sm">
+      {lineBadge}
+    </p>
+  </div>
+
+  <div class="flex flex-1 flex-col gap-space-sm p-space-lg">
+    <h3 class="font-heading text-headline-sm font-bold text-on-surface">{title}</h3>
+    <p class="text-body-sm leading-relaxed text-on-surface-variant">{description}</p>
+    <ul class="mt-2 flex flex-wrap gap-1.5">
+      {tags.map((tag) => (
+        <li>
+          <Chip>{tag}</Chip>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="p-space-lg pt-0">
+    {/* data-request-type preselects this line in the quote form (D-13, wired in US-FRM-002). */}
+    <Button
+      href="/#contact"
+      variant="soft"
+      size="sm"
+      iconEnd="chevron-right"
+      fullWidth
+      data-request-type={requestType}
+    >
+      {ctaLabel}
+    </Button>
+  </div>
+</article>
