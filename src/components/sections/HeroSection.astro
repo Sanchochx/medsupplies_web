@@ -2,106 +2,73 @@
 import { Image } from 'astro:assets';
 import heroImage from '../../assets/images/placeholders/hero-laboratory.webp';
 import { getHeroCopy } from '../../lib/data';
-import { Button, Chip, Container, IconTile } from '../ui';
-import TrustBadgeBar from './TrustBadgeBar.astro';
+import { Button, Chip, Container } from '../ui';
 
 const HEADING_ID = 'hero-heading';
-// Floating badge positions over the image, in data order (top-left, then bottom-right).
-const BADGE_POSITIONS = ['top-4 left-4', 'right-4 bottom-4 max-w-65'] as const;
 
-const { microSpecs, badges } = getHeroCopy();
+const { microSpecs } = getHeroCopy();
 ---
 
 <section
-  id="home"
+  id="inicio"
   aria-labelledby={HEADING_ID}
-  class="relative w-full overflow-hidden bg-surface py-space-xl lg:py-24"
+  class="focus-ring-inverse relative w-full overflow-hidden bg-scrim py-space-xl lg:py-24"
 >
-  <div
-    aria-hidden="true"
-    class="pointer-events-none absolute inset-0 bg-radial-[at_20%_20%] from-primary-container/8 to-transparent to-60% opacity-40"
-  ></div>
+  {/* PLACEHOLDER (D-12): decorative background photo until the real one is delivered. */}
+  <Image
+    src={heroImage}
+    alt=""
+    width={1200}
+    height={960}
+    widths={[600, 900, 1200]}
+    sizes="100vw"
+    loading="eager"
+    fetchpriority="high"
+    class="absolute inset-0 size-full object-cover"
+  />
+  {/* 85%, not lower: keeps the blue highlight above 3:1 (large text) over the photo's brightest pixels. */}
+  <div aria-hidden="true" class="absolute inset-0 bg-scrim/85"></div>
 
   <Container class="relative z-10">
-    <div class="grid grid-cols-1 items-center gap-gutter lg:grid-cols-12">
-      <div class="flex flex-col gap-space-md lg:col-span-7">
-        <Chip variant="eyebrow" icon="verified-user" class="self-start">
-          Biomedical &amp; Pharmaceutical Technology in Colombia
-        </Chip>
+    <div class="mx-auto flex max-w-4xl flex-col items-center gap-space-md text-center">
+      <Chip variant="eyebrow" icon="verified-user">
+        Tecnología Biomédica y Farmacéutica en Colombia
+      </Chip>
 
-        <h1
-          id={HEADING_ID}
-          class="font-heading text-headline-xl leading-[1.1] tracking-tight text-on-surface lg:text-display-lg"
-        >
-          Integrated Solutions in <span class="text-primary">Medical Devices</span>, Pharmaceutical
-          Products and Specialized Engineering
-        </h1>
+      <h1
+        id={HEADING_ID}
+        class="text-start font-heading text-headline-xl leading-[1.1] tracking-tight text-surface-bright lg:text-display-lg"
+      >
+        Soluciones Integrales en <span class="text-primary-container">Dispositivos Médicos</span>,
+        Productos Farmacéuticos e Ingeniería Especializada
+      </h1>
 
-        <p class="max-w-2xl text-body-lg leading-relaxed text-on-surface-variant">
-          We distribute cutting-edge medical technology and hospital supplies in Colombia, backed by
-          technical support, regulatory compliance and operational excellence.
-        </p>
+      <p class="max-w-2xl text-body-lg leading-relaxed text-surface-variant">
+        Distribuimos tecnología médica de vanguardia e insumos hospitalarios en Colombia, con el
+        respaldo de soporte técnico, cumplimiento normativo y excelencia operativa.
+      </p>
 
-        <div class="flex flex-wrap items-center gap-space-sm pt-space-xs">
-          <Button href="/#contact" variant="primary" iconStart="assignment">
-            Request a quote
-          </Button>
-          <Button href="/#products" variant="neutral" iconStart="inventory-2">
-            View product portfolio
-          </Button>
-        </div>
-
-        {/*
-          Fixed-width columns, stacked on phones: with content-sized items the second one moved
-          (a layout shift) when the first grew as Inter replaced the fallback font.
-        */}
-        <ul class="grid gap-x-6 gap-y-space-xs pt-space-sm text-label-sm text-on-surface-variant sm:max-w-sm sm:grid-cols-2">
-          {microSpecs.map((spec) => (
-            <li class="flex items-center gap-1.5">
-              <span aria-hidden="true" class="size-2 rounded-full bg-primary" />
-              {spec}
-            </li>
-          ))}
-        </ul>
+      <div class="flex flex-wrap items-center justify-center gap-space-sm pt-space-xs">
+        <Button href="/#contacto" variant="primary" iconStart="assignment">
+          Solicitar cotización
+        </Button>
+        <Button href="/#productos" variant="neutral" iconStart="inventory-2">
+          Ver portafolio de productos
+        </Button>
       </div>
 
-      <div class="relative mt-6 lg:col-span-5 lg:mt-0">
-        <div class="relative overflow-hidden rounded-2xl bg-surface-container-lowest shadow-xl">
-          {/* PLACEHOLDER (D-12): local image at the final size until the real photo is delivered. */}
-          <Image
-            src={heroImage}
-            alt="Biomedical engineering laboratory with technicians testing diagnostic monitors"
-            width={1200}
-            height={960}
-            widths={[600, 900, 1200]}
-            sizes="(min-width: 1024px) 40vw, 100vw"
-            loading="eager"
-            fetchpriority="high"
-            class="h-105 w-full object-cover lg:h-120"
-          />
-          <div
-            aria-hidden="true"
-            class="absolute inset-0 bg-linear-to-t from-on-surface/60 via-transparent to-transparent"
-          ></div>
-
-          {badges.map(({ icon, title, text }, index) => (
-            <div
-              class:list={[
-                'absolute flex items-center gap-3 rounded-xl bg-surface-container-lowest/95 p-3 shadow-md backdrop-blur-md',
-                BADGE_POSITIONS[index],
-              ]}
-            >
-              <IconTile icon={icon} />
-              <p class="flex flex-col">
-                <span class="text-label-md font-bold text-on-surface">{title}</span>
-                <span class="text-label-sm font-normal text-on-surface-variant">{text}</span>
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/*
+        Fixed-width columns, stacked on phones: with content-sized items the second one moved
+        (a layout shift) when the first grew as Inter replaced the fallback font.
+      */}
+      <ul class="grid gap-x-6 gap-y-space-xs pt-space-sm text-label-sm text-surface-variant sm:max-w-sm sm:grid-cols-2">
+        {microSpecs.map((spec) => (
+          <li class="flex items-center justify-center gap-1.5">
+            <span aria-hidden="true" class="size-2 rounded-full bg-primary-fixed-dim" />
+            {spec}
+          </li>
+        ))}
+      </ul>
     </div>
-
-    <TrustBadgeBar />
   </Container>
 </section>

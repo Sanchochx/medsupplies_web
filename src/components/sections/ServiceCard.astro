@@ -12,14 +12,13 @@ const { service } = Astro.props;
 const { title, icon, description, highlight } = service;
 ---
 
-<article class="flex h-full flex-col justify-between rounded-2xl bg-surface-container-lowest/10 p-space-lg backdrop-blur-sm transition-colors duration-200 hover:bg-surface-container-lowest/15">
+<article class="flex h-full flex-col justify-between rounded-2xl bg-surface-container-low p-space-lg transition-colors duration-200 hover:bg-surface-container">
   <div class="flex flex-col gap-space-sm">
     <IconTile icon={icon} size="lg" tone="solid" class="mb-2" />
-    <h3 class="font-heading text-headline-sm font-bold text-surface-bright">{title}</h3>
-    {/* /90, not lower: at /80 the text drops below 4.5:1 on the 15% hover background. */}
-    <p class="text-body-sm leading-relaxed text-surface-variant/90">{description}</p>
+    <h3 class="font-heading text-headline-sm font-bold text-on-surface">{title}</h3>
+    <p class="text-body-sm leading-relaxed text-on-surface-variant">{description}</p>
   </div>
-  <p class="mt-space-md flex items-center gap-1.5 pt-space-xs text-label-sm text-primary-fixed">
+  <p class="mt-space-md flex items-center gap-1.5 pt-space-xs text-label-sm text-primary">
     <Icon name="check-circle" size={16} />
     {highlight}
   </p>

@@ -12,15 +12,14 @@ vi.mock('../../../../src/lib/data', async (importOriginal) => ({
 
 const IMAGE = { src: '/placeholder.webp', width: 800, height: 448, format: 'webp' } as const;
 
-function mockLine(requestType: ProductLine['requestType'], order: number): ProductLine {
+function mockLine(id: string, order: number): ProductLine {
   return {
-    id: requestType,
+    id,
     title: `Mock title ${order}`,
     lineBadge: `Mock badge ${order}`,
     description: `Mock description ${order}`,
     tags: [`Tag ${order}a`, `Tag ${order}b`],
     ctaLabel: `Mock CTA ${order}`,
-    requestType,
     image: IMAGE,
     imageAlt: `Mock image description for line ${order}`,
     order,
@@ -46,28 +45,30 @@ beforeEach(() => {
 });
 
 describe('ProductsSection', () => {
-  it('is the #products section on the surface background, labelled by its heading', async () => {
+  it('is the #productos section on the primary background, labelled by its heading', async () => {
     const html = await renderProducts();
 
     expect(html).toMatch(
-      /^<section id="products" aria-labelledby="products-heading" class="[^"]*\bbg-surface py-space-xl lg:py-24"/,
+      /^<section id="productos" aria-labelledby="products-heading" class="[^"]*\bbg-primary py-space-xl lg:py-24"/,
     );
-    expect(html).toMatch(/<h2 id="products-heading"[^>]*>\s*Product Portfolio\s*<\/h2>/);
+    expect(html).toMatch(/<h2 id="products-heading"[^>]*>\s*Portafolio de Productos\s*<\/h2>/);
   });
 
-  it('renders the eyebrow, lead and a non-preselecting price list link', async () => {
+  it('renders the primary-tone header and a light price list link', async () => {
     const html = await renderProducts();
 
-    expect(html).toContain('Certified Hospital Supply');
+    expect(html).not.toContain('Suministro Hospitalario Certificado');
     expect(html).toContain(
-      'A clinical supply chain subject to strict traceability controls, supplier qualification and valid health registrations.',
+      'Una cadena de suministro clínico sujeta a estrictos controles de trazabilidad, calificación de proveedores y registros sanitarios vigentes.',
     );
-    const priceLink = /<a [^>]*>\s*Request the full price list[\s\S]*?<\/a>/.exec(html)?.[0] ?? '';
-    expect(priceLink).toMatch(/href="\/#contact"/);
-    expect(priceLink).not.toContain('data-request-type');
+    const priceLink =
+      /<a [^>]*>\s*Solicitar lista de precios completa[\s\S]*?<\/a>/.exec(html)?.[0] ?? '';
+    expect(priceLink).toMatch(/href="\/#contacto"/);
     expect(priceLink).toMatch(/<svg /);
+    expect(priceLink).toMatch(/class="[^"]*\btext-on-primary\b/);
+    expect(html).toMatch(/<h2 id="products-heading" class="[^"]*\btext-on-primary\b/);
     expect(html).toMatch(
-      /class="flex flex-col justify-between gap-space-md md:flex-row md:items-end"/,
+      /class="focus-ring-inverse flex flex-col justify-between gap-space-md md:flex-row md:items-end"/,
     );
   });
 
@@ -85,20 +86,15 @@ describe('ProductsSection', () => {
     });
   });
 
-  it('links every CTA to /#contact carrying its request type', async () => {
+  it('links every CTA to /#contacto', async () => {
     const ctas = cards(await renderProducts()).map(
       (card) => /<a [^>]*>[\s\S]*?<\/a>/.exec(card)?.[0] ?? '',
     );
 
     expect(ctas.map((cta) => /href="([^"]+)"/.exec(cta)?.[1])).toEqual([
-      '/#contact',
-      '/#contact',
-      '/#contact',
-    ]);
-    expect(ctas.map((cta) => /data-request-type="([^"]+)"/.exec(cta)?.[1])).toEqual([
-      'medical-devices',
-      'pharmaceuticals',
-      'surgical-supplies',
+      '/#contacto',
+      '/#contacto',
+      '/#contacto',
     ]);
     ctas.forEach((cta, index) => {
       expect(cta).toContain(MOCK_LINES[index]?.ctaLabel);

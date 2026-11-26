@@ -18,7 +18,7 @@ describe('MobileNav', () => {
     const button = /<button [^>]*data-mobile-drawer-toggle[^>]*>/.exec(html)?.[0] ?? '';
 
     expect(button).toContain('type="button"');
-    expect(button).toContain('aria-label="Open menu"');
+    expect(button).toContain('aria-label="Abrir menú"');
     expect(button).toContain('aria-expanded="false"');
     expect(button).toContain('aria-controls="mobile-nav-drawer"');
     expect(button).toMatch(/class="[^"]*\bsize-11\b[^"]*\bxl:hidden\b/);
@@ -36,7 +36,7 @@ describe('MobileNav', () => {
     const drawer = drawerMarkup(await renderMobileNav());
 
     expect(drawer).toContain('aria-labelledby="mobile-nav-drawer-title"');
-    expect(drawer).toMatch(/<p id="mobile-nav-drawer-title"[^>]*>Menu<\/p>/);
+    expect(drawer).toMatch(/<p id="mobile-nav-drawer-title"[^>]*>Menú<\/p>/);
   });
 
   it('contains the close button, the six section links and the quote CTA', async () => {
@@ -45,17 +45,17 @@ describe('MobileNav', () => {
       ([, href, label]) => [label, href],
     );
 
-    expect(drawer).toMatch(/<button [^>]*data-mobile-drawer-close[^>]*aria-label="Close menu"/);
-    expect(drawer).toContain('<nav aria-label="Main">');
+    expect(drawer).toMatch(/<button [^>]*data-mobile-drawer-close[^>]*aria-label="Cerrar menú"/);
+    expect(drawer).toContain('<nav aria-label="Principal">');
     expect(links).toEqual([
-      ['Home', '/#home'],
-      ['About', '/#about'],
-      ['Products', '/#products'],
-      ['Engineering', '/#engineering'],
-      ['Why Choose Us', '/#why-us'],
-      ['Contact', '/#contact'],
+      ['Inicio', '/#inicio'],
+      ['Nosotros', '/#nosotros'],
+      ['Productos', '/#productos'],
+      ['Ingeniería', '/#ingenieria'],
+      ['Por qué elegirnos', '/#por-que-elegirnos'],
+      ['Contacto', '/#contacto'],
     ]);
-    expect(drawer).toMatch(/<a [^>]*href="\/#contact"[^>]*>\s*Request a quote\s*<\/a>/);
+    expect(drawer).toMatch(/<a [^>]*href="\/#contacto"[^>]*>\s*Solicitar cotización\s*<\/a>/);
   });
 
   it('tracks the section links with the scrollspy and marks none as current without JavaScript', async () => {
@@ -80,7 +80,7 @@ describe('MobileNav', () => {
     const html = await renderAstro(SiteHeader);
 
     expect(html.indexOf('data-mobile-drawer-toggle')).toBeGreaterThan(
-      html.indexOf('Request a quote'),
+      html.indexOf('Solicitar cotización'),
     );
   });
 

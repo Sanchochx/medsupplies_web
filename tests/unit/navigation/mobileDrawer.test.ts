@@ -152,7 +152,7 @@ describe('initMobileDrawer', () => {
   it('closes when a section link is selected, without blocking its navigation', () => {
     openWithButton();
     const link = required(
-      drawerLinks().find((anchor) => anchor.getAttribute('href') === '/#products'),
+      drawerLinks().find((anchor) => anchor.getAttribute('href') === '/#productos'),
       'products link',
     );
     const event = click();
@@ -165,7 +165,7 @@ describe('initMobileDrawer', () => {
   it('closes when the quote CTA is selected', () => {
     openWithButton();
     const cta = required(
-      drawerLinks().find((anchor) => anchor.textContent?.trim() === 'Request a quote'),
+      drawerLinks().find((anchor) => anchor.textContent?.trim() === 'Solicitar cotización'),
       'quote CTA',
     );
     cta.dispatchEvent(click());

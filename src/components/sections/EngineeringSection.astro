@@ -10,22 +10,15 @@ const services = await getEngineeringServices();
 ---
 
 <section
-  id="engineering"
+  id="ingenieria"
   aria-labelledby={HEADING_ID}
-  class="focus-ring-inverse relative w-full overflow-hidden bg-inverse-surface py-space-xl text-inverse-on-surface lg:py-24"
+  class="w-full bg-surface-container-lowest py-space-xl lg:py-24"
 >
-  <div
-    aria-hidden="true"
-    class="pointer-events-none absolute inset-0 bg-[radial-gradient(var(--color-primary-fixed-dim)_1px,transparent_1px)] bg-size-[24px_24px] opacity-10"
-  ></div>
-
-  <Container class="relative z-10 flex flex-col gap-space-xl">
+  <Container class="flex flex-col gap-space-xl">
     <SectionHeader
       headingId={HEADING_ID}
-      tone="dark"
-      eyebrow="Specialized Technical Services"
-      heading="Biomedical Engineering & Clinical Support"
-      lead="We ensure patient safety and maximum operational continuity of hospital infrastructure through preventive engineering methodologies, metrological calibration and technovigilance management."
+      heading="Ingeniería Biomédica y Soporte Clínico"
+      lead="Garantizamos la seguridad del paciente y la máxima continuidad operativa de la infraestructura hospitalaria mediante metodologías de ingeniería preventiva, calibración metrológica y gestión de tecnovigilancia."
     />
 
     <ul class="grid grid-cols-1 gap-gutter md:grid-cols-2 lg:grid-cols-4">

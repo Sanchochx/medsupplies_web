@@ -1,4 +1,3 @@
-import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { describe, expect, it } from 'vitest';
 import ContactSection from '../../../../src/components/sections/ContactSection.astro';
 import { getContactChannels, getWhatsAppUrl } from '../../../../src/lib/data';
@@ -19,26 +18,30 @@ function whatsAppLink(html: string): string {
 }
 
 describe('ContactSection', () => {
-  it('is the #contact section on the surface background, labelled by its heading', async () => {
+  it('is the #contacto section on white, labelled by its heading', async () => {
     expect(await renderContact()).toMatch(
-      /^<section id="contact" aria-labelledby="contact-heading" class="[^"]*\bbg-surface py-space-xl lg:py-24"/,
+      /^<section id="contacto" aria-labelledby="contact-heading" class="[^"]*\bbg-surface-container-lowest py-space-xl lg:py-24"/,
     );
   });
 
-  it('uses a 12-column grid from lg: info in 5 columns first, form in 7', async () => {
+  it('uses a 12-column grid from lg: header and WhatsApp in 5 columns first, channel cards in 7', async () => {
     const html = await renderContact();
 
     expect(html).toMatch(/<div class="grid grid-cols-1 items-start gap-12 lg:grid-cols-12">/);
     expect(html.indexOf('lg:col-span-5')).toBeLessThan(html.indexOf('lg:col-span-7'));
+    expect(html).toMatch(
+      /<div class="lg:col-span-7">\s*<ul class="grid grid-cols-1 gap-space-md sm:grid-cols-2">/,
+    );
+    expect(html).not.toContain('<form');
   });
 
   it('renders the section header', async () => {
     const html = await renderContact();
 
-    expect(html).toContain('Institutional Channel');
-    expect(html).toMatch(/<h2 id="contact-heading"[^>]*>\s*Contact Us\s*<\/h2>/);
+    expect(html).not.toContain('Canal Institucional');
+    expect(html).toMatch(/<h2 id="contact-heading"[^>]*>\s*Contáctenos\s*<\/h2>/);
     expect(html).toContain(
-      'Personalized service for hospitals, clinics, clinical laboratories and specialized centers across Colombia.',
+      'Atención personalizada para hospitales, clínicas, laboratorios clínicos y centros especializados en toda Colombia.',
     );
   });
 
@@ -47,18 +50,22 @@ describe('ContactSection', () => {
     const cards = channelCards(await renderContact());
 
     expect(cards.map((card) => /<h3[^>]*>([^<]+)<\/h3>/.exec(card)?.[1])).toEqual([
-      'Operations Address',
-      'Phone Lines',
-      'Email',
-      'Business Hours',
+      'Dirección de Operaciones',
+      'Líneas Telefónicas',
+      'Correo Electrónico',
+      'Horario de Atención',
     ]);
     expect(cards[0]).toContain(address.text);
     expect(cards[0]).toMatch(new RegExp(`class="[^"]*\\btext-primary\\b[^"]*">${address.note}<`));
     expect(cards[3]).toContain(hours.text);
     expect(cards[3]).toContain(hours.note);
     for (const card of cards) {
-      expect(card).toMatch(/^<li class="[^"]*\brounded-xl bg-surface-container-lowest\b/);
+      expect(card).toMatch(/^<li class="[^"]*\brounded-xl bg-surface-container-low\b/);
       expect(card).toMatch(/class="[^"]*\bsize-10\b/);
+      // The lines sit in their own block, spaced below the title instead of touching it.
+      expect(card).toMatch(
+        /<div class="flex min-w-0 flex-col gap-space-sm pt-2\.5">\s*<h3 class="font-heading text-label-lg text-on-surface">[^<]+<\/h3>\s*<div class="flex flex-col gap-1">/,
+      );
     }
   });
 
@@ -87,25 +94,16 @@ describe('ContactSection', () => {
         .replace(/<[^>]+>/g, '')
         .replace(/\s+/g, ' ')
         .trim(),
-    ).toBe('Chat on WhatsApp (opens WhatsApp in a new tab)');
-    expect(link).toContain('<span class="sr-only"> (opens WhatsApp in a new tab)</span>');
+    ).toBe('Escríbanos por WhatsApp (abre WhatsApp en una pestaña nueva)');
+    expect(link).toContain('<span class="sr-only"> (abre WhatsApp en una pestaña nueva)</span>');
   });
 
-  it('mounts the content of the "form" slot in the right column', async () => {
-    const container = await AstroContainer.create();
-    const html = await container.renderToString(ContactSection, {
-      slots: { form: '<form id="slot-probe"></form>' },
-    });
+  it('links WhatsApp from the contact section and the floating button only', async () => {
+    const page = await renderAstro(IndexPage);
 
-    expect(html).toMatch(/<div class="lg:col-span-7">\s*<form id="slot-probe"><\/form>\s*<\/div>/);
-  });
-
-  it('renders exactly one visible WhatsApp link on the home page: no floating button', async () => {
-    // <template> content is inert: the form's error message only shows its link after a failure.
-    const page = (await renderAstro(IndexPage)).replace(/<template[\s\S]*?<\/template>/g, '');
-
-    expect(page.match(/href="https:\/\/wa\.me\//g)).toHaveLength(1);
-    expect(page).toContain('<section id="contact"');
+    expect(page.match(/href="https:\/\/wa\.me\//g)).toHaveLength(2);
+    expect(page.indexOf('wa.me/')).toBeGreaterThan(page.indexOf('<section id="contacto"'));
+    expect(page).toContain('<section id="contacto"');
   });
 
   it('only uses utilities that exist in the design system', async () => {

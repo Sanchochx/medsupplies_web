@@ -10,7 +10,7 @@ export interface ProductLineCardProps {
 type Props = ProductLineCardProps;
 
 const { line } = Astro.props;
-const { title, lineBadge, description, tags, ctaLabel, requestType, image, imageAlt } = line;
+const { title, lineBadge, description, tags, ctaLabel, image, imageAlt } = line;
 ---
 
 <article class="group flex h-full flex-col overflow-hidden rounded-2xl bg-surface-container-lowest shadow-sm transition-shadow duration-200 hover:shadow-md">
@@ -44,15 +44,7 @@ const { title, lineBadge, description, tags, ctaLabel, requestType, image, image
   </div>
 
   <div class="p-space-lg pt-0">
-    {/* data-request-type preselects this line in the quote form (D-13, wired in US-FRM-002). */}
-    <Button
-      href="/#contact"
-      variant="soft"
-      size="sm"
-      iconEnd="chevron-right"
-      fullWidth
-      data-request-type={requestType}
-    >
+    <Button href="/#contacto" variant="soft" size="sm" iconEnd="chevron-right" fullWidth>
       {ctaLabel}
     </Button>
   </div>

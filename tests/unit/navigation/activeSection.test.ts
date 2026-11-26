@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  ACTIVATION_LINE_RATIO,
+  activationLineRootMargin,
   resolveActiveSection,
   sectionIdFromHref,
   updateVisibleSections,
@@ -66,5 +68,21 @@ describe('resolveActiveSection', () => {
     }
 
     expect(history).toEqual(['home', 'home', 'about', 'about']);
+  });
+});
+
+describe('activationLineRootMargin', () => {
+  it('shrinks the root to a line at 35% of the viewport by default', () => {
+    expect(ACTIVATION_LINE_RATIO).toBe(0.35);
+    expect(activationLineRootMargin()).toBe('-35% 0px -65% 0px');
+  });
+
+  it('places the line at the given ratio', () => {
+    expect(activationLineRootMargin(0.5)).toBe('-50% 0px -50% 0px');
+    expect(activationLineRootMargin(0)).toBe('-0% 0px -100% 0px');
+  });
+
+  it.each([-0.1, 1.5, Number.NaN])('rejects the out-of-range ratio %s', (ratio) => {
+    expect(() => activationLineRootMargin(ratio)).toThrow(RangeError);
   });
 });

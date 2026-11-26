@@ -1,5 +1,6 @@
 ---
 import { Font } from 'astro:assets';
+import WhatsAppFloatingButton from '../components/layout/WhatsAppFloatingButton.astro';
 import '../styles/global.css';
 
 export interface BaseLayoutProps {
@@ -13,7 +14,7 @@ const { title } = Astro.props;
 // <html> gets `data-scroll-locked` from the mobile drawer while it is open (lib/navigation/mobileDrawer.ts).
 ---
 
-<html lang="en" class="data-scroll-locked:overflow-hidden">
+<html lang="es" class="data-scroll-locked:overflow-hidden">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -27,7 +28,7 @@ const { title } = Astro.props;
       href="#main-content"
       class="fixed top-space-md left-space-md z-60 -translate-y-[200%] rounded-lg bg-primary px-space-md py-space-sm text-label-lg text-on-primary shadow-md transition-transform duration-150 focus:translate-y-0"
     >
-      Skip to content
+      Saltar al contenido
     </a>
     <slot name="header" />
     {/*
@@ -38,5 +39,6 @@ const { title } = Astro.props;
       <slot />
     </main>
     <slot name="footer" />
+    <WhatsAppFloatingButton />
   </body>
 </html>

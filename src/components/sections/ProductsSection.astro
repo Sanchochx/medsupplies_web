@@ -8,21 +8,22 @@ const HEADING_ID = 'products-heading';
 const productLines = await getProductLines();
 ---
 
-<section id="products" aria-labelledby={HEADING_ID} class="w-full bg-surface py-space-xl lg:py-24">
+<section id="productos" aria-labelledby={HEADING_ID} class="w-full bg-primary py-space-xl lg:py-24">
   <Container class="flex flex-col gap-space-xl">
-    <div class="flex flex-col justify-between gap-space-md md:flex-row md:items-end">
+    {/* Inverse ring on the header only: the white cards below keep the default blue ring. */}
+    <div class="focus-ring-inverse flex flex-col justify-between gap-space-md md:flex-row md:items-end">
       {/* Wrapped because SectionHeader's own max-w-3xl would win over a max-w-2xl class. */}
       <div class="max-w-2xl">
         <SectionHeader
           headingId={HEADING_ID}
-          eyebrow="Certified Hospital Supply"
-          heading="Product Portfolio"
-          lead="A clinical supply chain subject to strict traceability controls, supplier qualification and valid health registrations."
+          tone="primary"
+          heading="Portafolio de Productos"
+          lead="Una cadena de suministro clínico sujeta a estrictos controles de trazabilidad, calificación de proveedores y registros sanitarios vigentes."
           leadSize="md"
         />
       </div>
-      <Button href="/#contact" variant="link" class="self-start md:self-auto">
-        Request the full price list
+      <Button href="/#contacto" variant="link-inverse" class="self-start md:self-auto">
+        Solicitar lista de precios completa
       </Button>
     </div>
 

@@ -9,7 +9,7 @@ async function renderLayout(): Promise<string> {
   return renderAstro(BaseLayout, {
     props: { title: 'Test title' },
     slots: {
-      header: '<header><a href="/#home">Logo</a></header>',
+      header: '<header><a href="/#inicio">Logo</a></header>',
       default: '<p>Page content</p>',
       footer: '<footer>Footer</footer>',
     },
@@ -17,10 +17,10 @@ async function renderLayout(): Promise<string> {
 }
 
 describe('BaseLayout', () => {
-  it('renders an English document with the given title', async () => {
+  it('renders a Spanish document with the given title', async () => {
     const html = await renderLayout();
 
-    expect(html).toContain('<html lang="en" class="data-scroll-locked:overflow-hidden">');
+    expect(html).toContain('<html lang="es" class="data-scroll-locked:overflow-hidden">');
     expect(html).toContain('<meta charset="utf-8">');
     expect(html).toContain('<title>Test title</title>');
   });
@@ -31,7 +31,7 @@ describe('BaseLayout', () => {
     const [firstFocusable] = body.match(FOCUSABLE) ?? [];
 
     expect(firstFocusable).toContain('href="#main-content"');
-    expect(body).toMatch(/<a href="#main-content"[^>]*>\s*Skip to content\s*<\/a>/);
+    expect(body).toMatch(/<a href="#main-content"[^>]*>\s*Saltar al contenido\s*<\/a>/);
   });
 
   it('renders the header slot, a focusable main region offset by the header, and the footer slot in order', async () => {
@@ -46,6 +46,14 @@ describe('BaseLayout', () => {
     expect(content).toBeGreaterThan(main);
     expect(footer).toBeGreaterThan(content);
   });
+
+  it('renders the WhatsApp floating button after the footer, on every page', async () => {
+    const html = await renderLayout();
+
+    expect(html.indexOf('aria-label="Escríbanos por WhatsApp')).toBeGreaterThan(
+      html.indexOf('<footer>'),
+    );
+  });
 });
 
 describe('home page', () => {
@@ -54,6 +62,13 @@ describe('home page', () => {
     const main = html.slice(html.indexOf('<main'), html.indexOf('</main>'));
     const ids = [...main.matchAll(/<section id="([^"]+)"/g)].map(([, id]) => id);
 
-    expect(ids).toEqual(['home', 'about', 'products', 'engineering', 'why-us', 'contact']);
+    expect(ids).toEqual([
+      'inicio',
+      'nosotros',
+      'productos',
+      'ingenieria',
+      'por-que-elegirnos',
+      'contacto',
+    ]);
   });
 });

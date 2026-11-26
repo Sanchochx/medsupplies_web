@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import PrivacyPolicy from '../../../src/pages/privacy-policy.astro';
+import PrivacyPolicy from '../../../src/pages/politica-de-privacidad.astro';
 import { renderAstro } from '../helpers/renderAstro';
 
 async function renderPage(): Promise<string> {
@@ -10,9 +10,9 @@ describe('privacy-policy page', () => {
   it('uses the base layout with the site header and footer', async () => {
     const html = await renderPage();
 
-    expect(html).toContain('<html lang="en"');
+    expect(html).toContain('<html lang="es"');
     expect(html).toContain(
-      '<title>Personal Data Processing Policy | Medsupplies Ingeniería S.A.S.</title>',
+      '<title>Política de Tratamiento de Datos Personales | Medsupplies Ingeniería S.A.S.</title>',
     );
     expect(html).toContain('data-site-header');
     expect(html).toMatch(/<main id="main-content"[\s\S]*<\/main>\s*<footer /);
@@ -26,9 +26,9 @@ describe('privacy-policy page', () => {
       .replace(/\s+/g, ' ')
       .trim();
 
-    expect(main).toMatch(/<h1[^>]*>\s*Personal Data Processing Policy\s*<\/h1>/);
+    expect(main).toMatch(/<h1[^>]*>\s*Política de Tratamiento de Datos Personales\s*<\/h1>/);
     expect(text).toBe(
-      'Personal Data Processing Policy Placeholder — the final policy text will be provided by Medsupplies Ingeniería S.A.S.',
+      'Política de Tratamiento de Datos Personales Contenido provisional — el texto definitivo de la política será suministrado por Medsupplies Ingeniería S.A.S.',
     );
   });
 });

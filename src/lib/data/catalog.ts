@@ -1,7 +1,6 @@
 import type { ImageMetadata } from 'astro';
 import { getCollection } from 'astro:content';
 import type { IconName } from '../../components/ui/iconNames';
-import type { RequestTypeId } from './siteData';
 
 export interface ProductLine {
   id: string;
@@ -10,7 +9,6 @@ export interface ProductLine {
   description: string;
   tags: readonly string[];
   ctaLabel: string;
-  requestType: RequestTypeId;
   image: ImageMetadata;
   imageAlt: string;
   order: number;

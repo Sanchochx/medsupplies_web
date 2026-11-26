@@ -2,7 +2,6 @@
 // Run `npm run icons:generate` after adding or removing an icon.
 
 export const ICON_NAMES = [
-  'ac-unit',
   'arrow-forward',
   'assignment',
   'build',
@@ -12,12 +11,10 @@ export const ICON_NAMES = [
   'check-circle',
   'chevron-right',
   'close',
+  'facebook',
   'flag',
-  'health-and-safety',
   'hub',
-  'instagram',
   'inventory-2',
-  'linkedin',
   'local-shipping',
   'location-on',
   'mail',
@@ -33,11 +30,10 @@ export const ICON_NAMES = [
   'square-foot',
   'support-agent',
   'task-alt',
-  'thermostat',
-  'upload-file',
   'verified',
   'verified-user',
   'visibility',
+  'whatsapp',
 ] as const;
 
 export type IconName = (typeof ICON_NAMES)[number];

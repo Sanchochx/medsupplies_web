@@ -13,9 +13,9 @@ function cards(html: string): string[] {
 }
 
 describe('WhyUsSection', () => {
-  it('is the #why-us section on surface-container-low, labelled by its heading', async () => {
+  it('is the #por-que-elegirnos section on the primary background, labelled by its heading', async () => {
     expect(await renderWhyUs()).toMatch(
-      /^<section id="why-us" aria-labelledby="why-us-heading" class="[^"]*\bbg-surface-container-low py-space-xl lg:py-24"/,
+      /^<section id="por-que-elegirnos" aria-labelledby="why-us-heading" class="[^"]*\bbg-primary py-space-xl lg:py-24"/,
     );
   });
 
@@ -23,12 +23,12 @@ describe('WhyUsSection', () => {
     const html = await renderWhyUs();
 
     expect(html).toMatch(/<div class="[^"]*\bmx-auto items-center text-center\b/);
-    expect(html).toContain('Key Differentiators');
+    expect(html).not.toContain('Diferenciadores Clave');
     expect(html).toMatch(
-      /<h2 id="why-us-heading"[^>]*>\s*Why choose Medsupplies Ingeniería\s*<\/h2>/,
+      /<h2 id="why-us-heading"[^>]*>\s*¿Por qué elegir a Medsupplies Ingeniería\?\s*<\/h2>/,
     );
     expect(html).toContain(
-      'Operational assurance, technical solvency and strict adherence to Colombian public health guidelines.',
+      'Respaldo operativo, solvencia técnica y estricto apego a los lineamientos de salud pública de Colombia.',
     );
   });
 
@@ -38,10 +38,10 @@ describe('WhyUsSection', () => {
     );
 
     expect(titles).toEqual([
-      'Rigorous Quality',
-      'Regulatory Compliance',
-      'Logistics Efficiency',
-      'Continuous Technical Support',
+      'Calidad Rigurosa',
+      'Cumplimiento Normativo',
+      'Eficiencia Logística',
+      'Soporte Técnico Continuo',
     ]);
   });
 
@@ -54,7 +54,7 @@ describe('WhyUsSection', () => {
       expect(card).toContain(pillars[index]?.text);
       expect(card).toMatch(/<svg /);
     });
-    expect(rendered[0]).toContain('ISO 13485, CE and FDA');
+    expect(rendered[0]).toContain('ISO 13485, CE y FDA');
     expect(rendered[1]).toContain('INVIMA');
   });
 

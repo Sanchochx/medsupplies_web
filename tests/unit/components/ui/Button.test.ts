@@ -2,15 +2,15 @@ import { describe, expect, it } from 'vitest';
 import Button from '../../../../src/components/ui/Button.astro';
 import { renderAstro } from '../../helpers/renderAstro';
 
-const slots = { default: 'Request a quote' };
+const slots = { default: 'Solicitar cotización' };
 
 describe('Button', () => {
   it('renders an anchor when href is passed', async () => {
-    const html = await renderAstro(Button, { props: { href: '#contact' }, slots });
+    const html = await renderAstro(Button, { props: { href: '#contacto' }, slots });
 
     expect(html).toMatch(/^<a /);
-    expect(html).toContain('href="#contact"');
-    expect(html).toContain('Request a quote');
+    expect(html).toContain('href="#contacto"');
+    expect(html).toContain('Solicitar cotización');
     expect(html).not.toContain('type="button"');
   });
 
@@ -33,6 +33,7 @@ describe('Button', () => {
     ['neutral', ['bg-surface-container-lowest', 'shadow-sm', 'hover:bg-surface-container-high']],
     ['soft', ['bg-surface-container-high', 'text-primary', 'hover:bg-primary']],
     ['link', ['text-primary', 'hover:text-secondary', 'hover:underline']],
+    ['link-inverse', ['text-on-primary', 'hover:text-primary-fixed', 'hover:underline']],
   ] as const)('applies the %s variant styles', async (variant, expected) => {
     const html = await renderAstro(Button, { props: { href: '#', variant }, slots });
 
@@ -46,8 +47,8 @@ describe('Button', () => {
     });
 
     expect(html.match(/<svg /g)).toHaveLength(2);
-    expect(html.indexOf('<svg')).toBeLessThan(html.indexOf('Request a quote'));
-    expect(html.lastIndexOf('<svg')).toBeGreaterThan(html.indexOf('Request a quote'));
+    expect(html.indexOf('<svg')).toBeLessThan(html.indexOf('Solicitar cotización'));
+    expect(html.lastIndexOf('<svg')).toBeGreaterThan(html.indexOf('Solicitar cotización'));
     expect(html).toContain('w-full');
   });
 
@@ -55,7 +56,7 @@ describe('Button', () => {
     const html = await renderAstro(Button, { props: { href: '#', variant: 'link' }, slots });
 
     expect(html.match(/<svg /g)).toHaveLength(1);
-    expect(html.lastIndexOf('<svg')).toBeGreaterThan(html.indexOf('Request a quote'));
+    expect(html.lastIndexOf('<svg')).toBeGreaterThan(html.indexOf('Solicitar cotización'));
     expect(html).not.toContain('px-space-lg');
   });
 });

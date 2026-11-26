@@ -14,14 +14,15 @@ describe('Chip', () => {
     expect(html).not.toContain('<svg');
   });
 
-  it('renders the eyebrow pill with an icon and uppercase label', async () => {
+  it('renders the eyebrow as a solid primary pill with white text, an icon and an uppercase label', async () => {
     const html = await renderAstro(Chip, {
       props: { variant: 'eyebrow', icon: 'verified-user' },
       slots: { default: 'Biomedical technology' },
     });
 
     expect(html).toContain('uppercase');
-    expect(html).toContain('text-primary');
+    expect(html).toMatch(/class="[^"]*\bbg-primary\b[^"]*\btext-on-primary\b/);
+    expect(html).not.toContain('bg-surface-container-high');
     expect(html).toMatch(/<svg [^>]*aria-hidden="true"/);
     expect(html.indexOf('<svg')).toBeLessThan(html.indexOf('Biomedical technology'));
   });

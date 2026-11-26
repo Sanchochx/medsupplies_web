@@ -3,15 +3,15 @@ import type { HTMLAttributes } from 'astro/types';
 import Icon from './Icon.astro';
 import type { IconName } from './iconNames';
 
-export type ButtonVariant = 'primary' | 'neutral' | 'soft' | 'link';
+export type ButtonVariant = 'primary' | 'neutral' | 'soft' | 'link' | 'link-inverse';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 export interface ButtonBaseProps {
   variant?: ButtonVariant;
-  /** Padding scale; ignored by the `link` variant. */
+  /** Padding scale; ignored by the link variants. */
   size?: ButtonSize;
   iconStart?: IconName;
-  /** Defaults to `arrow-forward` for the `link` variant. */
+  /** Defaults to `arrow-forward` for the link variants. */
   iconEnd?: IconName;
   fullWidth?: boolean;
 }
@@ -39,6 +39,9 @@ const VARIANT_CLASSES: Record<ButtonVariant, string> = {
     'rounded-lg bg-surface-container-lowest text-on-surface shadow-sm hover:bg-surface-container-high',
   soft: 'rounded-lg bg-surface-container-high text-primary hover:bg-primary hover:text-on-primary',
   link: 'rounded-sm text-primary underline-offset-4 hover:text-secondary hover:underline',
+  /** `link` for sections on the `primary` background, where blue text would disappear. */
+  'link-inverse':
+    'rounded-sm text-on-primary underline-offset-4 hover:text-primary-fixed hover:underline',
 };
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {
@@ -51,19 +54,20 @@ const {
   variant = 'primary',
   size = 'md',
   iconStart,
-  iconEnd = variant === 'link' ? 'arrow-forward' : undefined,
+  iconEnd = variant === 'link' || variant === 'link-inverse' ? 'arrow-forward' : undefined,
   fullWidth = false,
   type = 'button',
   class: className,
   ...attrs
 } = Astro.props;
 
-const iconSize = variant === 'link' || variant === 'soft' ? 18 : 20;
+const isLinkVariant = variant === 'link' || variant === 'link-inverse';
+const iconSize = isLinkVariant || variant === 'soft' ? 18 : 20;
 const classes = [
   'inline-flex items-center justify-center gap-2 text-label-lg transition duration-200 ease-out',
   'disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100',
   VARIANT_CLASSES[variant],
-  variant !== 'link' && SIZE_CLASSES[size],
+  !isLinkVariant && SIZE_CLASSES[size],
   fullWidth && 'w-full',
   className,
 ];

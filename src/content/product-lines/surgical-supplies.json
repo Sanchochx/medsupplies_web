@@ -1,11 +1,10 @@
 {
-  "title": "Supplies & Surgical Materials",
-  "lineBadge": "Surgical Line",
-  "description": "Hospital consumables, sterile materials, biological protection and specialized supplies for operating rooms and laboratories.",
-  "tags": ["Biocompatibility", "Sterile Packaging", "Immediate Availability"],
-  "ctaLabel": "Request supplies",
-  "requestType": "surgical-supplies",
+  "title": "Insumos y Material Quirúrgico",
+  "lineBadge": "Línea Quirúrgica",
+  "description": "Consumibles hospitalarios, material estéril, protección biológica e insumos especializados para quirófanos y laboratorios.",
+  "tags": ["Biocompatibilidad", "Empaque Estéril", "Disponibilidad Inmediata"],
+  "ctaLabel": "Solicitar insumos",
   "image": "../../assets/images/placeholders/product-surgical-supplies.webp",
-  "imageAlt": "Placeholder image for the supplies and surgical materials line",
+  "imageAlt": "Imagen provisional de la línea de insumos y material quirúrgico",
   "order": 3
 }

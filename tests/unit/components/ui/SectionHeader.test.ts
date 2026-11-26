@@ -9,21 +9,17 @@ function classesOf(html: string, tag: string): string[] {
 }
 
 describe('SectionHeader', () => {
-  it('renders eyebrow, h2 heading and lead with the light tone', async () => {
+  it('renders the h2 heading and lead with the light tone', async () => {
     const html = await renderAstro(SectionHeader, {
       props: {
-        eyebrow: 'About us',
         heading: 'Commitment to health',
         lead: 'Colombian company…',
         headingId: 'about-title',
       },
     });
-    const [eyebrow, lead] = [...html.matchAll(/<p class="([^"]*)">([^<]*)<\/p>/g)];
+    const [lead, ...others] = [...html.matchAll(/<p class="([^"]*)">([^<]*)<\/p>/g)];
 
-    expect(eyebrow?.[2]).toBe('About us');
-    expect(eyebrow?.[1]?.split(' ')).toEqual(
-      expect.arrayContaining(['uppercase', 'tracking-widest', 'text-label-md', 'text-primary']),
-    );
+    expect(others).toHaveLength(0);
     expect(html).toContain('<h2 id="about-title"');
     expect(classesOf(html, 'h2')).toEqual(
       expect.arrayContaining(['font-heading', 'md:text-headline-xl', 'text-on-surface']),
@@ -35,28 +31,26 @@ describe('SectionHeader', () => {
     expect(classesOf(html, 'div')).not.toContain('items-center');
   });
 
-  it('omits the optional eyebrow and lead', async () => {
+  it('omits the optional lead', async () => {
     const html = await renderAstro(SectionHeader, { props: { heading: 'Contact us' } });
 
     expect(html).not.toContain('<p');
   });
 
-  it('supports center alignment, dark tone, md lead and a custom heading level', async () => {
+  it('supports center alignment, primary tone, md lead and a custom heading level', async () => {
     const html = await renderAstro(SectionHeader, {
       props: {
-        eyebrow: 'Services',
         heading: 'Biomedical engineering',
         lead: 'We guarantee…',
         as: 'h3',
         align: 'center',
-        tone: 'dark',
+        tone: 'primary',
         leadSize: 'md',
       },
     });
 
     expect(classesOf(html, 'div')).toEqual(expect.arrayContaining(['items-center', 'text-center']));
-    expect(classesOf(html, 'h3')).toContain('text-surface-bright');
-    expect(html).toContain('text-primary-fixed');
-    expect(html).toMatch(/<p class="[^"]*text-body-md[^"]*text-surface-variant\/80/);
+    expect(classesOf(html, 'h3')).toContain('text-on-primary');
+    expect(html).toMatch(/<p class="[^"]*text-body-md[^"]*\btext-primary-fixed\b/);
   });
 });

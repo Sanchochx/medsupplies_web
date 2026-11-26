@@ -29,8 +29,26 @@ export function updateVisibleSections(
 }
 
 /**
- * The active section is the first visible one in page order, i.e. the one at the top of the
- * viewport just below the header. When none is visible (e.g. between anchored sections) the
+ * Where the activation line sits, as a fraction of the viewport height from the top. A section is
+ * active while it crosses this line: low enough to clear the fixed header, high enough that a new
+ * section takes over as soon as it fills the reading area instead of only once the previous one
+ * has scrolled completely out of view.
+ */
+export const ACTIVATION_LINE_RATIO = 0.35;
+
+/**
+ * IntersectionObserver `rootMargin` that shrinks the root to a zero-height line at `ratio` of the
+ * viewport height, so an entry intersects only while the section crosses that line.
+ */
+export function activationLineRootMargin(ratio: number = ACTIVATION_LINE_RATIO): string {
+  if (!(ratio >= 0 && ratio <= 1)) throw new RangeError(`Invalid activation line ratio: ${ratio}`);
+  const top = Math.round(ratio * 100);
+  return `-${top}% 0px -${100 - top}% 0px`;
+}
+
+/**
+ * The active section is the first one in page order that crosses the activation line (at a
+ * boundary two can touch it for a frame). When none does (e.g. the line falls on the footer) the
  * previous one stays active, so the highlight never flickers off while scrolling.
  */
 export function resolveActiveSection(

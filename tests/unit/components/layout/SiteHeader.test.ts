@@ -21,7 +21,7 @@ describe('SiteHeader', () => {
 
   it('links the logo placeholder and wordmark to the home section', async () => {
     const html = await renderHeader();
-    const brand = html.slice(html.indexOf('<a href="/#home"'), html.indexOf('</a>'));
+    const brand = html.slice(html.indexOf('<a href="/#inicio"'), html.indexOf('</a>'));
 
     expect(brand).toMatch(/<img [^>]*alt="Medsupplies Ingeniería S\.A\.S\."[^>]*>/);
     expect(brand).toMatch(/<img [^>]*width="32"[^>]*height="32"/);
@@ -35,14 +35,14 @@ describe('SiteHeader', () => {
       ([, href, label]) => [label, href],
     );
 
-    expect(nav).toMatch(/^<nav aria-label="Main" class="hidden [^"]*xl:flex/);
+    expect(nav).toMatch(/^<nav aria-label="Principal" class="hidden [^"]*xl:flex/);
     expect(links).toEqual([
-      ['Home', '/#home'],
-      ['About', '/#about'],
-      ['Products', '/#products'],
-      ['Engineering', '/#engineering'],
-      ['Why Choose Us', '/#why-us'],
-      ['Contact', '/#contact'],
+      ['Inicio', '/#inicio'],
+      ['Nosotros', '/#nosotros'],
+      ['Productos', '/#productos'],
+      ['Ingeniería', '/#ingenieria'],
+      ['Por qué elegirnos', '/#por-que-elegirnos'],
+      ['Contacto', '/#contacto'],
     ]);
   });
 
@@ -52,10 +52,10 @@ describe('SiteHeader', () => {
 
   it('renders the quote CTA, hidden below sm, after the nav', async () => {
     const html = await renderHeader();
-    const cta = html.search(/<div class="hidden sm:flex">\s*<a [^>]*href="\/#contact"/);
+    const cta = html.search(/<div class="hidden sm:flex">\s*<a [^>]*href="\/#contacto"/);
 
     expect(cta).toBeGreaterThan(html.indexOf('</nav>'));
-    expect(html).toMatch(/<a [^>]*href="\/#contact"[^>]*>\s*Request a quote\s*<\/a>/);
+    expect(html).toMatch(/<a [^>]*href="\/#contacto"[^>]*>\s*Solicitar cotización\s*<\/a>/);
   });
 
   it('does not render the design’s person icon (D-06)', async () => {

@@ -2,11 +2,9 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { ICON_NAMES } from './components/ui/iconNames';
-import { REQUEST_TYPES } from './lib/data/siteData';
 
 const nonEmptyText = z.string().trim().min(1);
 const order = z.number().int().positive();
-const requestTypeId = z.enum(REQUEST_TYPES.map(({ id }) => id));
 
 // Strict objects: an unknown or misspelled key fails the build instead of being silently dropped.
 const productLines = defineCollection({
@@ -18,7 +16,6 @@ const productLines = defineCollection({
       description: nonEmptyText,
       tags: z.array(nonEmptyText).min(1),
       ctaLabel: nonEmptyText,
-      requestType: requestTypeId,
       image: image(),
       imageAlt: nonEmptyText,
       order,

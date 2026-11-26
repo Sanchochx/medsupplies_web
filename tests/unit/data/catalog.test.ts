@@ -16,7 +16,6 @@ function productEntry(id: string, order: number) {
       description: 'Description',
       tags: ['Tag'],
       ctaLabel: 'CTA',
-      requestType: id,
       image: IMAGE,
       imageAlt: 'Alt',
       order,

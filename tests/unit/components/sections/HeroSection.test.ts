@@ -16,81 +16,87 @@ function text(markup: string): string {
 }
 
 describe('HeroSection', () => {
-  it('is the #home section, labelled by its heading, on the surface background', async () => {
+  it('is the #inicio section, labelled by its heading, with the inverse focus ring', async () => {
     const html = await renderHero();
 
     expect(html).toMatch(
-      /^<section id="home" aria-labelledby="hero-heading" class="[^"]*\bbg-surface\b/,
-    );
-    expect(html).toMatch(
-      /<div aria-hidden="true" class="[^"]*\bbg-radial-\[at_20%_20%\] from-primary-container\/8/,
+      /^<section id="inicio" aria-labelledby="hero-heading" class="focus-ring-inverse [^"]*\bbg-scrim\b/,
     );
   });
 
-  it('renders a single h1 with "Medical Devices" highlighted in primary', async () => {
+  it('renders a single light h1 with "Dispositivos Médicos" highlighted', async () => {
     const html = await renderHero();
     const h1 = /<h1[^>]*>[\s\S]*?<\/h1>/.exec(html)?.[0] ?? '';
 
     expect(html.match(/<h1/g)).toHaveLength(1);
     expect(h1).toMatch(/class="[^"]*\btext-headline-xl\b[^"]*\blg:text-display-lg\b/);
-    expect(h1).toContain('<span class="text-primary">Medical Devices</span>');
-    // Tags are dropped without a space here, so "Medical Devices</span>," keeps its comma.
+    // Centered as a block by the parent, but its lines align to the left edge.
+    expect(h1).toMatch(/class="text-start /);
+    expect(h1).toContain('<span class="text-primary-container">Dispositivos Médicos</span>');
+    // Tags are dropped without a space here, so "Dispositivos Médicos</span>," keeps its comma.
     expect(
       h1
         .replace(/<[^>]+>/g, '')
         .replace(/\s+/g, ' ')
         .trim(),
     ).toBe(
-      'Integrated Solutions in Medical Devices, Pharmaceutical Products and Specialized Engineering',
+      'Soluciones Integrales en Dispositivos Médicos, Productos Farmacéuticos e Ingeniería Especializada',
     );
   });
 
   it('shows the eyebrow and the lead', async () => {
     const page = text(await renderHero());
 
-    expect(page).toContain('Biomedical & Pharmaceutical Technology in Colombia');
+    expect(page).toContain('Tecnología Biomédica y Farmacéutica en Colombia');
     expect(page).toContain(
-      'We distribute cutting-edge medical technology and hospital supplies in Colombia, backed by technical support, regulatory compliance and operational excellence.',
+      'Distribuimos tecnología médica de vanguardia e insumos hospitalarios en Colombia, con el respaldo de soporte técnico, cumplimiento normativo y excelencia operativa.',
     );
   });
 
   it('links the CTAs to the contact and products sections, without preselecting a request type', async () => {
     const html = await renderHero();
 
-    expect(html).toMatch(/<a [^>]*href="\/#contact"[^>]*>[\s\S]*?Request a quote\s*<\/a>/);
-    expect(html).toMatch(/<a [^>]*href="\/#products"[^>]*>[\s\S]*?View product portfolio\s*<\/a>/);
+    expect(html).toMatch(/<a [^>]*href="\/#contacto"[^>]*>[\s\S]*?Solicitar cotización\s*<\/a>/);
+    expect(html).toMatch(
+      /<a [^>]*href="\/#productos"[^>]*>[\s\S]*?Ver portafolio de productos\s*<\/a>/,
+    );
     expect(html).not.toMatch(/href="[^"]*[?&]type=/);
     expect(html).toMatch(/class="flex flex-wrap [^"]*"/);
   });
 
-  it('lists the micro-specs and the two floating badges from the data file', async () => {
+  it('lists the micro-specs from the data file', async () => {
     const page = text(await renderHero());
 
-    expect(page).toContain('INVIMA Health Regulation');
-    expect(page).toContain('Traceability & Cold Chain');
-    expect(page).toContain('Technical Warranty & Quality Certified metrology protocols');
-    expect(page).toContain('Chain of Custody Continuous temperature monitoring');
+    expect(page).toContain('Regulación Sanitaria INVIMA');
+    expect(page).toContain('Trazabilidad y Cadena de Frío');
+    expect(page).not.toContain('Garantía Técnica y Calidad');
+    expect(page).not.toContain('Cadena de Custodia');
   });
 
-  it('serves a local, eagerly loaded image with reserved dimensions', async () => {
+  it('covers the section with a decorative, eagerly loaded placeholder photo under a black veil', async () => {
     const html = await renderHero();
     const img = /<img [^>]*>/.exec(html)?.[0] ?? '';
 
     expect(img).toMatch(/src="\/(?:@fs|_image)[^"]*hero-laboratory/);
-    expect(img).not.toMatch(/https?:\/\//);
+    // Astro renders an empty alt as a bare `alt` attribute, which HTML treats as alt="".
+    expect(img).toMatch(/\salt(?:="")?\s/);
     expect(img).toContain('width="1200"');
     expect(img).toContain('height="960"');
     expect(img).toContain('loading="eager"');
     expect(img).toContain('fetchpriority="high"');
-    expect(img).toMatch(/alt="[^"]{20,}"/);
-    expect(img).toMatch(/class="[^"]*\bh-105\b[^"]*\bobject-cover\b[^"]*\blg:h-120\b/);
+    expect(img).toMatch(/class="absolute inset-0 size-full object-cover"/);
+    expect(html).toMatch(/<div aria-hidden="true" class="absolute inset-0 bg-scrim\/85">/);
+    expect(html.indexOf('<img')).toBeLessThan(html.indexOf('<h1'));
   });
 
-  it('uses a 12-column grid from lg with the text in 7 columns and the image in 5', async () => {
+  it('centers the text block, capped at max-w-4xl', async () => {
     const html = await renderHero();
 
-    expect(html).toMatch(/class="grid grid-cols-1 [^"]*lg:grid-cols-12"/);
-    expect(html.indexOf('lg:col-span-7')).toBeLessThan(html.indexOf('lg:col-span-5'));
+    expect(html).not.toMatch(/lg:grid-cols-12|lg:col-span-/);
+    expect(html).toMatch(
+      /<div class="mx-auto flex max-w-4xl flex-col items-center gap-space-md text-center">/,
+    );
+    expect(html).toMatch(/class="flex flex-wrap items-center justify-center /);
   });
 
   it('only uses utilities that exist in the design system', async () => {

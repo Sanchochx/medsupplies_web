@@ -13,40 +13,40 @@ function cards(html: string): string[] {
 }
 
 describe('AboutSection', () => {
-  it('is the #about section on surface-container-low, with the section padding', async () => {
+  it('is the #nosotros section on white, with the section padding', async () => {
     const html = await renderAbout();
 
     expect(html).toMatch(
-      /^<section id="about" aria-labelledby="about-heading" class="[^"]*\bbg-surface-container-low py-space-xl lg:py-24"/,
+      /^<section id="nosotros" aria-labelledby="about-heading" class="[^"]*\bbg-surface-container-lowest py-space-xl lg:py-24"/,
     );
   });
 
-  it('renders the section header with its eyebrow, h2 and lead', async () => {
+  it('renders the section header with its h2 and lead, without an eyebrow', async () => {
     const html = await renderAbout();
 
-    expect(html).toContain('About Medsupplies Ingeniería');
+    expect(html).not.toContain('Sobre Medsupplies Ingeniería');
     expect(html).toMatch(
-      /<h2 id="about-heading"[^>]*>\s*Committed to health and rigor in biomedical engineering\s*<\/h2>/,
+      /<h2 id="about-heading"[^>]*>\s*Comprometidos con la salud y el rigor en la ingeniería biomédica\s*<\/h2>/,
     );
-    expect(html).toContain('A Colombian company dedicated to raising the standards');
+    expect(html).toContain('Empresa colombiana dedicada a elevar los estándares');
   });
 
   it('renders the mission and vision cards with h3 titles, data-file texts and footers', async () => {
     const { mission, vision } = getMissionVision();
     const [missionCard = '', visionCard = ''] = cards(await renderAbout());
 
-    expect(missionCard).toMatch(/<h3[^>]*>Our Mission<\/h3>/);
+    expect(missionCard).toMatch(/<h3[^>]*>Nuestra Misión<\/h3>/);
     expect(missionCard).toContain(mission);
-    expect(missionCard).toContain('Clinical biosafety standards');
-    expect(visionCard).toMatch(/<h3[^>]*>Our Vision<\/h3>/);
+    expect(missionCard).toContain('Estándares de bioseguridad clínica');
+    expect(visionCard).toMatch(/<h3[^>]*>Nuestra Visión<\/h3>/);
     expect(visionCard).toContain(vision);
-    expect(visionCard).toContain('Leadership in hospital technology management');
+    expect(visionCard).toContain('Liderazgo en gestión de tecnología hospitalaria');
   });
 
-  it('renders white rounded cards that lift on hover, with the footer pinned to the bottom', async () => {
+  it('renders tinted rounded cards that lift on hover, with the footer pinned to the bottom', async () => {
     for (const card of cards(await renderAbout())) {
       expect(card).toMatch(
-        /^<li class="flex flex-col justify-between rounded-2xl bg-surface-container-lowest [^"]*shadow-sm [^"]*hover:shadow-md"/,
+        /^<li class="flex flex-col justify-between rounded-2xl bg-surface-container-low [^"]*shadow-sm [^"]*hover:shadow-md"/,
       );
       expect(card.match(/<svg /g)).toHaveLength(2);
     }

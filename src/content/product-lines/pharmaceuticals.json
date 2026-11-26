@@ -1,11 +1,10 @@
 {
-  "title": "Pharmaceutical Products",
-  "lineBadge": "Pharmaceutical Line",
-  "description": "Hospital-use medicines, clinical specialties and therapeutic solutions with strict temperature control and traceability.",
-  "tags": ["Cold Chain", "Good Storage Practices (GSP)", "Verified Batches"],
-  "ctaLabel": "Browse catalog",
-  "requestType": "pharmaceuticals",
+  "title": "Productos Farmacéuticos",
+  "lineBadge": "Línea Farmacéutica",
+  "description": "Medicamentos de uso hospitalario, especialidades clínicas y soluciones terapéuticas con estricto control de temperatura y trazabilidad.",
+  "tags": ["Cadena de Frío", "Buenas Prácticas de Almacenamiento (BPA)", "Lotes Verificados"],
+  "ctaLabel": "Ver catálogo",
   "image": "../../assets/images/placeholders/product-pharmaceuticals.webp",
-  "imageAlt": "Placeholder image for the pharmaceutical products line",
+  "imageAlt": "Imagen provisional de la línea de productos farmacéuticos",
   "order": 2
 }

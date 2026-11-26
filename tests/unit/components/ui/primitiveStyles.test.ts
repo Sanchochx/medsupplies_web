@@ -11,7 +11,7 @@ import { renderAstro } from '../../helpers/renderAstro';
 async function renderAllVariants(): Promise<string> {
   const renders = [
     renderAstro(Container),
-    ...(['primary', 'neutral', 'soft', 'link'] as const).flatMap((variant) =>
+    ...(['primary', 'neutral', 'soft', 'link', 'link-inverse'] as const).flatMap((variant) =>
       (['sm', 'md', 'lg'] as const).map((size) =>
         renderAstro(Button, { props: { href: '#', variant, size, fullWidth: true } }),
       ),
@@ -24,10 +24,10 @@ async function renderAllVariants(): Promise<string> {
     ),
     renderAstro(Chip),
     renderAstro(Chip, { props: { variant: 'eyebrow', icon: 'verified' } }),
-    ...(['light', 'dark'] as const).flatMap((tone) =>
+    ...(['light', 'primary'] as const).flatMap((tone) =>
       (['md', 'lg'] as const).map((leadSize) =>
         renderAstro(SectionHeader, {
-          props: { heading: 'H', eyebrow: 'E', lead: 'L', tone, leadSize, align: 'center' },
+          props: { heading: 'H', lead: 'L', tone, leadSize, align: 'center' },
         }),
       ),
     ),
@@ -47,7 +47,7 @@ describe('UI primitive styles', () => {
     expect(missing).toEqual([]);
   });
 
-  it('provide a visible focus ring, with an inverse variant for dark sections', async () => {
+  it('provide a visible focus ring, with an inverse variant for dark and blue sections', async () => {
     const css = await compileTailwind(['focus-ring-inverse']);
 
     expect(css).toMatch(

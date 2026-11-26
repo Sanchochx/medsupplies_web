@@ -70,6 +70,16 @@
   /* Outlines */
   --color-outline: #727787;
   --color-outline-variant: #c2c6d8;
+
+  /* Scrim: black veil over photos so light text stays readable. */
+  --color-scrim: #000000;
+
+  /*
+   * WhatsApp floating button. Darker than the brand's #25d366, on which the white logo only
+   * reaches 1.98:1; #1da851 gives the 3:1 that WCAG requires for graphics.
+   */
+  --color-whatsapp: #1da851;
+  --color-whatsapp-hover: #168a45;
 }
 
 /*
@@ -192,6 +202,21 @@
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+/* ANIMATIONS — `animate-float`: a gentle bob for the WhatsApp floating button. */
+@theme {
+  --animate-float: float 3s ease-in-out infinite;
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
 }
 
 @layer base {

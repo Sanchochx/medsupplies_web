@@ -11,7 +11,7 @@ const navItems = getNavItems();
 <button
   type="button"
   data-mobile-drawer-toggle
-  aria-label="Open menu"
+  aria-label="Abrir menú"
   aria-expanded="false"
   aria-controls={DRAWER_ID}
   class="inline-flex size-11 cursor-pointer items-center justify-center rounded-lg text-on-surface transition-colors duration-150 hover:bg-surface-container-high xl:hidden"
@@ -33,19 +33,19 @@ const navItems = getNavItems();
   <div class="flex h-full flex-col gap-space-lg overflow-y-auto p-space-lg">
     <div class="flex items-center justify-between">
       <p id={TITLE_ID} class="font-heading text-headline-sm text-on-surface">
-        Menu
+        Menú
       </p>
       <button
         type="button"
         data-mobile-drawer-close
-        aria-label="Close menu"
+        aria-label="Cerrar menú"
         class="inline-flex size-11 cursor-pointer items-center justify-center rounded-lg text-on-surface-variant transition-colors duration-150 hover:bg-surface-container-high hover:text-on-surface"
       >
         <Icon name="close" />
       </button>
     </div>
 
-    <nav aria-label="Main">
+    <nav aria-label="Principal">
       <ul class="flex flex-col gap-space-xs">
         {navItems.map(({ label, href }) => (
           <li>
@@ -61,8 +61,8 @@ const navItems = getNavItems();
       </ul>
     </nav>
 
-    <Button href="/#contact" variant="primary" size="md" fullWidth class="mt-auto">
-      Request a quote
+    <Button href="/#contacto" variant="primary" size="md" fullWidth class="mt-auto">
+      Solicitar cotización
     </Button>
   </div>
 </dialog>

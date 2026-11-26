@@ -1,11 +1,10 @@
 {
-  "title": "Medical Devices",
-  "lineBadge": "Biomedical Line",
-  "description": "Monitoring, clinical diagnostics, imaging and biomedical technology equipment for critical care areas, ICUs and general wards.",
-  "tags": ["Clinical Grade", "Health Registration", "After-Sales Support"],
-  "ctaLabel": "Ask about references",
-  "requestType": "medical-devices",
+  "title": "Dispositivos Médicos",
+  "lineBadge": "Línea Biomédica",
+  "description": "Equipos de monitoreo, diagnóstico clínico, imagenología y tecnología biomédica para áreas críticas, UCI y hospitalización general.",
+  "tags": ["Grado Clínico", "Registro Sanitario", "Soporte Posventa"],
+  "ctaLabel": "Consultar referencias",
   "image": "../../assets/images/placeholders/product-medical-devices.webp",
-  "imageAlt": "Placeholder image for the medical devices line",
+  "imageAlt": "Imagen provisional de la línea de dispositivos médicos",
   "order": 1
 }

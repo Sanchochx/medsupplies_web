@@ -5,7 +5,7 @@ import { Container, Icon } from '../components/ui';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCompanyInfo } from '../lib/data';
 
-const TITLE = 'Personal Data Processing Policy';
+const TITLE = 'Política de Tratamiento de Datos Personales';
 
 const { legalName } = getCompanyInfo();
 ---
@@ -19,7 +19,7 @@ const { legalName } = getCompanyInfo();
     </h1>
     <p class="flex max-w-2xl items-start gap-space-sm rounded-xl border border-dashed border-outline bg-surface-container-low p-space-md text-body-md text-on-surface-variant">
       <Icon name="policy" size={20} class="mt-0.5 text-primary" />
-      Placeholder — the final policy text will be provided by {legalName}
+      Contenido provisional — el texto definitivo de la política será suministrado por {legalName}
     </p>
   </Container>
   <SiteFooter slot="footer" />

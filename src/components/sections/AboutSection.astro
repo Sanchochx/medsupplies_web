@@ -1,7 +1,6 @@
 ---
 import { getMissionVision } from '../../lib/data';
 import { Container, Icon, IconTile, SectionHeader, type IconName } from '../ui';
-import KeyMetrics from './KeyMetrics.astro';
 
 interface StatementCard {
   icon: IconName;
@@ -18,37 +17,36 @@ const { mission, vision } = getMissionVision();
 const cards: StatementCard[] = [
   {
     icon: 'flag',
-    title: 'Our Mission',
+    title: 'Nuestra Misión',
     text: mission,
     footerIcon: 'task-alt',
-    footer: 'Clinical biosafety standards',
+    footer: 'Estándares de bioseguridad clínica',
   },
   {
     icon: 'visibility',
-    title: 'Our Vision',
+    title: 'Nuestra Visión',
     text: vision,
     footerIcon: 'military-tech',
-    footer: 'Leadership in hospital technology management',
+    footer: 'Liderazgo en gestión de tecnología hospitalaria',
   },
 ];
 ---
 
 <section
-  id="about"
+  id="nosotros"
   aria-labelledby={HEADING_ID}
-  class="w-full bg-surface-container-low py-space-xl lg:py-24"
+  class="w-full bg-surface-container-lowest py-space-xl lg:py-24"
 >
   <Container class="flex flex-col gap-space-xl">
     <SectionHeader
       headingId={HEADING_ID}
-      eyebrow="About Medsupplies Ingeniería"
-      heading="Committed to health and rigor in biomedical engineering"
-      lead="A Colombian company dedicated to raising the standards of the healthcare sector through the timely supply of medical devices, hospital supplies and medicines, complemented by preventive and corrective biomedical engineering services and equipment calibration."
+      heading="Comprometidos con la salud y el rigor en la ingeniería biomédica"
+      lead="Empresa colombiana dedicada a elevar los estándares del sector salud mediante el suministro oportuno de dispositivos médicos, insumos hospitalarios y medicamentos, complementado con servicios de ingeniería biomédica preventiva y correctiva y calibración de equipos."
     />
 
     <ul class="grid grid-cols-1 gap-gutter md:grid-cols-2">
       {cards.map(({ icon, title, text, footerIcon, footer }) => (
-        <li class="flex flex-col justify-between rounded-2xl bg-surface-container-lowest p-space-lg shadow-sm transition-shadow duration-200 hover:shadow-md">
+        <li class="flex flex-col justify-between rounded-2xl bg-surface-container-low p-space-lg shadow-sm transition-shadow duration-200 hover:shadow-md">
           <div class="flex flex-col gap-space-sm">
             <IconTile icon={icon} size="lg" class="mb-2" />
             <h3 class="font-heading text-headline-sm font-bold text-on-surface">{title}</h3>
@@ -61,7 +59,5 @@ const cards: StatementCard[] = [
         </li>
       ))}
     </ul>
-
-    <KeyMetrics />
   </Container>
 </section>

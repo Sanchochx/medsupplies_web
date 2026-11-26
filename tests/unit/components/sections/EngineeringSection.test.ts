@@ -39,33 +39,23 @@ beforeEach(() => {
 });
 
 describe('EngineeringSection', () => {
-  it('is the #engineering section on the navy background, with the inverse focus ring', async () => {
+  it('is the #ingenieria section on white', async () => {
     const html = await renderEngineering();
 
     expect(html).toMatch(
-      /^<section id="engineering" aria-labelledby="engineering-heading" class="focus-ring-inverse [^"]*\bbg-inverse-surface\b[^"]*\btext-inverse-on-surface\b/,
+      /^<section id="ingenieria" aria-labelledby="engineering-heading" class="w-full bg-surface-container-lowest py-space-xl lg:py-24"/,
     );
   });
 
-  it('draws a decorative dot grid at 10% opacity, hidden from assistive tech', async () => {
+  it('renders the light-tone section header', async () => {
     const html = await renderEngineering();
 
+    expect(html).not.toContain('Servicios Técnicos Especializados');
     expect(html).toMatch(
-      /<div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-\[radial-gradient\(var\(--color-primary-fixed-dim\)_1px,transparent_1px\)\] bg-size-\[24px_24px\] opacity-10">/,
-    );
-  });
-
-  it('renders the dark-tone section header', async () => {
-    const html = await renderEngineering();
-
-    expect(html).toMatch(
-      /<p class="[^"]*\btext-primary-fixed\b[^"]*">Specialized Technical Services/,
-    );
-    expect(html).toMatch(
-      /<h2 id="engineering-heading" class="[^"]*\btext-surface-bright\b[^"]*">\s*Biomedical Engineering &amp; Clinical Support\s*<\/h2>/,
+      /<h2 id="engineering-heading" class="[^"]*\btext-on-surface\b[^"]*">\s*Ingeniería Biomédica y Soporte Clínico\s*<\/h2>/,
     );
     expect(html).toContain(
-      'We ensure patient safety and maximum operational continuity of hospital infrastructure',
+      'Garantizamos la seguridad del paciente y la máxima continuidad operativa de la infraestructura hospitalaria',
     );
   });
 
@@ -78,14 +68,14 @@ describe('EngineeringSection', () => {
       const service = MOCK_SERVICES[index];
       expect(card).toMatch(new RegExp(`<h3[^>]*>${service?.title}</h3>`));
       expect(card).toContain(service?.description);
-      expect(card).toMatch(new RegExp(`text-primary-fixed[^>]*>[\\s\\S]*?${service?.highlight}`));
+      expect(card).toMatch(new RegExp(`text-primary"[^>]*>[\\s\\S]*?${service?.highlight}`));
     });
   });
 
-  it('renders translucent blurred cards with a solid icon tile and a check icon', async () => {
+  it('renders tinted cards with a solid icon tile and a check icon', async () => {
     for (const card of cards(await renderEngineering())) {
       expect(card).toMatch(
-        /^<article class="[^"]*\brounded-2xl bg-surface-container-lowest\/10 [^"]*\bbackdrop-blur-sm\b[^"]*\bhover:bg-surface-container-lowest\/15"/,
+        /^<article class="[^"]*\brounded-2xl bg-surface-container-low [^"]*\bhover:bg-surface-container"/,
       );
       expect(card).toMatch(/class="[^"]*\bbg-primary-container text-on-primary\b/);
       expect(card.match(/<svg /g)).toHaveLength(2);
