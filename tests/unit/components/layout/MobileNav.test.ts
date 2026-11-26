@@ -39,7 +39,7 @@ describe('MobileNav', () => {
     expect(drawer).toMatch(/<p id="mobile-nav-drawer-title"[^>]*>Menú<\/p>/);
   });
 
-  it('contains the close button, the six section links and the quote CTA', async () => {
+  it('contains the close button, the six section links and no quote CTA', async () => {
     const drawer = drawerMarkup(await renderMobileNav());
     const links = [...drawer.matchAll(/<a href="([^"]+)"[^>]*>\s*([^<]+?)\s*<\/a>/g)].map(
       ([, href, label]) => [label, href],
@@ -55,7 +55,7 @@ describe('MobileNav', () => {
       ['Por qué elegirnos', '/#por-que-elegirnos'],
       ['Contacto', '/#contacto'],
     ]);
-    expect(drawer).toMatch(/<a [^>]*href="\/#contacto"[^>]*>\s*Solicitar cotización\s*<\/a>/);
+    expect(drawer).not.toContain('Solicitar cotización');
   });
 
   it('tracks the section links with the scrollspy and marks none as current without JavaScript', async () => {
@@ -76,12 +76,10 @@ describe('MobileNav', () => {
     expect(drawer).toMatch(/\bbackdrop:bg-inverse-surface\/60\b/);
   });
 
-  it('is rendered by the site header, after the quote CTA', async () => {
+  it('is rendered by the site header, after the nav', async () => {
     const html = await renderAstro(SiteHeader);
 
-    expect(html.indexOf('data-mobile-drawer-toggle')).toBeGreaterThan(
-      html.indexOf('Solicitar cotización'),
-    );
+    expect(html.indexOf('data-mobile-drawer-toggle')).toBeGreaterThan(html.indexOf('</nav>'));
   });
 
   it('only uses utilities that exist in the design system', async () => {

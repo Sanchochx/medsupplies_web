@@ -162,17 +162,6 @@ describe('initMobileDrawer', () => {
     expectClosed();
   });
 
-  it('closes when the quote CTA is selected', () => {
-    openWithButton();
-    const cta = required(
-      drawerLinks().find((anchor) => anchor.textContent?.trim() === 'Solicitar cotización'),
-      'quote CTA',
-    );
-    cta.dispatchEvent(click());
-
-    expectClosed();
-  });
-
   it('traps Tab inside the drawer in both directions', () => {
     openWithButton();
     const lastLink = required(drawerLinks().at(-1), 'last link');

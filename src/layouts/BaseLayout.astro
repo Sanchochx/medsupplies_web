@@ -1,5 +1,6 @@
 ---
-import { Font } from 'astro:assets';
+import { Font, getImage } from 'astro:assets';
+import roundLogo from '../assets/images/logo_redondo.png';
 import WhatsAppFloatingButton from '../components/layout/WhatsAppFloatingButton.astro';
 import '../styles/global.css';
 
@@ -11,6 +12,16 @@ export interface BaseLayoutProps {
 type Props = BaseLayoutProps;
 
 const { title } = Astro.props;
+
+// The round logo is not perfectly square, so `contain` pads it instead of cropping its edges.
+const faviconOptions = {
+  src: roundLogo,
+  format: 'png',
+  fit: 'contain',
+  background: 'transparent',
+} as const;
+const favicon = await getImage({ ...faviconOptions, width: 32, height: 32 });
+const appleTouchIcon = await getImage({ ...faviconOptions, width: 180, height: 180 });
 // <html> gets `data-scroll-locked` from the mobile drawer while it is open (lib/navigation/mobileDrawer.ts).
 ---
 
@@ -19,6 +30,8 @@ const { title } = Astro.props;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
+    <link rel="icon" type="image/png" sizes="32x32" href={favicon.src} />
+    <link rel="apple-touch-icon" sizes="180x180" href={appleTouchIcon.src} />
     <Font cssVariable="--font-inter" preload={[{ weight: 400 }]} />
     <Font cssVariable="--font-plus-jakarta-sans" preload={[{ weight: 700 }]} />
   </head>

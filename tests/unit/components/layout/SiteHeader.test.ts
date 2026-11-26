@@ -19,14 +19,21 @@ describe('SiteHeader', () => {
     expect(html).toContain('h-header');
   });
 
-  it('links the logo placeholder and wordmark to the home section', async () => {
+  it('keeps an opaque white background so scrolled content never tints it', async () => {
+    const header = (await renderHeader()).match(/<header [^>]*class="([^"]*)"/)?.[1] ?? '';
+
+    expect(header.split(' ')).toContain('bg-surface-container-lowest');
+    expect(header).not.toMatch(/bg-surface-container-lowest\/|backdrop-blur/);
+  });
+
+  it('links the brand logo to the home section', async () => {
     const html = await renderHeader();
     const brand = html.slice(html.indexOf('<a href="/#inicio"'), html.indexOf('</a>'));
 
     expect(brand).toMatch(/<img [^>]*alt="Medsupplies Ingeniería S\.A\.S\."[^>]*>/);
-    expect(brand).toMatch(/<img [^>]*width="32"[^>]*height="32"/);
-    expect(brand).toContain('Medsupplies');
-    expect(brand).toContain('Ingeniería S.A.S.');
+    expect(brand).toMatch(/<img [^>]*width="144"[^>]*height="48"/);
+    expect(brand).toMatch(/<img [^>]*src="[^"]*logo[^"]*"/);
+    expect(brand).toMatch(/<img [^>]*loading="eager"/);
   });
 
   it('renders the main nav landmark with the six section links, visible from xl', async () => {
@@ -50,12 +57,8 @@ describe('SiteHeader', () => {
     expect(navMarkup(await renderHeader())).not.toContain('aria-current');
   });
 
-  it('renders the quote CTA, hidden below sm, after the nav', async () => {
-    const html = await renderHeader();
-    const cta = html.search(/<div class="hidden sm:flex">\s*<a [^>]*href="\/#contacto"/);
-
-    expect(cta).toBeGreaterThan(html.indexOf('</nav>'));
-    expect(html).toMatch(/<a [^>]*href="\/#contacto"[^>]*>\s*Solicitar cotización\s*<\/a>/);
+  it('does not render a quote CTA', async () => {
+    expect(await renderHeader()).not.toContain('Solicitar cotización');
   });
 
   it('does not render the design’s person icon (D-06)', async () => {

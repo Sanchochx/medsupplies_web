@@ -25,8 +25,6 @@ export interface LegalLink {
 
 export interface CompanyInfo {
   legalName: string;
-  wordmark: string;
-  wordmarkSuffix: string;
   description: string;
   /** Small badge shown in the footer. */
   complianceBadge: string;
@@ -93,8 +91,6 @@ export interface SiteData {
 export const SITE_DATA: SiteData = {
   company: {
     legalName: 'Medsupplies Ingeniería S.A.S.',
-    wordmark: 'Medsupplies',
-    wordmarkSuffix: 'Ingeniería S.A.S.',
     description:
       'Soluciones avanzadas en tecnología biomédica, dotación hospitalaria y soporte técnico especializado, con altos estándares de calidad y rigor institucional.',
     complianceBadge: 'Operamos bajo normativa INVIMA',

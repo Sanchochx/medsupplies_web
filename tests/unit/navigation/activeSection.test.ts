@@ -42,6 +42,18 @@ describe('resolveActiveSection', () => {
     expect(resolveActiveSection(ORDER, new Set(), 'engineering')).toBe('engineering');
   });
 
+  it('activates the last section at the end of the page, even if another one is visible', () => {
+    expect(resolveActiveSection(ORDER, new Set(['why-us']), 'why-us', true)).toBe('contact');
+  });
+
+  it('goes back to the visible section once the page end is left', () => {
+    expect(resolveActiveSection(ORDER, new Set(['why-us']), 'contact', false)).toBe('why-us');
+  });
+
+  it('keeps the previous section at the page end when there are no sections', () => {
+    expect(resolveActiveSection([], new Set(), 'home', true)).toBe('home');
+  });
+
   it('returns null before any section has been seen', () => {
     expect(resolveActiveSection(ORDER, new Set(), null)).toBeNull();
   });

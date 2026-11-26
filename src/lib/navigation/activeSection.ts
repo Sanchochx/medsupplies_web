@@ -50,11 +50,17 @@ export function activationLineRootMargin(ratio: number = ACTIVATION_LINE_RATIO):
  * The active section is the first one in page order that crosses the activation line (at a
  * boundary two can touch it for a frame). When none does (e.g. the line falls on the footer) the
  * previous one stays active, so the highlight never flickers off while scrolling.
+ *
+ * At the end of the page the last section wins: a short last section (with a short footer below
+ * it) can never scroll up to the activation line, so without this rule its link would never light
+ * up, not even after clicking it.
  */
 export function resolveActiveSection(
   order: readonly string[],
   visible: ReadonlySet<string>,
   previous: string | null,
+  atPageEnd = false,
 ): string | null {
+  if (atPageEnd && order.length > 0) return order[order.length - 1] ?? previous;
   return order.find((id) => visible.has(id)) ?? previous;
 }

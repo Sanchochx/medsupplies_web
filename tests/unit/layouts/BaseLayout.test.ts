@@ -25,6 +25,17 @@ describe('BaseLayout', () => {
     expect(html).toContain('<title>Test title</title>');
   });
 
+  it('links the round logo as favicon and Apple touch icon', async () => {
+    const html = await renderLayout();
+
+    expect(html).toMatch(
+      /<link rel="icon" type="image\/png" sizes="32x32" href="[^"]*logo_redondo[^"]*"/,
+    );
+    expect(html).toMatch(
+      /<link rel="apple-touch-icon" sizes="180x180" href="[^"]*logo_redondo[^"]*"/,
+    );
+  });
+
   it('renders the skip link as the first focusable element, pointing to the main content', async () => {
     const html = await renderLayout();
     const body = html.slice(html.indexOf('<body'));

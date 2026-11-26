@@ -1,46 +1,35 @@
 ---
 import { Image } from 'astro:assets';
-import logoPlaceholder from '../../assets/images/placeholders/logo-placeholder.svg';
+import logo from '../../assets/images/logo.png';
 import { getCompanyInfo } from '../../lib/data';
-import { Button, Container } from '../ui';
+import { Container } from '../ui';
 import MainNav from './MainNav.astro';
 import MobileNav from './MobileNav.astro';
 
-const { legalName, wordmark, wordmarkSuffix } = getCompanyInfo();
+const { legalName } = getCompanyInfo();
 ---
 
 <header
   data-site-header
-  class="fixed inset-x-0 top-0 z-50 h-header border-b border-outline-variant/40 bg-surface-container-lowest/90 backdrop-blur-md"
+  class="fixed inset-x-0 top-0 z-50 h-header border-b border-outline-variant/40 bg-surface-container-lowest"
 >
   <Container class="flex h-full items-center justify-between gap-gutter">
-    <a href="/#inicio" class="flex shrink-0 items-center gap-space-sm rounded-lg">
-      {/* PLACEHOLDER: empty tile at the logo's final size until the brand identity is delivered. */}
+    <a href="/#inicio" class="flex shrink-0 items-center rounded-lg">
+      {/* The logo already contains the company name, so it replaces the text wordmark. */}
       <Image
-        src={logoPlaceholder}
+        src={logo}
         alt={legalName}
-        width={32}
-        height={32}
+        width={144}
+        height={48}
+        densities={[1, 2]}
         loading="eager"
-        class="size-8 rounded-lg border border-dashed border-outline bg-surface-container-high"
+        fetchpriority="high"
+        class="h-12 w-auto"
       />
-      <span class="flex flex-col">
-        <span class="font-heading text-headline-sm leading-tight font-bold tracking-tight text-on-surface">
-          {wordmark}
-        </span>
-        <span class="text-label-sm tracking-wider text-primary uppercase">{wordmarkSuffix}</span>
-      </span>
     </a>
 
     <MainNav />
 
-    <div class="flex items-center gap-space-sm">
-      <div class="hidden sm:flex">
-        <Button href="/#contacto" variant="primary" size="sm">
-          Solicitar cotización
-        </Button>
-      </div>
-      <MobileNav />
-    </div>
+    <MobileNav />
   </Container>
 </header>
