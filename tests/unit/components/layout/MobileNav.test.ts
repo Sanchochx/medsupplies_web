@@ -39,7 +39,7 @@ describe('MobileNav', () => {
     expect(drawer).toMatch(/<p id="mobile-nav-drawer-title"[^>]*>Menú<\/p>/);
   });
 
-  it('contains the close button, the six section links and no quote CTA', async () => {
+  it('contains the close button, the five section links and no quote CTA', async () => {
     const drawer = drawerMarkup(await renderMobileNav());
     const links = [...drawer.matchAll(/<a href="([^"]+)"[^>]*>\s*([^<]+?)\s*<\/a>/g)].map(
       ([, href, label]) => [label, href],
@@ -52,7 +52,6 @@ describe('MobileNav', () => {
       ['Nosotros', '/#nosotros'],
       ['Productos', '/#productos'],
       ['Ingeniería', '/#ingenieria'],
-      ['Por qué elegirnos', '/#por-que-elegirnos'],
       ['Contacto', '/#contacto'],
     ]);
     expect(drawer).not.toContain('Solicitar cotización');
@@ -61,7 +60,7 @@ describe('MobileNav', () => {
   it('tracks the section links with the scrollspy and marks none as current without JavaScript', async () => {
     const drawer = drawerMarkup(await renderMobileNav());
 
-    expect(drawer.match(/data-section-link/g)).toHaveLength(6);
+    expect(drawer.match(/data-section-link/g)).toHaveLength(5);
     expect(drawer).not.toContain('aria-current');
   });
 

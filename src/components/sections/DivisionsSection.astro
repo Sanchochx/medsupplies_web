@@ -1,0 +1,64 @@
+---
+import { getDivisionBanners, getDivisionsHeading } from '../../lib/data';
+import { Container, SectionHeader } from '../ui';
+import DivisionBanner from './DivisionBanner.astro';
+import DivisionPanel from './DivisionPanel.astro';
+
+const HEADING_ID = 'divisions-heading';
+
+const heading = getDivisionsHeading();
+const banners = getDivisionBanners();
+---
+
+{/*
+ * Keeps the `#productos` anchor the "Productos" nav link and the hero CTA point to. One screen
+ * below the fixed header (like the hero), so with the global header-height scroll margin the
+ * title and the three banners land exactly between the header and the bottom of the screen.
+ * Opening a division's panel lets the section grow past one screen (see divisionPanels.ts).
+ */}
+<section
+  id="productos"
+  aria-labelledby={HEADING_ID}
+  data-divisions
+  class="flex min-h-screen-below-header w-full flex-col bg-surface-container-lowest"
+>
+  <Container class="py-space-lg md:py-space-xl" data-divisions-heading>
+    <!-- Same highlighted band as "POLÍTICA INTEGRADA"; uppercase is visual only, the copy stays as written. -->
+    <SectionHeader
+      headingId={HEADING_ID}
+      heading={heading}
+      highlight
+      align="center"
+      headingClass="uppercase"
+    />
+  </Container>
+  <ul
+    class="group/divisions grid flex-1 grid-rows-divisions gap-space-sm data-locked:grid-rows-none"
+    data-divisions-list
+  >
+    {banners.map((banner) => {
+      const articleId = `division-${banner.id}`;
+      const titleId = `${articleId}-title`;
+      const panelId = `${articleId}-panel`;
+      return (
+        <li class="flex">
+          <article
+            id={articleId}
+            data-division={banner.id}
+            data-state="closed"
+            class="group/division flex w-full flex-col"
+          >
+            <DivisionBanner banner={banner} titleId={titleId} panelId={panelId} />
+            <DivisionPanel id={panelId} labelledBy={titleId} lines={banner.lines} />
+          </article>
+        </li>
+      );
+    })}
+  </ul>
+</section>
+
+<script>
+  import { initDivisionPanels } from '../../lib/divisions/divisionPanels';
+
+  initDivisionPanels();
+</script>

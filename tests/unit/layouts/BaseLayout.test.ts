@@ -80,19 +80,11 @@ describe('BaseLayout', () => {
 });
 
 describe('home page', () => {
-  it('hosts the seven sections in page order inside the main region', async () => {
+  it('hosts the five sections in page order inside the main region', async () => {
     const html = await renderAstro(HomePage);
     const main = html.slice(html.indexOf('<main'), html.indexOf('</main>'));
     const ids = [...main.matchAll(/<section id="([^"]+)"/g)].map(([, id]) => id);
 
-    expect(ids).toEqual([
-      'inicio',
-      'nosotros',
-      'organizacion',
-      'productos',
-      'ingenieria',
-      'por-que-elegirnos',
-      'contacto',
-    ]);
+    expect(ids).toEqual(['inicio', 'nosotros', 'productos', 'ingenieria', 'contacto']);
   });
 });

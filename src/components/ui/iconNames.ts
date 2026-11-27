@@ -11,6 +11,7 @@ export const ICON_NAMES = [
   'check-circle',
   'chevron-right',
   'close',
+  'expand-more',
   'facebook',
   'flag',
   'home-and-garden',

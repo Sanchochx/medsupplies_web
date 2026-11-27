@@ -1,12 +1,11 @@
 import {
   SITE_DATA,
   type CompanyInfo,
+  type DivisionBanner,
   type HeroCopy,
-  type Highlight,
   type LegalLink,
   type MissionVision,
   type NavItem,
-  type ServiceOrganization,
   type SocialLink,
 } from './siteData';
 
@@ -70,10 +69,11 @@ export function getHeroCopy(): HeroCopy {
   return SITE_DATA.hero;
 }
 
-export function getWhyUsPillars(): readonly Highlight[] {
-  return SITE_DATA.whyUsPillars;
+export function getDivisionsHeading(): string {
+  return SITE_DATA.divisionsHeading;
 }
 
-export function getServiceOrganization(): ServiceOrganization {
-  return SITE_DATA.serviceOrganization;
+/** The three division banners, in display order. */
+export function getDivisionBanners(): readonly DivisionBanner[] {
+  return SITE_DATA.divisionBanners;
 }

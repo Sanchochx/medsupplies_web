@@ -34,7 +34,7 @@ const statements: [Statement, Statement] = [
 <section
   id="nosotros"
   aria-labelledby={HEADING_ID}
-  class="flex w-full flex-col gap-margin bg-surface-container-lowest py-space-xl lg:gap-16 lg:py-24"
+  class="flex w-full flex-col gap-margin bg-surface-container-lowest pt-space-xl pb-space-md lg:gap-16 lg:pt-24 lg:pb-space-lg"
 >
   <Container>
     <SectionHeader
@@ -49,7 +49,11 @@ const statements: [Statement, Statement] = [
 
   <MissionVisionPanel statements={statements} />
 
-  <Container>
+  {/*
+   * Pushed down so the policy sits closer to the next section's title than to the mission and
+   * vision panel; the section's short bottom padding completes that shift.
+   */}
+  <Container class="mt-space-md lg:mt-space-xl">
     <SectionHeader
       as="h3"
       headingId={POLICY_HEADING_ID}

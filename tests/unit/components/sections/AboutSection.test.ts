@@ -17,7 +17,7 @@ describe('AboutSection', () => {
     const html = await renderAbout();
 
     expect(html).toMatch(
-      /^<section id="nosotros" aria-labelledby="about-heading" class="[^"]*\bbg-surface-container-lowest py-space-xl lg:gap-16 lg:py-24"/,
+      /^<section id="nosotros" aria-labelledby="about-heading" class="[^"]*\bbg-surface-container-lowest pt-space-xl pb-space-md lg:gap-16 lg:pt-24 lg:pb-space-lg"/,
     );
   });
 

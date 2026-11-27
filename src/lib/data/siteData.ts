@@ -8,7 +8,11 @@
  * Only the data access layer (`src/lib/data/`) and `src/content.config.ts` may import this file;
  * pages and components read it through the accessor functions (enforced by ESLint).
  */
-import type { IconName } from '../../components/ui/iconNames';
+import type { ImageMetadata } from 'astro';
+import engineeringImage from '../../assets/images/division_ingenieria.png';
+import suppliesImage from '../../assets/images/division_suministros.png';
+import hospitalImage from '../../assets/images/divison_hospitalaria.png';
+import productLinePlaceholder from '../../assets/images/placeholders/product-line.webp';
 
 /** `/#anchor` hrefs work from any page, not only the home page. */
 export type AnchorHref = `/#${string}`;
@@ -59,13 +63,6 @@ export interface SocialLink {
   href: string;
 }
 
-/** Icon + title + text item used by the "Why Choose Us" pillars. */
-export interface Highlight {
-  icon: IconName;
-  title: string;
-  text: string;
-}
-
 export interface MissionVision {
   mission: string;
   vision: string;
@@ -75,31 +72,38 @@ export interface HeroCopy {
   microSpecs: readonly string[];
 }
 
-/** Sub-service listed inside a division card. */
-export interface DivisionItem {
-  icon: IconName;
-  title: string;
-  text: string;
-}
+/** Side of the banner the text block sits on; the dark overlay follows it. */
+export type BannerTextSide = 'left' | 'right';
 
-export interface ServiceDivision {
-  /** Small uppercase label above the title, e.g. "DIVISIÓN 01". */
+/**
+ * A product (or service) line shown in a division's expandable panel. To replace the placeholder
+ * content, edit the strings and point `image` at the real photo (square, 1:1, transparent or
+ * white background works best because the tile shows it with `object-fit: contain`).
+ */
+export interface DivisionLine {
+  /** Code slug, unique across all divisions; used for element ids. */
+  id: string;
+  /** Short pill above the title, e.g. "Línea 01" (shown uppercase). */
   label: string;
   title: string;
-  icon: IconName;
-  description: string;
-  items: readonly DivisionItem[];
-  /** Footer link text. */
-  footerLabel: string;
-  href: AnchorHref;
+  /** Decorative product photo (rendered with `alt=""`; the line title names it). */
+  image: ImageMetadata;
+  /** Product or service names, in display order. Names only, no descriptions. */
+  items: readonly string[];
 }
 
-export interface ServiceOrganization {
-  heading: string;
-  lead: string;
-  /** Screen-reader-only suffix of the division footer links, which all lead to the contact section. */
-  linkHint: string;
-  divisions: readonly ServiceDivision[];
+/** Full-width image banner of the "Divisiones" section (anchor `#productos`). */
+export interface DivisionBanner {
+  /** Code slug, unique per division; used for element ids and the toggle script. */
+  id: string;
+  title: string;
+  /** Decorative background photo (rendered with `alt=""`). */
+  image: ImageMetadata;
+  /** CSS `object-position` that keeps the photo's subject inside the short banner crop. */
+  imagePosition: string;
+  textSide: BannerTextSide;
+  /** Content of the panel that expands below the banner. */
+  lines: readonly DivisionLine[];
 }
 
 export interface SiteData {
@@ -112,8 +116,9 @@ export interface SiteData {
   socialLinks: readonly SocialLink[];
   missionVision: MissionVision;
   hero: HeroCopy;
-  whyUsPillars: readonly Highlight[];
-  serviceOrganization: ServiceOrganization;
+  /** Visible title of the "Divisiones" section, shown above the banners. */
+  divisionsHeading: string;
+  divisionBanners: readonly DivisionBanner[];
 }
 
 export const SITE_DATA: SiteData = {
@@ -131,7 +136,6 @@ export const SITE_DATA: SiteData = {
     { label: 'Nosotros', href: '/#nosotros' },
     { label: 'Productos', href: '/#productos' },
     { label: 'Ingeniería', href: '/#ingenieria' },
-    { label: 'Por qué elegirnos', href: '/#por-que-elegirnos' },
     { label: 'Contacto', href: '/#contacto' },
   ],
   legalLinks: [
@@ -163,101 +167,112 @@ export const SITE_DATA: SiteData = {
   hero: {
     microSpecs: ['Regulación Sanitaria INVIMA', 'Trazabilidad y Cadena de Frío'],
   },
-  whyUsPillars: [
+
+  divisionsHeading: 'Organización Integral de Servicios',
+  divisionBanners: [
     {
-      icon: 'verified',
-      title: 'Calidad Rigurosa',
-      text: 'Selección exclusiva de fabricantes internacionales con certificaciones ISO 13485, CE y FDA, que garantizan insumos clínicos de primer nivel.',
+      id: 'hospital',
+      title: 'División Hospitalaria',
+      image: hospitalImage,
+      imagePosition: '55% 42%',
+      textSide: 'left',
+      lines: [
+        {
+          id: 'hospital-line-1',
+          label: 'Línea 01',
+          title: 'Línea de productos de ejemplo A',
+          image: productLinePlaceholder,
+          items: [
+            'Producto de ejemplo 1',
+            'Producto de ejemplo 2 con un nombre bastante más largo',
+            'Producto de ejemplo 3',
+            'Producto de ejemplo 4 de nombre medio',
+            'Producto 5',
+            'Producto de ejemplo 6 con nombre largo para probar el ajuste',
+            'Producto de ejemplo 7',
+            'Producto de ejemplo 8',
+          ],
+        },
+        {
+          id: 'hospital-line-2',
+          label: 'Línea 02',
+          title: 'Línea de productos de ejemplo B',
+          image: productLinePlaceholder,
+          items: [
+            'Producto de ejemplo 1',
+            'Producto 2',
+            'Producto de ejemplo 3 con un nombre que ocupa dos líneas',
+            'Producto de ejemplo 4',
+            'Producto de ejemplo 5 de nombre medio',
+            'Producto de ejemplo 6',
+            'Producto de ejemplo 7 con un nombre bastante más largo',
+            'Producto de ejemplo 8',
+            'Producto de ejemplo 9',
+          ],
+        },
+      ],
     },
     {
-      icon: 'policy',
-      title: 'Cumplimiento Normativo',
-      text: 'Alineación total con la regulación sanitaria del INVIMA y programas activos de reactivovigilancia, tecnovigilancia y farmacovigilancia.',
+      id: 'supplies',
+      title: 'División Suministros',
+      image: suppliesImage,
+      imagePosition: '70% 50%',
+      textSide: 'right',
+      lines: [
+        {
+          id: 'supplies-line-1',
+          label: 'Línea 01',
+          title: 'Línea de suministros de ejemplo A',
+          image: productLinePlaceholder,
+          items: [
+            'Producto de ejemplo 1',
+            'Producto de ejemplo 2 de nombre medio',
+            'Producto 3',
+            'Producto de ejemplo 4 con un nombre bastante más largo',
+            'Producto de ejemplo 5',
+            'Producto de ejemplo 6',
+            'Producto de ejemplo 7',
+          ],
+        },
+        {
+          id: 'supplies-line-2',
+          label: 'Línea 02',
+          title: 'Línea de suministros de ejemplo B',
+          image: productLinePlaceholder,
+          items: [
+            'Producto de ejemplo 1',
+            'Producto de ejemplo 2',
+            'Producto de ejemplo 3 con nombre largo para probar el ajuste',
+            'Producto 4',
+            'Producto de ejemplo 5 de nombre medio',
+            'Producto de ejemplo 6',
+          ],
+        },
+      ],
     },
     {
-      icon: 'local-shipping',
-      title: 'Eficiencia Logística',
-      text: 'Red de distribución con control permanente de la cadena de frío y trazabilidad digital de envíos, con cobertura total en Colombia.',
-    },
-    {
-      icon: 'precision-manufacturing',
-      title: 'Soporte Técnico Continuo',
-      text: 'Equipo multidisciplinario de ingenieros biomédicos con capacidad de respuesta inmediata para asegurar la continuidad de la atención.',
+      id: 'engineering',
+      title: 'División Ingeniería',
+      image: engineeringImage,
+      imagePosition: '75% 28%',
+      textSide: 'left',
+      lines: [
+        {
+          id: 'engineering-line-1',
+          label: 'Línea 01',
+          title: 'Línea de servicios de ejemplo',
+          image: productLinePlaceholder,
+          items: [
+            'Servicio de ejemplo 1',
+            'Servicio de ejemplo 2 con un nombre bastante más largo',
+            'Servicio 3',
+            'Servicio de ejemplo 4 de nombre medio',
+            'Servicio de ejemplo 5',
+            'Servicio de ejemplo 6 con nombre largo para probar el ajuste',
+            'Servicio de ejemplo 7',
+          ],
+        },
+      ],
     },
   ],
-  serviceOrganization: {
-    heading: 'Organización Integral de Servicios',
-    lead: 'Arquitectura operativa articulada para responder a las exigencias industriales, asistenciales e institucionales con rigor técnico y certificación.',
-    linkHint: '(ir a contacto)',
-    divisions: [
-      {
-        label: 'DIVISIÓN 01',
-        title: 'Ingeniería',
-        icon: 'precision-manufacturing',
-        description:
-          'Optimización y gestión técnica especializada orientada al sector productivo y normas de calidad.',
-        items: [
-          {
-            icon: 'verified',
-            title: 'Programas de Gestión de Calidad',
-            text: 'Estrategias y estándares adaptados para MIPYMES',
-          },
-          {
-            icon: 'build',
-            title: 'Mantenimiento Industrial',
-            text: 'Rutinas preventivas, operativas y predictivas',
-          },
-          {
-            icon: 'recycling',
-            title: 'Gestión Integral de Residuos',
-            text: "Implementación de metodología 5'S y sostenibilidad",
-          },
-        ],
-        footerLabel: 'Línea de productos',
-        href: '/#contacto',
-      },
-      {
-        label: 'DIVISIÓN 02',
-        title: 'Hospitalaria',
-        icon: 'local-hospital',
-        description:
-          'Soluciones biomédicas y farmacológicas de alto impacto para la red de salud pública y privada.',
-        items: [
-          {
-            icon: 'medical-services',
-            title: 'Cadena Integral de Suministros',
-            text: 'Medicamentos, ortopédicos, equipos, insumos y dispositivos',
-          },
-          {
-            icon: 'monitor-heart',
-            title: 'Mantenimiento Biomédico',
-            text: 'Calibración, metrología y tecnovigilancia certificada',
-          },
-        ],
-        footerLabel: 'Línea de productos',
-        href: '/#contacto',
-      },
-      {
-        label: 'DIVISIÓN 03',
-        title: 'Suministros',
-        icon: 'household-supplies',
-        description:
-          'Higiene, asepsia e insumos químicos especializados para entornos institucionales y domésticos.',
-        items: [
-          {
-            icon: 'sanitizer',
-            title: 'Productos Líquidos de Limpieza',
-            text: 'Desinfectantes clínicos, detergentes y formulaciones especializadas',
-          },
-          {
-            icon: 'home-and-garden',
-            title: 'Elementos de Aseo Institucional y Hogar',
-            text: 'Dotación para empresas, plantas clínicas y uso residencial',
-          },
-        ],
-        footerLabel: 'Línea de productos',
-        href: '/#contacto',
-      },
-    ],
-  },
 };

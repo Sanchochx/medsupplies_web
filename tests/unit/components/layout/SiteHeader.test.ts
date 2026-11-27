@@ -36,7 +36,7 @@ describe('SiteHeader', () => {
     expect(brand).toMatch(/<img [^>]*loading="eager"/);
   });
 
-  it('renders the main nav landmark with the six section links, visible from xl', async () => {
+  it('renders the main nav landmark with the five section links, visible from xl', async () => {
     const nav = navMarkup(await renderHeader());
     const links = [...nav.matchAll(/<a href="([^"]+)"[^>]*>\s*([^<]+?)\s*<\/a>/g)].map(
       ([, href, label]) => [label, href],
@@ -48,7 +48,6 @@ describe('SiteHeader', () => {
       ['Nosotros', '/#nosotros'],
       ['Productos', '/#productos'],
       ['Ingeniería', '/#ingenieria'],
-      ['Por qué elegirnos', '/#por-que-elegirnos'],
       ['Contacto', '/#contacto'],
     ]);
   });

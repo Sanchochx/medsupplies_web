@@ -2,12 +2,13 @@
 import Icon from './Icon.astro';
 import type { IconName } from './iconNames';
 
-export type ChipVariant = 'tag' | 'eyebrow' | 'inverse';
+export type ChipVariant = 'tag' | 'eyebrow' | 'inverse' | 'soft';
 
 export interface ChipProps {
   /**
    * `tag`: small muted label. `eyebrow`: solid primary uppercase pill with an optional icon (hero).
    * `inverse`: translucent white pill with white text, for blue/dark surfaces.
+   * `soft`: light blue uppercase pill with dark blue text, for white/light surfaces.
    */
   variant?: ChipVariant;
   icon?: IconName;
@@ -22,6 +23,7 @@ const VARIANT_CLASSES: Record<ChipVariant, string> = {
     'gap-2 bg-primary px-3 py-1 text-label-sm text-on-primary font-semibold uppercase tracking-wider',
   inverse:
     'gap-2 border border-on-primary/25 bg-on-primary/12 px-3.5 py-1.5 text-label-lg text-on-primary',
+  soft: 'gap-2 bg-primary-fixed px-3 py-1 text-label-sm text-on-primary-fixed-variant font-semibold uppercase tracking-wider',
 };
 
 const { variant = 'tag', icon, class: className } = Astro.props;

@@ -1,18 +1,5 @@
-import type { ImageMetadata } from 'astro';
 import { getCollection } from 'astro:content';
 import type { IconName } from '../../components/ui/iconNames';
-
-export interface ProductLine {
-  id: string;
-  title: string;
-  lineBadge: string;
-  description: string;
-  tags: readonly string[];
-  ctaLabel: string;
-  image: ImageMetadata;
-  imageAlt: string;
-  order: number;
-}
 
 export interface EngineeringService {
   id: string;
@@ -25,12 +12,6 @@ export interface EngineeringService {
 
 function byOrder<T extends { order: number }>(a: T, b: T): number {
   return a.order - b.order;
-}
-
-/** Product lines, in display order. */
-export async function getProductLines(): Promise<ProductLine[]> {
-  const entries = await getCollection('productLines');
-  return entries.map(({ id, data }) => ({ id, ...data })).sort(byOrder);
 }
 
 /** Engineering services, in display order. */

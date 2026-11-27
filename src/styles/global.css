@@ -107,6 +107,12 @@
   --text-hero-lead--letter-spacing: 0;
   --text-hero-lead--font-weight: 400;
 
+  /* Division banner title: fluid so the longest title still fits a 320px screen on one line. */
+  --text-banner-title: clamp(1.75rem, 1rem + 3.5vw, 4.5rem);
+  --text-banner-title--line-height: 1.05;
+  --text-banner-title--letter-spacing: -0.02em;
+  --text-banner-title--font-weight: 700;
+
   --text-display-lg-mobile: 2.25rem;
   --text-display-lg-mobile--line-height: 2.75rem;
   --text-display-lg-mobile--letter-spacing: -0.02em;
@@ -282,6 +288,67 @@
 @utility min-h-screen-below-header {
   min-height: calc(100vh - var(--spacing-header));
   min-height: calc(100svh - var(--spacing-header));
+}
+
+/*
+ * Rows of the "Divisiones" stack: three equal rows that share the section's one-screen height.
+ * The minimum keeps content from being clipped when the screen is short, so the section grows
+ * instead. Below lg each row also keeps roughly a third of the screen (`vh` fallback, then `svh`).
+ */
+@utility grid-rows-divisions {
+  grid-template-rows: repeat(3, minmax(max(9rem, 27vh), 1fr));
+  grid-template-rows: repeat(3, minmax(max(9rem, 27svh), 1fr));
+
+  @media (width >= 64rem) {
+    grid-template-rows: repeat(3, minmax(11.25rem, 1fr));
+  }
+}
+
+/*
+ * Banner height while a division panel is open. The stack then sizes its rows to their content
+ * (so the open panel can push the section past one screen); this reproduces the height the
+ * `grid-rows-divisions` rows give each banner when everything is closed, so banners never jump.
+ * `--divisions-heading-height` (the title block above the stack) is measured by the toggle script.
+ */
+@utility h-division-banner {
+  flex: none;
+  height: max(
+    9rem,
+    27vh,
+    (
+        100vh - var(--spacing-header) - var(--divisions-heading-height) - 2 *
+          var(--spacing-space-sm)
+      ) /
+      3
+  );
+  height: max(
+    9rem,
+    27svh,
+    (
+        100svh - var(--spacing-header) - var(--divisions-heading-height) - 2 *
+          var(--spacing-space-sm)
+      ) /
+      3
+  );
+
+  @media (width >= 64rem) {
+    height: max(
+      11.25rem,
+      (
+          100vh - var(--spacing-header) - var(--divisions-heading-height) - 2 *
+            var(--spacing-space-sm)
+        ) /
+        3
+    );
+    height: max(
+      11.25rem,
+      (
+          100svh - var(--spacing-header) - var(--divisions-heading-height) - 2 *
+            var(--spacing-space-sm)
+        ) /
+        3
+    );
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

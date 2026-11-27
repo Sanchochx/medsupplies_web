@@ -24,13 +24,12 @@ describe('getWhatsAppUrl', () => {
 });
 
 describe('getNavItems', () => {
-  it('returns the six sections as /#anchor links', () => {
+  it('returns the five sections as /#anchor links', () => {
     expect(getNavItems().map(({ href }) => href)).toEqual([
       '/#inicio',
       '/#nosotros',
       '/#productos',
       '/#ingenieria',
-      '/#por-que-elegirnos',
       '/#contacto',
     ]);
   });

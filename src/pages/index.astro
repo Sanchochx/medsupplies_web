@@ -3,11 +3,9 @@ import SiteFooter from '../components/layout/SiteFooter.astro';
 import SiteHeader from '../components/layout/SiteHeader.astro';
 import AboutSection from '../components/sections/AboutSection.astro';
 import ContactSection from '../components/sections/ContactSection.astro';
+import DivisionsSection from '../components/sections/DivisionsSection.astro';
 import EngineeringSection from '../components/sections/EngineeringSection.astro';
 import HeroSection from '../components/sections/HeroSection.astro';
-import ProductsSection from '../components/sections/ProductsSection.astro';
-import ServiceOrganizationSection from '../components/sections/ServiceOrganizationSection.astro';
-import WhyUsSection from '../components/sections/WhyUsSection.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCompanyInfo } from '../lib/data';
 
@@ -18,10 +16,8 @@ const { legalName } = getCompanyInfo();
   <SiteHeader slot="header" />
   <HeroSection />
   <AboutSection />
-  <ServiceOrganizationSection />
-  <ProductsSection />
+  <DivisionsSection />
   <EngineeringSection />
-  <WhyUsSection />
   <ContactSection />
   <SiteFooter slot="footer" />
 </BaseLayout>

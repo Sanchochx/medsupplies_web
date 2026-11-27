@@ -1,0 +1,93 @@
+---
+import { Image } from 'astro:assets';
+import type { DivisionBanner } from '../../lib/data';
+import { Container, Icon } from '../ui';
+
+export interface DivisionBannerProps {
+  banner: DivisionBanner;
+  /** Id of the `<h3>`, which names the panel region. */
+  titleId: string;
+  /** Id of the panel this banner expands. */
+  panelId: string;
+}
+
+type Props = DivisionBannerProps;
+
+const { banner, titleId, panelId } = Astro.props;
+const { title, image, imagePosition, textSide } = banner;
+const isRight = textSide === 'right';
+
+// Full-bleed banner: the largest candidate is the photo's own width (sources are ~1.5–1.7k wide).
+const WIDTHS = [...new Set([640, 960, 1280, image.width].filter((width) => width <= image.width))];
+
+/*
+ * The navy overlay is darkest behind the text and fades out on the far side so the photo shows.
+ * Below md the text spans most of the narrow banner, so the far end keeps a light veil instead of
+ * going fully transparent; that keeps white text above WCAG AA even over the brightest pixels.
+ */
+const OVERLAY =
+  'from-on-primary-fixed/90 via-on-primary-fixed/70 via-45% to-on-primary-fixed/30 md:to-transparent';
+---
+
+{/*
+ * The `<button>` sits inside the heading (a heading cannot live inside a button) and its
+ * `::after` covers the whole banner, so the entire banner is the click and focus target.
+ * The banner fills its row; while a panel is open (`data-locked` on the list) its height is
+ * pinned to the closed-state value instead.
+ */}
+<div class="group/banner relative isolate flex flex-1 overflow-hidden bg-on-primary-fixed group-data-locked/divisions:h-division-banner">
+  <Image
+    src={image}
+    alt=""
+    widths={WIDTHS}
+    sizes="100vw"
+    loading="lazy"
+    decoding="async"
+    class="absolute inset-0 -z-10 size-full object-cover transition-[filter] duration-200 ease-out group-hover/banner:brightness-115"
+    style={`object-position: ${imagePosition}`}
+  />
+  {/* Duotone: multiplying by the brand blue unifies the three photos into one tint. */}
+  <span aria-hidden="true" class="absolute inset-0 -z-10 bg-primary/25 mix-blend-multiply"></span>
+  <span
+    aria-hidden="true"
+    class:list={['absolute inset-0 -z-10', isRight ? 'bg-linear-to-l' : 'bg-linear-to-r', OVERLAY]}
+  ></span>
+
+  {/* Same content width as the header, so the text lines up with the rest of the page. */}
+  <Container
+    class:list={[
+      'flex flex-col justify-center py-space-lg md:py-space-xl',
+      isRight ? 'items-end text-right' : 'items-start text-left',
+    ]}
+  >
+    <h3 id={titleId} class="font-heading text-banner-title text-on-primary">
+      <button
+        type="button"
+        aria-expanded="false"
+        aria-controls={panelId}
+        data-division-toggle
+        class:list={[
+          'block w-full cursor-pointer focus-visible:outline-none',
+          'after:absolute after:inset-0 focus-visible:after:outline-3 focus-visible:after:-outline-offset-6 focus-visible:after:outline-on-primary',
+          isRight ? 'text-right' : 'text-left',
+        ]}
+      >
+        {title}
+      </button>
+    </h3>
+  </Container>
+
+  {/* Decorative state cue; the button's `aria-expanded` carries the state for assistive tech. */}
+  <div aria-hidden="true" class="pointer-events-none absolute inset-0">
+    <Container
+      class:list={[
+        'flex h-full items-end pb-space-sm md:items-center md:pb-0',
+        isRight ? 'justify-start' : 'justify-end',
+      ]}
+    >
+      <span class="inline-flex size-11 items-center justify-center rounded-full bg-on-primary/20 text-on-primary ring-1 ring-on-primary/30 backdrop-blur-sm transition-transform duration-350 ease-out group-data-[state=open]/division:rotate-180 md:size-14">
+        <Icon name="expand-more" size={28} />
+      </span>
+    </Container>
+  </div>
+</div>
