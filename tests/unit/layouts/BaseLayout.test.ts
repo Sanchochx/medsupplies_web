@@ -36,6 +36,18 @@ describe('BaseLayout', () => {
     );
   });
 
+  it('keeps the favicon transparent and flattens only the Apple touch icon onto white', async () => {
+    const html = await renderLayout();
+    const href = (rel: string): string =>
+      decodeURIComponent(
+        new RegExp(`<link rel="${rel}"[^>]*href="([^"]*)"`).exec(html)?.[1] ?? '',
+      ).replace(/&amp;/g, '&');
+
+    // A `background` makes Astro flatten the PNG, and a transparent flatten turns it black.
+    expect(href('icon')).not.toMatch(/[?&]background=/);
+    expect(href('apple-touch-icon')).toMatch(/[?&]background=white\b/);
+  });
+
   it('renders the skip link as the first focusable element, pointing to the main content', async () => {
     const html = await renderLayout();
     const body = html.slice(html.indexOf('<body'));
@@ -68,7 +80,7 @@ describe('BaseLayout', () => {
 });
 
 describe('home page', () => {
-  it('hosts the six sections in page order inside the main region', async () => {
+  it('hosts the seven sections in page order inside the main region', async () => {
     const html = await renderAstro(HomePage);
     const main = html.slice(html.indexOf('<main'), html.indexOf('</main>'));
     const ids = [...main.matchAll(/<section id="([^"]+)"/g)].map(([, id]) => id);
@@ -76,6 +88,7 @@ describe('home page', () => {
     expect(ids).toEqual([
       'inicio',
       'nosotros',
+      'organizacion',
       'productos',
       'ingenieria',
       'por-que-elegirnos',

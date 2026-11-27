@@ -31,6 +31,41 @@ describe('SectionHeader', () => {
     expect(classesOf(html, 'div')).not.toContain('items-center');
   });
 
+  it('wraps the heading text in a primary band when highlighted', async () => {
+    const html = await renderAstro(SectionHeader, {
+      props: { heading: 'Engineering and supplies', lead: 'Since 2015…', highlight: true },
+    });
+
+    expect(classesOf(html, 'h2')).not.toContain('text-on-surface');
+    expect(classesOf(html, 'span')).toEqual(
+      expect.arrayContaining(['bg-primary', 'text-on-primary', 'box-decoration-clone']),
+    );
+    expect(html).toMatch(/<span[^>]*>\s*Engineering and supplies\s*<\/span>/);
+    expect(classesOf(html, 'p')).toEqual(expect.arrayContaining(['mt-space-lg', 'max-w-3xl']));
+    expect(classesOf(html, 'div')).not.toContain('max-w-3xl');
+  });
+
+  it('appends heading classes to the heading element', async () => {
+    const html = await renderAstro(SectionHeader, {
+      props: { heading: 'Engineering and supplies', headingClass: 'lg:whitespace-nowrap' },
+    });
+
+    expect(classesOf(html, 'h2')).toEqual(
+      expect.arrayContaining(['font-heading', 'lg:whitespace-nowrap']),
+    );
+  });
+
+  it('renders the lead slot when it needs inline markup', async () => {
+    const html = await renderAstro(SectionHeader, {
+      props: { heading: 'Integrated policy' },
+      slots: { lead: 'For <span class="text-primary">Acme</span>, safety first.' },
+    });
+
+    expect(html).toMatch(
+      /<p class="[^"]*\btext-body-lg\b[^"]*">\s*For <span class="text-primary">Acme<\/span>, safety first\./,
+    );
+  });
+
   it('omits the optional lead', async () => {
     const html = await renderAstro(SectionHeader, { props: { heading: 'Contact us' } });
 

@@ -1,0 +1,20 @@
+---
+import type { DivisionItem } from '../../lib/data';
+import { Icon } from '../ui';
+
+export interface DivisionItemProps {
+  item: DivisionItem;
+}
+
+type Props = DivisionItemProps;
+
+const { icon, title, text } = Astro.props.item;
+---
+
+<li class="flex items-start gap-space-sm rounded-xl bg-surface-container-low p-space-md">
+  <Icon name={icon} size={20} class="mt-0.5 text-primary" />
+  <div class="flex min-w-0 flex-col gap-0.5">
+    <h4 class="text-label-lg font-bold text-on-surface">{title}</h4>
+    <p class="text-body-sm text-on-surface-variant">{text}</p>
+  </div>
+</li>

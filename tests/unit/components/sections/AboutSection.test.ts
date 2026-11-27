@@ -26,9 +26,11 @@ describe('AboutSection', () => {
 
     expect(html).not.toContain('Sobre Medsupplies Ingeniería');
     expect(html).toMatch(
-      /<h2 id="about-heading"[^>]*>\s*Comprometidos con la salud y el rigor en la ingeniería biomédica\s*<\/h2>/,
+      /<h2 id="about-heading"[^>]*>\s*<span[^>]*\bbg-primary\b[^>]*>\s*INGENIERÍA Y SUMINISTROS QUE FACILITAN SU VIDA\s*<\/span>\s*<\/h2>/,
     );
-    expect(html).toContain('Empresa colombiana dedicada a elevar los estándares');
+    expect(html).toContain('En 2015 nace FESIQ Ingeniería');
+    expect(html).toMatch(/<div class="flex flex-col mx-auto items-center text-center"/);
+    expect(html).toMatch(/<h2 id="about-heading" class="[^"]*\blg:whitespace-nowrap\b/);
   });
 
   it('renders the mission and vision cards with h3 titles, data-file texts and footers', async () => {
@@ -37,10 +39,10 @@ describe('AboutSection', () => {
 
     expect(missionCard).toMatch(/<h3[^>]*>Nuestra Misión<\/h3>/);
     expect(missionCard).toContain(mission);
-    expect(missionCard).toContain('Estándares de bioseguridad clínica');
+    expect(missionCard).toContain('Meta 2028: 10 empleos y 8% del mercado regional');
     expect(visionCard).toMatch(/<h3[^>]*>Nuestra Visión<\/h3>/);
     expect(visionCard).toContain(vision);
-    expect(visionCard).toContain('Liderazgo en gestión de tecnología hospitalaria');
+    expect(visionCard).toContain('Calidad total a precios competitivos');
   });
 
   it('renders tinted rounded cards that lift on hover, with the footer pinned to the bottom', async () => {
@@ -54,6 +56,21 @@ describe('AboutSection', () => {
 
   it('lays the cards out in 1 column below md and 2 from md', async () => {
     expect(await renderAbout()).toMatch(/<ul class="grid grid-cols-1 gap-gutter md:grid-cols-2">/);
+  });
+
+  it('closes with the integrated policy: a highlighted h3 and a lead with the company name in blue', async () => {
+    const html = await renderAbout();
+    // Whitespace is normalized because the source paragraph is wrapped by Prettier.
+    const policy = html.slice(html.lastIndexOf('</ul>')).replace(/\s+/g, ' ');
+
+    expect(policy).toMatch(
+      /<h3 id="integrated-policy-heading"[^>]*>\s*<span[^>]*\bbg-primary\b[^>]*>\s*POLÍTICA INTEGRADA\s*<\/span>\s*<\/h3>/,
+    );
+    expect(policy).toMatch(/<div class="flex flex-col mx-auto items-center text-center"/);
+    expect(policy).toContain(
+      'Para <span class="font-semibold text-primary">Medsupplies &amp; Ingeniería S.A.S.</span>, la',
+    );
+    expect(policy).toContain('satisfacción de los clientes, colaboradores y proveedores.');
   });
 
   it('only uses utilities that exist in the design system', async () => {

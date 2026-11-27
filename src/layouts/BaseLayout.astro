@@ -13,15 +13,18 @@ type Props = BaseLayoutProps;
 
 const { title } = Astro.props;
 
-// The round logo is not perfectly square, so `contain` pads it instead of cropping its edges.
-const faviconOptions = {
-  src: roundLogo,
-  format: 'png',
-  fit: 'contain',
-  background: 'transparent',
-} as const;
+// `contain` scales the round logo (not perfectly square) inside the box instead of cropping it.
+// No `background` on the favicon: Astro flattens the image with it, and a transparent flatten
+// turns the corners black.
+const faviconOptions = { src: roundLogo, format: 'png', fit: 'contain' } as const;
 const favicon = await getImage({ ...faviconOptions, width: 32, height: 32 });
-const appleTouchIcon = await getImage({ ...faviconOptions, width: 180, height: 180 });
+// iOS paints transparent home-screen icons black, so this one is flattened onto white.
+const appleTouchIcon = await getImage({
+  ...faviconOptions,
+  width: 180,
+  height: 180,
+  background: 'white',
+});
 // <html> gets `data-scroll-locked` from the mobile drawer while it is open (lib/navigation/mobileDrawer.ts).
 ---
 

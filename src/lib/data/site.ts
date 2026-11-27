@@ -6,6 +6,7 @@ import {
   type LegalLink,
   type MissionVision,
   type NavItem,
+  type ServiceOrganization,
   type SocialLink,
 } from './siteData';
 
@@ -71,4 +72,8 @@ export function getHeroCopy(): HeroCopy {
 
 export function getWhyUsPillars(): readonly Highlight[] {
   return SITE_DATA.whyUsPillars;
+}
+
+export function getServiceOrganization(): ServiceOrganization {
+  return SITE_DATA.serviceOrganization;
 }

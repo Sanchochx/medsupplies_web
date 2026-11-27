@@ -75,6 +75,33 @@ export interface HeroCopy {
   microSpecs: readonly string[];
 }
 
+/** Sub-service listed inside a division card. */
+export interface DivisionItem {
+  icon: IconName;
+  title: string;
+  text: string;
+}
+
+export interface ServiceDivision {
+  /** Small uppercase label above the title, e.g. "DIVISIÓN 01". */
+  label: string;
+  title: string;
+  icon: IconName;
+  description: string;
+  items: readonly DivisionItem[];
+  /** Footer link text. */
+  footerLabel: string;
+  href: AnchorHref;
+}
+
+export interface ServiceOrganization {
+  heading: string;
+  lead: string;
+  /** Screen-reader-only suffix of the division footer links, which all lead to the contact section. */
+  linkHint: string;
+  divisions: readonly ServiceDivision[];
+}
+
 export interface SiteData {
   company: CompanyInfo;
   navItems: readonly NavItem[];
@@ -86,6 +113,7 @@ export interface SiteData {
   missionVision: MissionVision;
   hero: HeroCopy;
   whyUsPillars: readonly Highlight[];
+  serviceOrganization: ServiceOrganization;
 }
 
 export const SITE_DATA: SiteData = {
@@ -128,9 +156,9 @@ export const SITE_DATA: SiteData = {
   ],
   missionVision: {
     mission:
-      'Proveer soluciones tecnológicas y farmacéuticas seguras y eficientes a las instituciones de salud de Colombia, respaldadas por un soporte técnico sobresaliente que garantice la continuidad y la calidad de la atención al paciente.',
+      'Para el año 2028 seremos una empresa competitiva y sostenible, generando 10 empleos directos y con una participación del 8% del mercado regional.',
     vision:
-      'Ser el aliado estratégico preferido en distribución e ingeniería biomédica a nivel nacional, reconocido por su calidad, cumplimiento normativo y servicio humano en toda la red hospitalaria pública y privada.',
+      'Entregar a la mano productos y servicios con los estándares de la calidad total, a precios tan competitivos que harán más fácil la vida de nuestros clientes.',
   },
   hero: {
     microSpecs: ['Regulación Sanitaria INVIMA', 'Trazabilidad y Cadena de Frío'],
@@ -157,4 +185,79 @@ export const SITE_DATA: SiteData = {
       text: 'Equipo multidisciplinario de ingenieros biomédicos con capacidad de respuesta inmediata para asegurar la continuidad de la atención.',
     },
   ],
+  serviceOrganization: {
+    heading: 'Organización Integral de Servicios',
+    lead: 'Arquitectura operativa articulada para responder a las exigencias industriales, asistenciales e institucionales con rigor técnico y certificación.',
+    linkHint: '(ir a contacto)',
+    divisions: [
+      {
+        label: 'DIVISIÓN 01',
+        title: 'Ingeniería',
+        icon: 'precision-manufacturing',
+        description:
+          'Optimización y gestión técnica especializada orientada al sector productivo y normas de calidad.',
+        items: [
+          {
+            icon: 'verified',
+            title: 'Programas de Gestión de Calidad',
+            text: 'Estrategias y estándares adaptados para MIPYMES',
+          },
+          {
+            icon: 'build',
+            title: 'Mantenimiento Industrial',
+            text: 'Rutinas preventivas, operativas y predictivas',
+          },
+          {
+            icon: 'recycling',
+            title: 'Gestión Integral de Residuos',
+            text: "Implementación de metodología 5'S y sostenibilidad",
+          },
+        ],
+        footerLabel: 'Línea de productos',
+        href: '/#contacto',
+      },
+      {
+        label: 'DIVISIÓN 02',
+        title: 'Hospitalaria',
+        icon: 'local-hospital',
+        description:
+          'Soluciones biomédicas y farmacológicas de alto impacto para la red de salud pública y privada.',
+        items: [
+          {
+            icon: 'medical-services',
+            title: 'Cadena Integral de Suministros',
+            text: 'Medicamentos, ortopédicos, equipos, insumos y dispositivos',
+          },
+          {
+            icon: 'monitor-heart',
+            title: 'Mantenimiento Biomédico',
+            text: 'Calibración, metrología y tecnovigilancia certificada',
+          },
+        ],
+        footerLabel: 'Línea de productos',
+        href: '/#contacto',
+      },
+      {
+        label: 'DIVISIÓN 03',
+        title: 'Suministros',
+        icon: 'household-supplies',
+        description:
+          'Higiene, asepsia e insumos químicos especializados para entornos institucionales y domésticos.',
+        items: [
+          {
+            icon: 'sanitizer',
+            title: 'Productos Líquidos de Limpieza',
+            text: 'Desinfectantes clínicos, detergentes y formulaciones especializadas',
+          },
+          {
+            icon: 'home-and-garden',
+            title: 'Elementos de Aseo Institucional y Hogar',
+            text: 'Dotación para empresas, plantas clínicas y uso residencial',
+          },
+        ],
+        footerLabel: 'Línea de productos',
+        href: '/#contacto',
+      },
+    ],
+  },
 };

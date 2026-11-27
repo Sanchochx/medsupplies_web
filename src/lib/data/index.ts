@@ -8,6 +8,7 @@ export {
   getLegalLinks,
   getMissionVision,
   getNavItems,
+  getServiceOrganization,
   getSocialLinks,
   getWhatsAppUrl,
   getWhyUsPillars,
@@ -16,11 +17,14 @@ export type { ContactChannels, ContactLink } from './site';
 export type {
   AnchorHref,
   CompanyInfo,
+  DivisionItem,
   HeroCopy,
   Highlight,
   LegalLink,
   MissionVision,
   NavItem,
+  ServiceDivision,
+  ServiceOrganization,
   SocialLink,
   SocialNetwork,
 } from './siteData';

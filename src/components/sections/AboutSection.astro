@@ -11,6 +11,14 @@ interface StatementCard {
 }
 
 const HEADING_ID = 'about-heading';
+const POLICY_HEADING_ID = 'integrated-policy-heading';
+
+/*
+ * Keeps the slogan on one line from `lg`. Set in Plus Jakarta Sans 700 it measures ~24.6em plus
+ * the band's 24px padding, so the size tracks the viewport (minus the 3rem side margins) and caps
+ * at headline-xl once there is room. Below `lg` it wraps; one line would need an unreadable size.
+ */
+const HEADING_ONE_LINE = 'lg:whitespace-nowrap lg:text-[clamp(1.75rem,4vw_-_0.375rem,2.5rem)]';
 
 const { mission, vision } = getMissionVision();
 
@@ -19,15 +27,15 @@ const cards: StatementCard[] = [
     icon: 'flag',
     title: 'Nuestra Misión',
     text: mission,
-    footerIcon: 'task-alt',
-    footer: 'Estándares de bioseguridad clínica',
+    footerIcon: 'query-stats',
+    footer: 'Meta 2028: 10 empleos y 8% del mercado regional',
   },
   {
     icon: 'visibility',
     title: 'Nuestra Visión',
     text: vision,
-    footerIcon: 'military-tech',
-    footer: 'Liderazgo en gestión de tecnología hospitalaria',
+    footerIcon: 'verified',
+    footer: 'Calidad total a precios competitivos',
   },
 ];
 ---
@@ -37,11 +45,14 @@ const cards: StatementCard[] = [
   aria-labelledby={HEADING_ID}
   class="w-full bg-surface-container-lowest py-space-xl lg:py-24"
 >
-  <Container class="flex flex-col gap-space-xl">
+  <Container class="flex flex-col gap-margin lg:gap-16">
     <SectionHeader
       headingId={HEADING_ID}
-      heading="Comprometidos con la salud y el rigor en la ingeniería biomédica"
-      lead="Empresa colombiana dedicada a elevar los estándares del sector salud mediante el suministro oportuno de dispositivos médicos, insumos hospitalarios y medicamentos, complementado con servicios de ingeniería biomédica preventiva y correctiva y calibración de equipos."
+      heading="INGENIERÍA Y SUMINISTROS QUE FACILITAN SU VIDA"
+      highlight
+      align="center"
+      headingClass={HEADING_ONE_LINE}
+      lead="En 2015 nace FESIQ Ingeniería, un grupo interdisciplinario de profesionales que comparte conceptos y herramientas para que sus clientes adopten nuevas prácticas de gestión. En los últimos 10 años la empresa incursionó en un nuevo campo y FESIQ fue absorbida por Medsupplies & Ingeniería S.A.S., que hoy ofrece, además de ingeniería, suministros para el sector salud y la industria de alimentos. Nos apoyamos en la calidad humana, la experiencia profesional y la preparación académica para brindar el mejor servicio."
     />
 
     <ul class="grid grid-cols-1 gap-gutter md:grid-cols-2">
@@ -59,5 +70,21 @@ const cards: StatementCard[] = [
         </li>
       ))}
     </ul>
+
+    <SectionHeader
+      as="h3"
+      headingId={POLICY_HEADING_ID}
+      heading="POLÍTICA INTEGRADA"
+      highlight
+      align="center"
+    >
+      <Fragment slot="lead">
+        Para <span class="font-semibold text-primary">Medsupplies &amp; Ingeniería S.A.S.</span>, la
+        salud, el bienestar y la seguridad de las personas están por encima de los demás objetivos
+        de la organización. Estamos comprometidos con la protección del medio ambiente, con la
+        calidad de los productos y servicios, y con la búsqueda continua de la satisfacción de los
+        clientes, colaboradores y proveedores.
+      </Fragment>
+    </SectionHeader>
   </Container>
 </section>

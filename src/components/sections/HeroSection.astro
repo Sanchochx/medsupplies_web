@@ -5,6 +5,11 @@ import { getHeroCopy } from '../../lib/data';
 import { Button, Chip, Container } from '../ui';
 
 const HEADING_ID = 'hero-heading';
+// WebM (VP9) first: Firefox on Linux may only have OpenH264, which stalls on non-Baseline H.264.
+const HERO_VIDEO_SOURCES = [
+  { src: '/videos/video_fondo.webm', type: 'video/webm' },
+  { src: '/videos/video_fondo.mp4', type: 'video/mp4' },
+] as const;
 
 const { microSpecs } = getHeroCopy();
 ---
@@ -14,7 +19,10 @@ const { microSpecs } = getHeroCopy();
   aria-labelledby={HEADING_ID}
   class="focus-ring-inverse relative w-full overflow-hidden bg-scrim py-space-xl lg:py-24"
 >
-  {/* PLACEHOLDER (D-12): decorative background photo until the real one is delivered. */}
+  {/*
+    The photo stays underneath the video: it is the LCP element, it fills the frame while the
+    video buffers or if it cannot play, and it is all that shows under reduced motion.
+  */}
   <Image
     src={heroImage}
     alt=""
@@ -26,21 +34,36 @@ const { microSpecs } = getHeroCopy();
     fetchpriority="high"
     class="absolute inset-0 size-full object-cover"
   />
-  {/* 85%, not lower: keeps the blue highlight above 3:1 (large text) over the photo's brightest pixels. */}
-  <div aria-hidden="true" class="absolute inset-0 bg-scrim/85"></div>
+  {/* Muted + playsinline: browsers (iOS Safari in particular) only autoplay silent inline video. */}
+  <video
+    autoplay
+    muted
+    loop
+    playsinline
+    data-looping-video
+    aria-hidden="true"
+    tabindex="-1"
+    class="absolute inset-0 size-full object-cover motion-reduce:hidden"
+  >
+    {HERO_VIDEO_SOURCES.map(({ src, type }) => (
+      <source src={src} type={type} />
+    ))}
+  </video>
+  {/* 75%: lighter veil so the video reads through; recheck the blue highlight contrast if the footage changes. */}
+  <div aria-hidden="true" class="absolute inset-0 bg-scrim/75"></div>
 
   <Container class="relative z-10">
     <div class="mx-auto flex max-w-4xl flex-col items-center gap-space-md text-center">
       <Chip variant="eyebrow" icon="verified-user">
-        Tecnología Biomédica y Farmacéutica en Colombia
+        Tecnología médica y Farmacéutica en Colombia
       </Chip>
 
       <h1
         id={HEADING_ID}
         class="text-start font-heading text-headline-xl leading-[1.1] tracking-tight text-surface-bright lg:text-display-lg"
       >
-        Soluciones Integrales en <span class="text-primary-container">Dispositivos Médicos</span>,
-        Productos Farmacéuticos e Ingeniería Especializada
+        <span class="text-primary-container">Medsupplies Ingeniería S.A.S.</span> soluciones
+        integrales con Dispositivos Médicos, Productos Farmacéuticos e Ingeniería Especializada
       </h1>
 
       <p class="max-w-2xl text-body-lg leading-relaxed text-surface-variant">
@@ -72,3 +95,9 @@ const { microSpecs } = getHeroCopy();
     </div>
   </Container>
 </section>
+
+<script>
+  import { initLoopingVideos } from '../../lib/media/loopingVideo';
+
+  initLoopingVideos();
+</script>

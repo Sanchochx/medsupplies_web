@@ -5,6 +5,7 @@ export type SectionHeadingLevel = 'h1' | 'h2' | 'h3';
 
 export interface SectionHeaderProps {
   heading: string;
+  /** Plain-text lead; use the `lead` slot instead when it needs inline markup. */
   lead?: string;
   /** Heading element; `h2` for regular page sections. */
   as?: SectionHeadingLevel;
@@ -14,6 +15,13 @@ export interface SectionHeaderProps {
   /** `primary` for sections on the blue `primary` background. */
   tone?: SectionHeaderTone;
   leadSize?: 'md' | 'lg';
+  /**
+   * Paints the heading text on a solid `primary` band with `on-primary` text. The width cap then
+   * applies to the lead only, so a short slogan can run on a single line.
+   */
+  highlight?: boolean;
+  /** Extra classes for the heading element (e.g. sizing that depends on the heading's length). */
+  headingClass?: string;
   class?: string;
 }
 
@@ -35,15 +43,19 @@ const {
   align = 'start',
   tone = 'light',
   leadSize = 'lg',
+  highlight = false,
+  headingClass,
   class: className,
 } = Astro.props;
 
 const toneClasses = TONE_CLASSES[tone];
+const hasLead = Boolean(lead) || Astro.slots.has('lead');
 ---
 
 <div
   class:list={[
-    'flex max-w-3xl flex-col',
+    'flex flex-col',
+    !highlight && 'max-w-3xl',
     align === 'center' && 'mx-auto items-center text-center',
     className,
   ]}
@@ -52,20 +64,31 @@ const toneClasses = TONE_CLASSES[tone];
     id={headingId}
     class:list={[
       'font-heading text-headline-xl-mobile tracking-tight md:text-headline-xl',
-      toneClasses.heading,
+      !highlight && toneClasses.heading,
+      headingClass,
     ]}
   >
-    {heading}
+    {highlight ? (
+      // box-decoration-clone keeps padding and radius on every line when the heading wraps.
+      <span class="rounded-lg bg-primary px-3 py-1 leading-[1.6] text-on-primary box-decoration-clone">
+        {heading}
+      </span>
+    ) : (
+      heading
+    )}
   </Heading>
-  {lead && (
+  {hasLead && (
     <p
       class:list={[
         'leading-relaxed',
-        leadSize === 'lg' ? 'mt-space-sm text-body-lg' : 'mt-2 text-body-md',
+        highlight && 'max-w-3xl',
+        leadSize === 'lg' ? 'text-body-lg' : 'text-body-md',
+        // The highlight band sits outside the heading's line box, so it needs extra room.
+        highlight ? 'mt-space-lg' : leadSize === 'lg' ? 'mt-space-sm' : 'mt-2',
         toneClasses.lead,
       ]}
     >
-      {lead}
+      {lead ?? <slot name="lead" />}
     </p>
   )}
 </div>
