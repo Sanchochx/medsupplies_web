@@ -7,7 +7,15 @@ import tseslint from 'typescript-eslint';
 
 export default defineConfig(
   {
-    ignores: ['dist/', '.astro/', '.vercel/', 'node_modules/', '.claude/', 'demo_design/'],
+    ignores: [
+      'dist/',
+      '.astro/',
+      '.vercel/',
+      'node_modules/',
+      '.claude/',
+      'demo_design/',
+      'scratch/',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.strict,

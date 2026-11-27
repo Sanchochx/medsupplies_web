@@ -1,0 +1,48 @@
+---
+import { lineCounterText } from '../../lib/divisions/lineTabs';
+import { Button, Icon } from '../ui';
+
+export interface DivisionPanelFooterProps {
+  /** Number of lines in the panel. */
+  count: number;
+}
+
+type Props = DivisionPanelFooterProps;
+
+const { count } = Astro.props;
+
+const ARROW_CLASSES =
+  'inline-flex size-11 cursor-pointer items-center justify-center rounded-full bg-surface-container-lowest text-primary shadow-sm ring-1 ring-outline-variant transition-colors duration-200 ease-out hover:bg-surface-container-high disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-surface-container-lowest';
+---
+
+{/* The first line starts selected, so "previous" starts disabled; lineTabs.ts keeps both in sync. */}
+<div class="flex flex-col gap-space-md border-t border-outline-variant/60 pt-space-lg sm:flex-row sm:items-center sm:justify-between">
+  <div class="flex items-center justify-between gap-space-md sm:justify-start">
+    <p data-line-counter aria-live="polite" class="text-body-sm text-on-surface-variant">
+      {lineCounterText(0, count)}
+    </p>
+    <div class="flex gap-space-sm">
+      <button
+        type="button"
+        data-line-prev
+        aria-label="Línea anterior"
+        disabled
+        class={ARROW_CLASSES}
+      >
+        <Icon name="arrow-back" size={20} />
+      </button>
+      <button
+        type="button"
+        data-line-next
+        aria-label="Línea siguiente"
+        disabled={count <= 1}
+        class={ARROW_CLASSES}
+      >
+        <Icon name="arrow-forward" size={20} />
+      </button>
+    </div>
+  </div>
+  <Button href="/#contacto" size="lg" fullWidth class="sm:w-auto">
+    Solicitar cotización
+  </Button>
+</div>

@@ -2,6 +2,7 @@
 // Run `npm run icons:generate` after adding or removing an icon.
 
 export const ICON_NAMES = [
+  'arrow-back',
   'arrow-forward',
   'assignment',
   'build',

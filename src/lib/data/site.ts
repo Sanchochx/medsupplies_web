@@ -69,10 +69,6 @@ export function getHeroCopy(): HeroCopy {
   return SITE_DATA.hero;
 }
 
-export function getDivisionsHeading(): string {
-  return SITE_DATA.divisionsHeading;
-}
-
 /** The three division banners, in display order. */
 export function getDivisionBanners(): readonly DivisionBanner[] {
   return SITE_DATA.divisionBanners;

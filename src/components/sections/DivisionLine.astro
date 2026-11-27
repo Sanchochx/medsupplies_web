@@ -1,59 +1,65 @@
 ---
-import { Image } from 'astro:assets';
 import type { DivisionLine } from '../../lib/data';
-import { Chip, Icon } from '../ui';
+import { formatLineLabel } from '../../lib/divisions/lineTabs';
+import { Chip, Icon, IconTile } from '../ui';
 
 export interface DivisionLineProps {
   line: DivisionLine;
-  /** Puts the photo on the right from md up; consecutive lines alternate. */
-  reversed?: boolean;
+  /** Position in the panel; drives the "Línea NN" pill. */
+  index: number;
+  /** Id of this tab panel. */
+  id: string;
+  /** Id of the tab that names this panel. */
+  tabId: string;
+  hidden?: boolean;
 }
 
 type Props = DivisionLineProps;
 
-const { line, reversed = false } = Astro.props;
-const { label, title, image, items } = line;
-
-// The tile is at most ~1/3 of the 1320px container (≈ 400px), shown up to 2× on dense screens.
-const WIDTHS = [...new Set([320, 480, 800, image.width].filter((width) => width <= image.width))];
+const { line, index, id, tabId, hidden = false } = Astro.props;
 ---
 
-<div class="grid items-start gap-space-lg md:grid-cols-3 lg:gap-space-xl">
-  <div
-    class:list={[
-      'relative isolate flex h-56 items-center justify-center overflow-hidden rounded-2xl bg-surface-container-lowest p-space-lg shadow-md sm:h-64 md:aspect-square md:h-auto lg:p-space-xl',
-      reversed && 'md:order-last',
-    ]}
-  >
-    {/* Faint blue halo that lifts the cut-out product photo off the white tile. */}
-    <span
-      aria-hidden="true"
-      class="absolute inset-0 -z-10 bg-radial from-primary-fixed/80 via-primary-fixed/25 via-45% to-transparent to-70%"
-    ></span>
-    <Image
-      src={image}
-      alt=""
-      widths={WIDTHS}
-      sizes="(min-width: 48rem) 400px, 100vw"
-      loading="lazy"
-      decoding="async"
-      class="size-full object-contain"
-    />
+{/* `tabindex="0"` lets keyboard users reach the panel, which has no focusable content of its own. */}
+<div
+  role="tabpanel"
+  id={id}
+  aria-labelledby={tabId}
+  tabindex="0"
+  hidden={hidden}
+  class="flex flex-col gap-space-md rounded-2xl focus-visible:outline-offset-4"
+>
+  <div class="flex flex-col items-start gap-space-sm">
+    <Chip variant="soft">{formatLineLabel(index)}</Chip>
+    <h3 class="font-heading text-headline-md font-bold text-on-primary-fixed">{line.title}</h3>
+    {line.badge && (
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-surface-container-lowest px-3 py-1 text-label-md text-on-primary-fixed-variant ring-1 ring-primary-fixed-dim">
+        <Icon name="verified" size={16} class="text-primary" />
+        {line.badge}
+      </span>
+    )}
+    {line.description && (
+      <p class="max-w-prose text-body-md text-on-surface-variant">{line.description}</p>
+    )}
   </div>
 
-  <div class="flex flex-col gap-space-md md:col-span-2">
-    <div class="flex flex-col items-start gap-space-sm">
-      <Chip variant="soft">{label}</Chip>
-      <h4 class="font-heading text-headline-md font-bold text-on-primary-fixed">{title}</h4>
-    </div>
-    {/* Grid rows stretch their cells, so chips in the same row keep the same height. */}
+  {/* Grid rows stretch their cells, so chips in the same row keep the same height; names wrap. */}
+  {line.kind === 'products' ? (
     <ul class="grid grid-cols-1 gap-space-sm sm:grid-cols-2 xl:grid-cols-3">
-      {items.map((item) => (
-        <li class="flex items-center gap-space-sm rounded-xl bg-surface-container-low px-space-md py-3 text-body-sm font-medium text-on-primary-fixed">
+      {line.items.map((item) => (
+        <li class="flex items-center gap-space-sm rounded-xl bg-surface-container-high px-space-md py-3 text-body-sm font-medium text-on-primary-fixed">
           <Icon name="check-circle" size={18} class="text-primary" />
           <span>{item}</span>
         </li>
       ))}
     </ul>
-  </div>
+  ) : (
+    <ul class="grid grid-cols-1 gap-space-sm sm:grid-cols-2 sm:gap-space-md">
+      {line.items.map(({ name, icon }) => (
+        <li class="flex items-center gap-space-md rounded-xl bg-surface-container-lowest p-space-sm pr-space-md text-body-md font-medium text-on-primary-fixed shadow-sm">
+          <IconTile icon={icon} />
+          <span>{name}</span>
+        </li>
+      ))}
+    </ul>
+  )}
 </div>

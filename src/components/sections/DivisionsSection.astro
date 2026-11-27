@@ -1,37 +1,24 @@
 ---
-import { getDivisionBanners, getDivisionsHeading } from '../../lib/data';
-import { Container, SectionHeader } from '../ui';
+import { getDivisionBanners } from '../../lib/data';
 import DivisionBanner from './DivisionBanner.astro';
 import DivisionPanel from './DivisionPanel.astro';
 
-const HEADING_ID = 'divisions-heading';
-
-const heading = getDivisionsHeading();
 const banners = getDivisionBanners();
 ---
 
 {/*
  * Keeps the `#productos` anchor the "Productos" nav link and the hero CTA point to. One screen
  * below the fixed header (like the hero), so with the global header-height scroll margin the
- * title and the three banners land exactly between the header and the bottom of the screen.
+ * three banners land exactly between the header and the bottom of the screen. There is no
+ * visible section title; each banner title is an `h2`.
  * Opening a division's panel lets the section grow past one screen (see divisionPanels.ts).
  */}
 <section
   id="productos"
-  aria-labelledby={HEADING_ID}
+  aria-label="Divisiones"
   data-divisions
   class="flex min-h-screen-below-header w-full flex-col bg-surface-container-lowest"
 >
-  <Container class="py-space-lg md:py-space-xl" data-divisions-heading>
-    <!-- Same highlighted band as "POLÍTICA INTEGRADA"; uppercase is visual only, the copy stays as written. -->
-    <SectionHeader
-      headingId={HEADING_ID}
-      heading={heading}
-      highlight
-      align="center"
-      headingClass="uppercase"
-    />
-  </Container>
   <ul
     class="group/divisions grid flex-1 grid-rows-divisions gap-space-sm data-locked:grid-rows-none"
     data-divisions-list
@@ -39,7 +26,7 @@ const banners = getDivisionBanners();
     {banners.map((banner) => {
       const articleId = `division-${banner.id}`;
       const titleId = `${articleId}-title`;
-      const panelId = `${articleId}-panel`;
+      const panelId = banner.panel ? `${articleId}-panel` : undefined;
       return (
         <li class="flex">
           <article
@@ -49,7 +36,9 @@ const banners = getDivisionBanners();
             class="group/division flex w-full flex-col"
           >
             <DivisionBanner banner={banner} titleId={titleId} panelId={panelId} />
-            <DivisionPanel id={panelId} labelledBy={titleId} lines={banner.lines} />
+            {panelId && banner.panel && (
+              <DivisionPanel id={panelId} labelledBy={titleId} panel={banner.panel} />
+            )}
           </article>
         </li>
       );
@@ -59,6 +48,10 @@ const banners = getDivisionBanners();
 
 <script>
   import { initDivisionPanels } from '../../lib/divisions/divisionPanels';
+  import { initLineTabs } from '../../lib/divisions/lineTabs';
+  import { initPhotoRotators } from '../../lib/divisions/photoRotation';
 
   initDivisionPanels();
+  initLineTabs();
+  initPhotoRotators();
 </script>

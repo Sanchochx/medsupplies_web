@@ -1,24 +1,35 @@
 ---
-import type { DivisionLine as DivisionLineData } from '../../lib/data';
-import { Button, Container } from '../ui';
+import type { DivisionPanel } from '../../lib/data';
+import { Container } from '../ui';
 import DivisionLine from './DivisionLine.astro';
+import DivisionLineTabs from './DivisionLineTabs.astro';
+import DivisionPanelFooter from './DivisionPanelFooter.astro';
+import DivisionPhotoLoop from './DivisionPhotoLoop.astro';
 
 export interface DivisionPanelProps {
   id: string;
-  /** Id of the division title that names this region. */
+  /** Id of the division title that names this region and its tab list. */
   labelledBy: string;
-  lines: readonly DivisionLineData[];
+  panel: DivisionPanel;
 }
 
 type Props = DivisionPanelProps;
 
-const { id, labelledBy, lines } = Astro.props;
+const { id, labelledBy, panel } = Astro.props;
+const lines = panel.lines.map((line) => ({
+  line,
+  tabId: `${id}-tab-${line.id}`,
+  panelId: `${id}-line-${line.id}`,
+}));
+const hasPhotos = panel.images.length > 0;
 ---
 
 {/*
  * Collapsed by default: `0fr` rows give it no height and `inert` + `aria-hidden` keep its content
  * out of the tab order and the accessibility tree. The toggle script flips `data-state` on the
- * division and these attributes together; the row animates `0fr` → `1fr`.
+ * division and these attributes together; the row animates `0fr` → `1fr`. Inside, the first line
+ * is selected; lineTabs.ts switches lines. The division's photo loop sits beside every line (above
+ * it on small screens), so it keeps running when the tab changes.
  */}
 <div
   id={id}
@@ -27,19 +38,27 @@ const { id, labelledBy, lines } = Astro.props;
   aria-hidden="true"
   inert
   data-division-panel
-  class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-350 ease-out group-data-[state=open]/division:grid-rows-[1fr] data-instant:transition-none"
+  class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-350 ease-out group-data-[state=open]/division:grid-rows-[1fr]"
 >
   <div class="min-h-0 overflow-hidden">
-    <div class="border-t-4 border-primary bg-surface-container-lowest py-space-xl lg:py-14">
-      <Container class="flex flex-col gap-space-xl lg:gap-14">
-        {lines.map((line, index) => (
-          <DivisionLine line={line} reversed={index % 2 === 1} />
-        ))}
-        <div class="border-t border-outline-variant/60 pt-space-lg">
-          <Button href="/#contacto" size="lg" fullWidth class="sm:w-auto">
-            Solicitar cotización
-          </Button>
+    <div class="bg-surface-container-low py-space-lg lg:py-space-xl">
+      <Container class="flex flex-col gap-space-lg lg:gap-space-xl" data-line-tabs>
+        <DivisionLineTabs labelledBy={labelledBy} lines={lines} />
+        <div class="grid items-start gap-space-lg md:grid-cols-3 lg:gap-space-xl">
+          {hasPhotos && <DivisionPhotoLoop images={panel.images} />}
+          <div class:list={[hasPhotos ? 'md:col-span-2' : 'md:col-span-3']}>
+            {lines.map(({ line, tabId, panelId }, index) => (
+              <DivisionLine
+                line={line}
+                index={index}
+                id={panelId}
+                tabId={tabId}
+                hidden={index !== 0}
+              />
+            ))}
+          </div>
         </div>
+        <DivisionPanelFooter count={lines.length} />
       </Container>
     </div>
   </div>

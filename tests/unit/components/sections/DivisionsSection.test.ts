@@ -26,29 +26,23 @@ describe('getDivisionBanners', () => {
 });
 
 describe('DivisionsSection', () => {
-  it('is the #productos section, named by its highlighted, centered h2 title', async () => {
+  it('is the #productos section, named for assistive tech, with no visible section title', async () => {
     const html = await renderSection();
 
-    expect(html).toMatch(/^<section id="productos" aria-labelledby="divisions-heading"/);
-    expect(html).toMatch(
-      /<h2 id="divisions-heading" class="[^"]*\buppercase\b[^"]*">\s*<span[^>]*\bbg-primary\b[^>]*\btext-on-primary\b[^>]*>\s*Organización Integral de Servicios\s*<\/span>\s*<\/h2>/,
-    );
-    expect(html.match(/<h2\b/g)).toHaveLength(1);
-  });
-
-  it('shows only the title above the banners: no lead, division cards or background photo', async () => {
-    const html = await renderSection();
-    const header = html.slice(0, html.indexOf('<ul '));
-
-    expect(header).not.toMatch(/<p\b|<img\b/);
+    expect(html).toMatch(/^<section id="productos" aria-label="Divisiones"/);
+    expect(html).not.toContain('Organización Integral de Servicios');
+    // The section starts straight with the banner list: no heading, lead or background photo.
+    expect(html).toMatch(/^<section [^>]*>\s*<ul /);
     expect(html).not.toContain('image_generica');
     expect(html).not.toContain('Arquitectura operativa');
     const banners = getDivisionBanners();
-    const lineCount = banners.reduce((total, { lines }) => total + lines.length, 0);
-    expect(html.match(/<img\b/g)).toHaveLength(banners.length + lineCount);
+    expect(html.match(/<h2\b/g)).toHaveLength(banners.length);
+    // Every division photo is in the markup (the loop renders all its slides).
+    const photoCount = banners.reduce((total, { panel }) => total + (panel?.images.length ?? 0), 0);
+    expect(html.match(/<img\b/g)).toHaveLength(banners.length + photoCount);
   });
 
-  it('renders one article per banner from siteData, in order, with its h3 title', async () => {
+  it('renders one article per banner from siteData, in order, with its h2 title', async () => {
     const rendered = cards(await renderSection());
     const banners = getDivisionBanners();
 
@@ -57,7 +51,7 @@ describe('DivisionsSection', () => {
       const banner = banners[index];
       expect(card).toMatch(
         new RegExp(
-          `<h3 id="division-${banner?.id}-title"[^>]*>\\s*<button[^>]*>\\s*${banner?.title}\\s*</button>\\s*</h3>`,
+          `<h2 id="division-${banner?.id}-title"[^>]*>\\s*(<button[^>]*>\\s*)?${banner?.title}\\s*(</button>\\s*)?</h2>`,
         ),
       );
     });
@@ -69,17 +63,19 @@ describe('DivisionsSection', () => {
     expect(html).not.toContain('Explorar');
     expect(html).not.toContain('DIVISIÓN 0');
     for (const card of cards(html)) {
-      const banner = card.slice(0, card.indexOf('data-division-panel'));
+      const panelStart = card.indexOf('data-division-panel');
+      const banner = panelStart === -1 ? card : card.slice(0, panelStart);
       expect(banner).not.toMatch(/<p\b|<a\b/);
-      expect(banner.match(/<button\b/g)).toHaveLength(1);
+      expect(banner.match(/<button\b/g)?.length ?? 0).toBeLessThanOrEqual(1);
     }
   });
 
-  it('makes each banner a collapsed disclosure button for its panel region', async () => {
-    for (const card of cards(await renderSection())) {
+  it('makes the hospital and supplies banners collapsed disclosure buttons for their panels', async () => {
+    const [hospital, supplies] = cards(await renderSection());
+    for (const card of [hospital ?? '', supplies ?? '']) {
       const button = /<button [^>]*>/.exec(card)?.[0] ?? '';
       const panelId = /aria-controls="([^"]+)"/.exec(button)?.[1];
-      const titleId = /<h3 id="([^"]+)"/.exec(card)?.[1];
+      const titleId = /<h2 id="([^"]+)"/.exec(card)?.[1];
 
       expect(button).toContain('type="button"');
       expect(button).toContain('aria-expanded="false"');
@@ -97,23 +93,56 @@ describe('DivisionsSection', () => {
     }
   });
 
-  it('adds a decorative chevron, on the left only for the right-aligned banner', async () => {
-    const [first, second, third] = cards(await renderSection());
+  it('keeps the engineering banner static: no button, chevron, panel or hover', async () => {
+    const [, , engineering] = cards(await renderSection());
 
-    for (const card of [first, second, third]) {
-      const chevron =
-        /<div aria-hidden="true" class="pointer-events-none absolute inset-0">[\s\S]*?<\/svg>/.exec(
-          card ?? '',
-        )?.[0] ?? '';
-      expect(chevron).toMatch(/\bsize-11\b/);
-      expect(chevron).toMatch(/group-data-\[state=open\]\/division:rotate-180/);
-    }
-    expect(first).toMatch(
+    expect(engineering).toMatch(
+      /<h2 id="division-engineering-title"[^>]*>\s*División Ingeniería\s*<\/h2>/,
+    );
+    expect(engineering).not.toMatch(/<button\b|data-division-panel|<svg\b|aria-controls/);
+    expect(engineering).not.toContain('group-hover/banner:brightness-115');
+    expect(engineering).not.toContain('Cerrar panel');
+  });
+
+  it('adds a decorative chevron on the right of the hospital banner that flips when open', async () => {
+    const [hospital] = cards(await renderSection());
+    const cue =
+      /<div aria-hidden="true" class="pointer-events-none absolute inset-0">[\s\S]*?<\/svg>/.exec(
+        hospital ?? '',
+      )?.[0] ?? '';
+
+    expect(cue).toMatch(/\bsize-11\b/);
+    expect(cue).toMatch(/group-data-\[state=open\]\/division:rotate-180/);
+    expect(hospital).toMatch(
       /pointer-events-none absolute inset-0">\s*<div class="[^"]*\bjustify-end\b/,
     );
-    expect(second).toMatch(
+  });
+
+  it('mirrors the supplies controls: chevron circle and label on the left, circle first', async () => {
+    const [, supplies] = cards(await renderSection());
+    const cue =
+      /<div aria-hidden="true" class="pointer-events-none absolute inset-0">[\s\S]*?<\/svg>/.exec(
+        supplies ?? '',
+      )?.[0] ?? '';
+
+    expect(cue).toMatch(
       /pointer-events-none absolute inset-0">\s*<div class="[^"]*\bjustify-start\b/,
     );
+    // DOM order is label then circle; reversing the row puts the circle at the left edge.
+    expect(cue).toMatch(/<span class="inline-flex items-center [^"]*\bflex-row-reverse\b/);
+    expect(cue).toMatch(/group-data-\[state=open\]\/division:rotate-180/);
+    const [hospital] = cards(await renderSection());
+    expect(hospital).not.toMatch(/\bflex-row-reverse\b/);
+  });
+
+  it('shows "Cerrar panel" beside the chevron only while each panel is open', async () => {
+    const [hospital, supplies] = cards(await renderSection());
+
+    for (const card of [hospital, supplies]) {
+      expect(card).toMatch(
+        /<span class="hidden [^"]*group-data-\[state=open\]\/division:inline">\s*Cerrar panel\s*<\/span>/,
+      );
+    }
   });
 
   it('serves decorative, lazy, responsive cover images', async () => {

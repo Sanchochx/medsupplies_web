@@ -12,7 +12,9 @@ import type { ImageMetadata } from 'astro';
 import engineeringImage from '../../assets/images/division_ingenieria.png';
 import suppliesImage from '../../assets/images/division_suministros.png';
 import hospitalImage from '../../assets/images/divison_hospitalaria.png';
-import productLinePlaceholder from '../../assets/images/placeholders/product-line.webp';
+import type { IconName } from '../../components/ui/iconNames';
+import { HOSPITAL_PANEL } from './hospitalPanel';
+import { SUPPLIES_PANEL } from './suppliesPanel';
 
 /** `/#anchor` hrefs work from any page, not only the home page. */
 export type AnchorHref = `/#${string}`;
@@ -75,21 +77,53 @@ export interface HeroCopy {
 /** Side of the banner the text block sits on; the dark overlay follows it. */
 export type BannerTextSide = 'left' | 'right';
 
-/**
- * A product (or service) line shown in a division's expandable panel. To replace the placeholder
- * content, edit the strings and point `image` at the real photo (square, 1:1, transparent or
- * white background works best because the tile shows it with `object-fit: contain`).
- */
-export interface DivisionLine {
-  /** Code slug, unique across all divisions; used for element ids. */
+/** Products get check chips; services get icon chips. */
+export type DivisionLineKind = 'products' | 'services';
+
+interface DivisionLineBase {
+  /** Code slug, unique within its panel; used for element ids. */
   id: string;
-  /** Short pill above the title, e.g. "Línea 01" (shown uppercase). */
-  label: string;
+  /** Short name on the line's tab. */
+  tabLabel: string;
   title: string;
-  /** Decorative product photo (rendered with `alt=""`; the line title names it). */
-  image: ImageMetadata;
-  /** Product or service names, in display order. Names only, no descriptions. */
+  /** Short catalog statement shown as a badge under the title (e.g. a certification). */
+  badge?: string;
+  /** Short paragraph under the title; omitted when the catalog has none. */
+  description?: string;
+}
+
+/** A product line of a division panel. */
+export interface DivisionProductLine extends DivisionLineBase {
+  kind: 'products';
+  /** Product names, in display order. Names only, no descriptions. */
   items: readonly string[];
+}
+
+export interface DivisionServiceItem {
+  name: string;
+  /** Decorative icon shown beside the name. */
+  icon: IconName;
+}
+
+/** A service line (e.g. biomedical maintenance). */
+export interface DivisionServiceLine extends DivisionLineBase {
+  kind: 'services';
+  items: readonly DivisionServiceItem[];
+}
+
+export type DivisionLine = DivisionProductLine | DivisionServiceLine;
+
+/** Content of the tabbed panel that expands below a division banner. */
+export interface DivisionPanel {
+  /** One tab per line, in display order; the "Línea NN" number follows this order. */
+  lines: readonly DivisionLine[];
+  /**
+   * Decorative product photos of the whole division (rendered with `alt=""`: the chips carry the
+   * information), shown beside every tab as one endless crossfading loop. Any aspect ratio: they
+   * are fitted with `object-fit: contain`. Empty → no photo column. The catalog photos are
+   * produced by `npm run images:prepare`.
+   */
+  images: readonly ImageMetadata[];
 }
 
 /** Full-width image banner of the "Divisiones" section (anchor `#productos`). */
@@ -102,8 +136,8 @@ export interface DivisionBanner {
   /** CSS `object-position` that keeps the photo's subject inside the short banner crop. */
   imagePosition: string;
   textSide: BannerTextSide;
-  /** Content of the panel that expands below the banner. */
-  lines: readonly DivisionLine[];
+  /** Expandable panel below the banner. Without it the banner is static: no toggle or chevron. */
+  panel?: DivisionPanel;
 }
 
 export interface SiteData {
@@ -116,8 +150,6 @@ export interface SiteData {
   socialLinks: readonly SocialLink[];
   missionVision: MissionVision;
   hero: HeroCopy;
-  /** Visible title of the "Divisiones" section, shown above the banners. */
-  divisionsHeading: string;
   divisionBanners: readonly DivisionBanner[];
 }
 
@@ -168,7 +200,6 @@ export const SITE_DATA: SiteData = {
     microSpecs: ['Regulación Sanitaria INVIMA', 'Trazabilidad y Cadena de Frío'],
   },
 
-  divisionsHeading: 'Organización Integral de Servicios',
   divisionBanners: [
     {
       id: 'hospital',
@@ -176,41 +207,7 @@ export const SITE_DATA: SiteData = {
       image: hospitalImage,
       imagePosition: '55% 42%',
       textSide: 'left',
-      lines: [
-        {
-          id: 'hospital-line-1',
-          label: 'Línea 01',
-          title: 'Línea de productos de ejemplo A',
-          image: productLinePlaceholder,
-          items: [
-            'Producto de ejemplo 1',
-            'Producto de ejemplo 2 con un nombre bastante más largo',
-            'Producto de ejemplo 3',
-            'Producto de ejemplo 4 de nombre medio',
-            'Producto 5',
-            'Producto de ejemplo 6 con nombre largo para probar el ajuste',
-            'Producto de ejemplo 7',
-            'Producto de ejemplo 8',
-          ],
-        },
-        {
-          id: 'hospital-line-2',
-          label: 'Línea 02',
-          title: 'Línea de productos de ejemplo B',
-          image: productLinePlaceholder,
-          items: [
-            'Producto de ejemplo 1',
-            'Producto 2',
-            'Producto de ejemplo 3 con un nombre que ocupa dos líneas',
-            'Producto de ejemplo 4',
-            'Producto de ejemplo 5 de nombre medio',
-            'Producto de ejemplo 6',
-            'Producto de ejemplo 7 con un nombre bastante más largo',
-            'Producto de ejemplo 8',
-            'Producto de ejemplo 9',
-          ],
-        },
-      ],
+      panel: HOSPITAL_PANEL,
     },
     {
       id: 'supplies',
@@ -218,37 +215,7 @@ export const SITE_DATA: SiteData = {
       image: suppliesImage,
       imagePosition: '70% 50%',
       textSide: 'right',
-      lines: [
-        {
-          id: 'supplies-line-1',
-          label: 'Línea 01',
-          title: 'Línea de suministros de ejemplo A',
-          image: productLinePlaceholder,
-          items: [
-            'Producto de ejemplo 1',
-            'Producto de ejemplo 2 de nombre medio',
-            'Producto 3',
-            'Producto de ejemplo 4 con un nombre bastante más largo',
-            'Producto de ejemplo 5',
-            'Producto de ejemplo 6',
-            'Producto de ejemplo 7',
-          ],
-        },
-        {
-          id: 'supplies-line-2',
-          label: 'Línea 02',
-          title: 'Línea de suministros de ejemplo B',
-          image: productLinePlaceholder,
-          items: [
-            'Producto de ejemplo 1',
-            'Producto de ejemplo 2',
-            'Producto de ejemplo 3 con nombre largo para probar el ajuste',
-            'Producto 4',
-            'Producto de ejemplo 5 de nombre medio',
-            'Producto de ejemplo 6',
-          ],
-        },
-      ],
+      panel: SUPPLIES_PANEL,
     },
     {
       id: 'engineering',
@@ -256,23 +223,6 @@ export const SITE_DATA: SiteData = {
       image: engineeringImage,
       imagePosition: '75% 28%',
       textSide: 'left',
-      lines: [
-        {
-          id: 'engineering-line-1',
-          label: 'Línea 01',
-          title: 'Línea de servicios de ejemplo',
-          image: productLinePlaceholder,
-          items: [
-            'Servicio de ejemplo 1',
-            'Servicio de ejemplo 2 con un nombre bastante más largo',
-            'Servicio 3',
-            'Servicio de ejemplo 4 de nombre medio',
-            'Servicio de ejemplo 5',
-            'Servicio de ejemplo 6 con nombre largo para probar el ajuste',
-            'Servicio de ejemplo 7',
-          ],
-        },
-      ],
     },
   ],
 };

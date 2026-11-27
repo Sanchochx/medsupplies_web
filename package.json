@@ -13,7 +13,8 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "icons:generate": "node scripts/generateIconNames.mjs"
+    "icons:generate": "node scripts/generateIconNames.mjs",
+    "images:prepare": "node scripts/prepare-catalog-images.mjs"
   },
   "dependencies": {
     "@fontsource/inter": "^5.3.0",
@@ -35,6 +36,7 @@
     "happy-dom": "^21.0.4",
     "prettier": "^3.10.1",
     "prettier-plugin-astro": "^1.1.2",
+    "sharp": "^0.35.5",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.73.0",
     "vitest": "^5.1.1"

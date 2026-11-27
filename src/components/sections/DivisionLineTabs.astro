@@ -1,0 +1,45 @@
+---
+import type { DivisionLine } from '../../lib/data';
+
+export interface DivisionLineTab {
+  line: DivisionLine;
+  tabId: string;
+  /** Id of the tab panel this tab controls. */
+  panelId: string;
+}
+
+export interface DivisionLineTabsProps {
+  /** Id of the division title that names the tab list. */
+  labelledBy: string;
+  lines: readonly DivisionLineTab[];
+}
+
+type Props = DivisionLineTabsProps;
+
+const { labelledBy, lines } = Astro.props;
+---
+
+{/*
+ * Below md the pills stay on one row that scrolls sideways, bleeding to the screen edges, with a
+ * faded right edge hinting at more tabs; from md up they wrap. The vertical padding keeps the
+ * selected halo and the focus outline from being clipped by the scroll container.
+ */}
+<div
+  role="tablist"
+  aria-labelledby={labelledBy}
+  class="-mx-margin-mobile flex gap-space-sm overflow-x-auto px-margin-mobile py-space-sm mask-r-from-85% [scrollbar-width:none] md:mx-0 md:flex-wrap md:overflow-visible md:px-0 md:mask-none"
+>
+  {lines.map(({ line, tabId, panelId }, index) => (
+    <button
+      type="button"
+      role="tab"
+      id={tabId}
+      aria-selected={index === 0 ? 'true' : 'false'}
+      aria-controls={panelId}
+      tabindex={index === 0 ? 0 : -1}
+      class="min-h-11 shrink-0 cursor-pointer rounded-full bg-surface-container-high px-space-md text-label-lg whitespace-nowrap text-on-surface-variant transition-colors duration-200 ease-out hover:bg-surface-container-highest focus-visible:outline-offset-4 aria-selected:bg-primary aria-selected:text-on-primary aria-selected:ring-4 aria-selected:ring-primary/25"
+    >
+      {line.tabLabel}
+    </button>
+  ))}
+</div>

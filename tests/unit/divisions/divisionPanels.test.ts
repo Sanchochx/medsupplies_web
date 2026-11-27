@@ -1,5 +1,5 @@
 import { Window } from 'happy-dom';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import DivisionsSection from '../../../src/components/sections/DivisionsSection.astro';
 import {
   LOCKED_ATTRIBUTE,
@@ -105,12 +105,11 @@ describe('initDivisionPanels', () => {
     expect(controller.openId).toBe('hospital');
     expectOnlyOpen(0);
     expect(list().hasAttribute(LOCKED_ATTRIBUTE)).toBe(true);
-    expect(list().style.getPropertyValue('--divisions-heading-height')).toMatch(/px$/);
   });
 
   it('closes the panel when the same banner is clicked again, then releases the lock', async () => {
-    click(1);
-    click(1);
+    click(0);
+    click(0);
 
     expect(controller.openId).toBeNull();
     expectOnlyOpen(null);
@@ -118,16 +117,96 @@ describe('initDivisionPanels', () => {
     expect(list().hasAttribute(LOCKED_ATTRIBUTE)).toBe(false);
   });
 
-  it('keeps only one panel open: opening another closes the previous one', async () => {
+  it('wires the hospital and supplies banners, the divisions with a panel', () => {
+    expect(toggles().map((button) => button.closest('article')?.dataset.division)).toEqual([
+      'hospital',
+      'supplies',
+    ]);
+    expect(panels()).toHaveLength(2);
+  });
+
+  it('keeps only one panel open across the section, in both directions', () => {
     click(0);
-    click(2);
-    expectOnlyOpen(2);
+    click(1);
+    expect(controller.openId).toBe('supplies');
+    expectOnlyOpen(1);
+
+    click(0);
+    expect(controller.openId).toBe('hospital');
+    expectOnlyOpen(0);
+    expect(expanded().filter((value) => value === 'true')).toHaveLength(1);
+  });
+
+  it('scrolls to the clicked banner only after the other panel has finished closing', async () => {
+    for (const panel of panels()) panel.style.transitionDuration = '350ms';
+    const scrollTo = vi.spyOn(window, 'scrollTo');
+
+    click(0);
+    expect(scrollTo).toHaveBeenCalledTimes(1); // Nothing was closing: scrolls at once.
 
     click(1);
     expectOnlyOpen(1);
-    expect(expanded().filter((value) => value === 'true')).toHaveLength(1);
+    expect(scrollTo).toHaveBeenCalledTimes(1);
+    await window.happyDOM.waitUntilComplete();
+    expect(scrollTo).toHaveBeenCalledTimes(2);
+  });
 
-    // A panel still open keeps the lock even after a previous close timer would have fired.
+  it('pins the clicked banner while the panel above it collapses, then scrolls to it', async () => {
+    for (const panel of panels()) panel.style.transitionDuration = '50ms';
+    click(0);
+    const supplies = toggles()[1]?.closest('article');
+    if (!supplies) throw new Error('Missing supplies article');
+    // happy-dom has no layout: fake a banner that rises 40px per frame as the panel above closes.
+    let top = 300;
+    supplies.getBoundingClientRect = () => {
+      const rect = {
+        top,
+        bottom: top + 200,
+        left: 0,
+        right: 0,
+        width: 0,
+        height: 200,
+        x: 0,
+        y: top,
+      };
+      top -= 40;
+      return { ...rect, toJSON: () => rect } as DOMRect;
+    };
+    const scrollBy = vi.spyOn(window, 'scrollBy');
+    const scrollTo = vi.spyOn(window, 'scrollTo');
+
+    click(1);
+    await window.happyDOM.waitUntilComplete();
+
+    expect(scrollBy).toHaveBeenCalled();
+    // Each correction scrolls up by however much the banner rose.
+    const shifts = scrollBy.mock.calls.map(([options]) => (options as ScrollToOptions).top ?? 0);
+    expect(shifts.every((shift) => shift < 0)).toBe(true);
+    expect(scrollTo).toHaveBeenCalledTimes(1);
+  });
+
+  it('drops a pending scroll when the visitor toggles again before it fires', async () => {
+    for (const panel of panels()) panel.style.transitionDuration = '350ms';
+    const scrollTo = vi.spyOn(window, 'scrollTo');
+
+    click(0);
+    click(1);
+    click(1); // Closes supplies before the delayed scroll runs.
+    await window.happyDOM.waitUntilComplete();
+
+    expect(scrollTo).toHaveBeenCalledTimes(1);
+    expectOnlyOpen(null);
+  });
+
+  it('reflects open/closed in aria-expanded across repeated toggles', async () => {
+    click(0);
+    expect(expanded()).toEqual(['true', 'false']);
+    click(0);
+    expect(expanded()).toEqual(['false', 'false']);
+    click(0);
+    expect(expanded()).toEqual(['true', 'false']);
+
+    // A panel reopened before the close timer fires keeps the lock.
     await window.happyDOM.waitUntilComplete();
     expect(list().hasAttribute(LOCKED_ATTRIBUTE)).toBe(true);
   });

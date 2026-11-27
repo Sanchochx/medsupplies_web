@@ -308,46 +308,15 @@
  * Banner height while a division panel is open. The stack then sizes its rows to their content
  * (so the open panel can push the section past one screen); this reproduces the height the
  * `grid-rows-divisions` rows give each banner when everything is closed, so banners never jump.
- * `--divisions-heading-height` (the title block above the stack) is measured by the toggle script.
  */
 @utility h-division-banner {
   flex: none;
-  height: max(
-    9rem,
-    27vh,
-    (
-        100vh - var(--spacing-header) - var(--divisions-heading-height) - 2 *
-          var(--spacing-space-sm)
-      ) /
-      3
-  );
-  height: max(
-    9rem,
-    27svh,
-    (
-        100svh - var(--spacing-header) - var(--divisions-heading-height) - 2 *
-          var(--spacing-space-sm)
-      ) /
-      3
-  );
+  height: max(9rem, 27vh, (100vh - var(--spacing-header) - 2 * var(--spacing-space-sm)) / 3);
+  height: max(9rem, 27svh, (100svh - var(--spacing-header) - 2 * var(--spacing-space-sm)) / 3);
 
   @media (width >= 64rem) {
-    height: max(
-      11.25rem,
-      (
-          100vh - var(--spacing-header) - var(--divisions-heading-height) - 2 *
-            var(--spacing-space-sm)
-        ) /
-        3
-    );
-    height: max(
-      11.25rem,
-      (
-          100svh - var(--spacing-header) - var(--divisions-heading-height) - 2 *
-            var(--spacing-space-sm)
-        ) /
-        3
-    );
+    height: max(11.25rem, (100vh - var(--spacing-header) - 2 * var(--spacing-space-sm)) / 3);
+    height: max(11.25rem, (100svh - var(--spacing-header) - 2 * var(--spacing-space-sm)) / 3);
   }
 }
 

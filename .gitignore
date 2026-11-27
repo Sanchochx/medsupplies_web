@@ -20,3 +20,6 @@ npm-debug.log*
 .env
 .env.*
 !.env.example
+
+# Catalog image extraction (raw originals, contact sheets); never committed
+scratch/

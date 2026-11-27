@@ -34,7 +34,7 @@ const statements: [Statement, Statement] = [
 <section
   id="nosotros"
   aria-labelledby={HEADING_ID}
-  class="flex w-full flex-col gap-margin bg-surface-container-lowest pt-space-xl pb-space-md lg:gap-16 lg:pt-24 lg:pb-space-lg"
+  class="flex w-full flex-col gap-margin bg-surface-container-lowest pt-space-xl pb-margin lg:gap-16 lg:pt-24 lg:pb-16"
 >
   <Container>
     <SectionHeader
@@ -50,10 +50,10 @@ const statements: [Statement, Statement] = [
   <MissionVisionPanel statements={statements} />
 
   {/*
-   * Pushed down so the policy sits closer to the next section's title than to the mission and
-   * vision panel; the section's short bottom padding completes that shift.
+   * Centered between the mission and vision panel and the divisions banners: the section's bottom
+   * padding matches its gap, and the divisions section starts straight with its first banner.
    */}
-  <Container class="mt-space-md lg:mt-space-xl">
+  <Container>
     <SectionHeader
       as="h3"
       headingId={POLICY_HEADING_ID}
@@ -64,9 +64,11 @@ const statements: [Statement, Statement] = [
       <Fragment slot="lead">
         Para <span class="font-semibold text-primary">Medsupplies &amp; Ingeniería S.A.S.</span>, la
         salud, el bienestar y la seguridad de las personas están por encima de los demás objetivos
-        de la organización. Estamos comprometidos con la protección del medio ambiente, con la
-        calidad de los productos y servicios, y con la búsqueda continua de la satisfacción de los
-        clientes, colaboradores y proveedores.
+        de la organización.
+        <br />
+        Estamos comprometidos con la protección del medio ambiente, con la calidad de los productos
+        y servicios, y con la búsqueda continua de la satisfacción de los clientes, colaboradores y
+        proveedores.
       </Fragment>
     </SectionHeader>
   </Container>
