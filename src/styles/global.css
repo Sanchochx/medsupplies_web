@@ -242,6 +242,24 @@
   }
 }
 
+@theme inline {
+  /*
+   * Logo marquee: the component sets the shift (one set's width), the duration (shift / speed)
+   * and the direction (`reverse` = left to right). `inline` so the utility uses this value
+   * directly: as a `:root` variable, those per-element variables would resolve too early.
+   */
+  --animate-marquee: marquee var(--marquee-duration) linear infinite var(--marquee-direction);
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(calc(-1 * var(--marquee-shift)));
+    }
+  }
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;

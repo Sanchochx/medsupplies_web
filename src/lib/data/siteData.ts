@@ -5,7 +5,7 @@
  * certification claims and corporate copy have NOT been validated by Medsupplies Ingeniería S.A.S.
  * and must be replaced before going live.
  *
- * Only the data access layer (`src/lib/data/`) and `src/content.config.ts` may import this file;
+ * Only the data access layer (`src/lib/data/`) may import this file;
  * pages and components read it through the accessor functions (enforced by ESLint).
  */
 import type { ImageMetadata } from 'astro';
@@ -22,11 +22,6 @@ export type AnchorHref = `/#${string}`;
 export interface NavItem {
   label: string;
   href: AnchorHref;
-}
-
-export interface LegalLink {
-  label: string;
-  href: string;
 }
 
 export interface CompanyInfo {
@@ -51,8 +46,8 @@ export interface ContactData {
   addressNote: string;
   phones: readonly PhoneEntry[];
   emails: readonly string[];
-  businessHours: string;
-  emergencySupport: string;
+  /** Google Maps search query of the location shown in the contact map (an address or a place). */
+  mapQuery: string;
 }
 
 export type SocialNetwork = 'facebook';
@@ -143,7 +138,6 @@ export interface DivisionBanner {
 export interface SiteData {
   company: CompanyInfo;
   navItems: readonly NavItem[];
-  legalLinks: readonly LegalLink[];
   contact: ContactData;
   /** International format, digits only, no `+` (as `wa.me` expects). */
   whatsAppNumber: string;
@@ -167,20 +161,15 @@ export const SITE_DATA: SiteData = {
     { label: 'Inicio', href: '/#inicio' },
     { label: 'Nosotros', href: '/#nosotros' },
     { label: 'Productos', href: '/#productos' },
-    { label: 'Ingeniería', href: '/#ingenieria' },
+    { label: 'Aliados', href: '/#aliados' },
     { label: 'Contacto', href: '/#contacto' },
-  ],
-  legalLinks: [
-    { label: 'Política de Tratamiento de Datos Personales', href: '/politica-de-privacidad' },
-    { label: 'Cumplimiento Normativo INVIMA', href: '#' },
   ],
   contact: {
     address: 'Sede principal: Tunja, Boyacá',
     addressNote: 'Envíos y cobertura a nivel nacional',
     phones: [{ display: '+57 3114472353', e164: '+573114472353' }],
-    emails: ['contacto@example.com', 'cotizaciones@example.com'],
-    businessHours: 'Lunes a viernes: 7:30 a. m. – 5:30 p. m.',
-    emergencySupport: 'Soporte de ingeniería 24/7 para emergencias clínicas',
+    emails: ['medsuppliesingenieria@gmail.com'],
+    mapQuery: 'Tunja, Boyacá, Colombia',
   },
   whatsAppNumber: '573114472353',
   socialLinks: [
@@ -197,7 +186,7 @@ export const SITE_DATA: SiteData = {
       'Entregar a la mano productos y servicios con los estándares de la calidad total, a precios tan competitivos que harán más fácil la vida de nuestros clientes.',
   },
   hero: {
-    microSpecs: ['Regulación Sanitaria INVIMA', 'Trazabilidad y Cadena de Frío'],
+    microSpecs: ['Regulación Sanitaria INVIMA', 'Envíos nacionales a todo Colombia'],
   },
 
   divisionBanners: [

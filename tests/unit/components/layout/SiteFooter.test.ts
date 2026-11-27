@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import SiteFooter from '../../../../src/components/layout/SiteFooter.astro';
-import { getLegalLinks } from '../../../../src/lib/data';
 import { compileTailwind, extractClasses } from '../../helpers/compileTailwind';
 import { renderAstro } from '../../helpers/renderAstro';
 
@@ -22,28 +21,21 @@ describe('SiteFooter', () => {
     );
   });
 
-  it('shows only the copyright with the current year and the legal links', async () => {
+  it('shows only the copyright with the current year and the company logo', async () => {
     const html = await renderFooter();
     const year = new Date().getFullYear();
-    const links = [...html.matchAll(/<a href="([^"]+)"[^>]*>\s*([^<]+?)\s*<\/a>/g)].map(
-      ([, href, label]) => [label, href],
-    );
 
     expect(text(html)).toBe(
-      `© ${year} Medsupplies Ingeniería S.A.S. Todos los derechos reservados. Colombia. ` +
-        'Política de Tratamiento de Datos Personales Cumplimiento Normativo INVIMA',
+      `© ${year} Medsupplies Ingeniería S.A.S. Todos los derechos reservados. Colombia.`,
     );
-    expect(links).toEqual(getLegalLinks().map(({ label, href }) => [label, href]));
-    expect(links).toContainEqual([
-      'Política de Tratamiento de Datos Personales',
-      '/politica-de-privacidad',
-    ]);
-    expect(html).not.toMatch(/<(?:h2|nav|img|svg)\b/);
+    expect(html).toMatch(/<img[^>]*alt="Medsupplies Ingeniería S\.A\.S\."/);
+    expect(html).toMatch(/<img[^>]*loading="lazy"/);
+    expect(html).not.toMatch(/<(?:a|h2|nav|svg)\b/);
   });
 
-  it('stacks below md and spreads copyright and links on one row from md', async () => {
+  it('stacks below md and spreads copyright and logo on one row from md', async () => {
     expect(await renderFooter()).toMatch(
-      /<div class="flex flex-col gap-space-sm py-space-lg md:flex-row md:items-center md:justify-between">/,
+      /<div class="flex flex-col gap-space-xs py-space-md md:flex-row md:items-center md:justify-between">/,
     );
   });
 

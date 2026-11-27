@@ -22,6 +22,8 @@ export interface SectionHeaderProps {
   highlight?: boolean;
   /** Extra classes for the heading element (e.g. sizing that depends on the heading's length). */
   headingClass?: string;
+  /** Extra classes for the lead paragraph (e.g. keeping a lead on one line from a breakpoint). */
+  leadClass?: string;
   class?: string;
 }
 
@@ -45,6 +47,7 @@ const {
   leadSize = 'lg',
   highlight = false,
   headingClass,
+  leadClass,
   class: className,
 } = Astro.props;
 
@@ -86,6 +89,7 @@ const hasLead = Boolean(lead) || Astro.slots.has('lead');
         // The highlight band sits outside the heading's line box, so it needs extra room.
         highlight ? 'mt-space-lg' : leadSize === 'lg' ? 'mt-space-sm' : 'mt-2',
         toneClasses.lead,
+        leadClass,
       ]}
     >
       {lead ?? <slot name="lead" />}

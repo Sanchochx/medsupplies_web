@@ -88,8 +88,7 @@ const OVERLAY =
 
   {/*
    * Decorative state cue; the button's `aria-expanded` carries the state for assistive tech.
-   * While open it reads "Cerrar panel" next to the (rotated) chevron; the whole banner is the
-   * button, so clicking the label closes the panel too.
+   * The chevron flips while open; the whole banner is the button that toggles the panel.
    */}
   {expandable && (
     <div aria-hidden="true" class="pointer-events-none absolute inset-0">
@@ -99,18 +98,8 @@ const OVERLAY =
           isRight ? 'justify-start' : 'justify-end',
         ]}
       >
-        <span
-          class:list={[
-            'inline-flex items-center gap-space-sm md:gap-space-md',
-            isRight && 'flex-row-reverse',
-          ]}
-        >
-          <span class="hidden text-label-lg text-on-primary group-data-[state=open]/division:inline">
-            Cerrar panel
-          </span>
-          <span class="inline-flex size-11 items-center justify-center rounded-full bg-on-primary/20 text-on-primary ring-1 ring-on-primary/30 backdrop-blur-sm transition-transform duration-350 ease-out group-data-[state=open]/division:rotate-180 md:size-14">
-            <Icon name="expand-more" size={28} />
-          </span>
+        <span class="inline-flex size-11 items-center justify-center rounded-full bg-on-primary/20 text-on-primary ring-1 ring-on-primary/30 backdrop-blur-sm transition-transform duration-350 ease-out group-data-[state=open]/division:rotate-180 md:size-14">
+          <Icon name="expand-more" size={28} />
         </span>
       </Container>
     </div>

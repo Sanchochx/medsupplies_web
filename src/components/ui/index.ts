@@ -7,7 +7,7 @@ export type { ContainerProps } from './Container.astro';
 export { default as Icon } from './Icon.astro';
 export type { IconProps } from './Icon.astro';
 export { default as IconTile } from './IconTile.astro';
-export type { IconTileProps, IconTileSize, IconTileTone } from './IconTile.astro';
+export type { IconTileProps, IconTileShape, IconTileSize, IconTileTone } from './IconTile.astro';
 export { default as SectionHeader } from './SectionHeader.astro';
 export type { SectionHeaderProps } from './SectionHeader.astro';
 export { ICON_NAMES } from './iconNames';

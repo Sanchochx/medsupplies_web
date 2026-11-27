@@ -85,6 +85,6 @@ describe('home page', () => {
     const main = html.slice(html.indexOf('<main'), html.indexOf('</main>'));
     const ids = [...main.matchAll(/<section id="([^"]+)"/g)].map(([, id]) => id);
 
-    expect(ids).toEqual(['inicio', 'nosotros', 'productos', 'ingenieria', 'contacto']);
+    expect(ids).toEqual(['inicio', 'nosotros', 'productos', 'aliados', 'contacto']);
   });
 });

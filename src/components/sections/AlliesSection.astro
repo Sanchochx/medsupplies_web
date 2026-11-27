@@ -1,0 +1,128 @@
+---
+import { Image } from 'astro:assets';
+import { allyImageAlt, getAllies } from '../../lib/data';
+import { fitWithin } from '../../lib/marquee/logoMarquee';
+import { Container, SectionHeader } from '../ui';
+
+const HEADING_ID = 'allies-heading';
+
+// Twice the largest slot (220×88 CSS px), so logos stay sharp on 2× screens.
+const IMAGE_MAX_WIDTH = 440;
+const IMAGE_MAX_HEIGHT = 176;
+
+const allies = getAllies().map((ally, index) => ({
+  ...ally,
+  alt: allyImageAlt(ally, index),
+  size: fitWithin(ally.image.width, ally.image.height, IMAGE_MAX_WIDTH, IMAGE_MAX_HEIGHT),
+}));
+---
+
+<section
+  id="aliados"
+  aria-labelledby={HEADING_ID}
+  class="w-full overflow-x-clip bg-surface-container-lowest py-space-lg md:py-space-xl"
+>
+  <Container>
+    <SectionHeader
+      headingId={HEADING_ID}
+      heading="Nuestros Aliados"
+      highlight
+      align="center"
+      headingClass="uppercase"
+    />
+  </Container>
+
+  {/*
+   * The track holds the set twice (JavaScript adds more copies on very wide screens) and moves by
+   * exactly one set, so the loop point is invisible. Under reduced motion only the original set
+   * shows, as a static wrapped row.
+   */}
+  <div
+    data-marquee
+    style={`--marquee-count: ${allies.length}`}
+    class="group mt-space-lg w-full overflow-hidden mask-x-from-91% md:mt-space-xl motion-reduce:mask-none"
+  >
+    <div
+      data-marquee-track
+      class="flex w-max group-focus-within:[animation-play-state:paused] group-hover:[animation-play-state:paused] group-data-offscreen:[animation-play-state:paused] motion-safe:animate-marquee motion-reduce:w-full"
+    >
+      {[false, true].map((isCopy) => (
+        <ul
+          data-marquee-set
+          data-marquee-copy={isCopy ? '' : undefined}
+          aria-hidden={isCopy ? 'true' : undefined}
+          class:list={[
+            'flex shrink-0 items-center motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center',
+            isCopy && 'motion-reduce:hidden',
+          ]}
+        >
+          {allies.map((ally) => (
+            <li data-marquee-slot>
+              <Image
+                src={ally.image}
+                alt={isCopy ? '' : ally.alt}
+                width={ally.size.width}
+                height={ally.size.height}
+                loading="lazy"
+                decoding="async"
+                class="size-full object-contain"
+              />
+            </li>
+          ))}
+        </ul>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  /*
+   * Slot geometry as unitless numbers (CSS px), so the shift and the duration can be derived
+   * from them: shift = one set's width, duration = shift / speed. Each slot carries half the gap
+   * on each side, so a set's width is exactly count × (slot + gap) and the row stays centered.
+   */
+  [data-marquee] {
+    --marquee-slot-width: 150;
+    --marquee-slot-height: 64;
+    --marquee-gap: 48;
+    /* px per second, independent of the number of logos. */
+    --marquee-speed: 50;
+    /* `reverse` moves the logos left to right; `normal` moves them right to left. */
+    --marquee-direction: reverse;
+    --marquee-shift: calc(
+      var(--marquee-count) * (var(--marquee-slot-width) + var(--marquee-gap)) * 1px
+    );
+    --marquee-duration: calc(
+      var(--marquee-count) * (var(--marquee-slot-width) + var(--marquee-gap)) /
+        var(--marquee-speed) * 1s
+    );
+  }
+
+  @media (width >= 48rem) {
+    [data-marquee] {
+      --marquee-slot-width: 220;
+      --marquee-slot-height: 88;
+      --marquee-gap: 80;
+    }
+  }
+
+  [data-marquee-slot] {
+    box-sizing: content-box;
+    flex: none;
+    width: calc(var(--marquee-slot-width) * 1px);
+    height: calc(var(--marquee-slot-height) * 1px);
+    padding-inline: calc(var(--marquee-gap) * 0.5px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-marquee-slot] {
+      padding-block: calc(var(--marquee-gap) * 0.25px);
+    }
+  }
+</style>
+
+<script>
+  import { initLogoMarquees } from '../../lib/marquee/logoMarquee';
+
+  initLogoMarquees();
+</script>

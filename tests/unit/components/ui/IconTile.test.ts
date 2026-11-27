@@ -25,4 +25,16 @@ describe('IconTile', () => {
     expect(html).toContain('text-on-primary');
     expect(html).toContain('width="24"');
   });
+
+  it('renders the 56px circular brand-blue badge', async () => {
+    const html = await renderAstro(IconTile, {
+      props: { icon: 'call', size: 'xl', shape: 'circle', tone: 'primary' },
+    });
+
+    expect(html).toContain('size-14');
+    expect(html).toContain('rounded-full');
+    expect(html).not.toContain('rounded-2xl');
+    expect(html).toContain('bg-primary text-on-primary shadow-md');
+    expect(html).toContain('width="28"');
+  });
 });

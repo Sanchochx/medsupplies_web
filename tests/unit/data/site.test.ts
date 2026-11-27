@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   getContactChannels,
+  getMapEmbedUrl,
   getNavItems,
   getSocialLinks,
   getWhatsAppUrl,
@@ -29,7 +30,7 @@ describe('getNavItems', () => {
       '/#inicio',
       '/#nosotros',
       '/#productos',
-      '/#ingenieria',
+      '/#aliados',
       '/#contacto',
     ]);
   });
@@ -40,8 +41,24 @@ describe('getContactChannels', () => {
     const { phones, emails } = getContactChannels();
 
     expect(phones).toEqual([{ label: '+57 3114472353', href: 'tel:+573114472353' }]);
-    expect(emails).toHaveLength(2);
-    for (const { label, href } of emails) expect(href).toBe(`mailto:${label}`);
+    expect(emails).toEqual([
+      { label: 'medsuppliesingenieria@gmail.com', href: 'mailto:medsuppliesingenieria@gmail.com' },
+    ]);
+  });
+});
+
+describe('getMapEmbedUrl', () => {
+  it('embeds the configured location (Tunja by default) without an API key', () => {
+    expect(getContactChannels().mapQuery).toBe('Tunja, Boyacá, Colombia');
+    expect(getMapEmbedUrl()).toBe(
+      'https://www.google.com/maps?q=Tunja%2C%20Boyac%C3%A1%2C%20Colombia&output=embed',
+    );
+  });
+
+  it('encodes the given query', () => {
+    expect(getMapEmbedUrl('Calle 1 # 2-3, Tunja')).toBe(
+      'https://www.google.com/maps?q=Calle%201%20%23%202-3%2C%20Tunja&output=embed',
+    );
   });
 });
 

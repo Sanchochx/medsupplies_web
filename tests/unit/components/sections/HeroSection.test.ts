@@ -78,9 +78,16 @@ describe('HeroSection', () => {
     const page = text(await renderHero());
 
     expect(page).toContain('Regulación Sanitaria INVIMA');
-    expect(page).toContain('Trazabilidad y Cadena de Frío');
+    expect(page).toContain('Envíos nacionales a todo Colombia');
     expect(page).not.toContain('Garantía Técnica y Calidad');
     expect(page).not.toContain('Cadena de Custodia');
+  });
+
+  it('keeps each micro-spec on a single line', async () => {
+    const items = (await renderHero()).match(/<li class="[^"]*\bgap-1\.5\b[^"]*"/g) ?? [];
+
+    expect(items).toHaveLength(2);
+    for (const item of items) expect(item).toContain('whitespace-nowrap');
   });
 
   it('covers the section with a decorative, eagerly loaded placeholder photo under a black veil', async () => {

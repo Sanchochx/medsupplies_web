@@ -1,12 +1,12 @@
 // Public entry point of the data access layer: pages and components import from here only.
-export { getEngineeringServices } from './catalog';
-export type { EngineeringService } from './catalog';
+export { allyImageAlt, getAllies } from './allies';
+export type { Ally } from './allies';
 export {
   getCompanyInfo,
   getContactChannels,
   getDivisionBanners,
   getHeroCopy,
-  getLegalLinks,
+  getMapEmbedUrl,
   getMissionVision,
   getNavItems,
   getSocialLinks,
@@ -25,7 +25,6 @@ export type {
   DivisionServiceItem,
   DivisionServiceLine,
   HeroCopy,
-  LegalLink,
   MissionVision,
   NavItem,
   SocialLink,

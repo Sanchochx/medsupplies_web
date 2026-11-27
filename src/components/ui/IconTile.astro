@@ -2,38 +2,50 @@
 import Icon from './Icon.astro';
 import type { IconName } from './iconNames';
 
-export type IconTileSize = 'md' | 'lg';
-export type IconTileTone = 'light' | 'solid';
+export type IconTileSize = 'md' | 'lg' | 'xl';
+export type IconTileTone = 'light' | 'solid' | 'primary';
+export type IconTileShape = 'rounded' | 'circle';
 
 export interface IconTileProps {
   icon: IconName;
-  /** `md` = 40px square, `lg` = 48px square. */
+  /** `md` = 40px, `lg` = 48px, `xl` = 56px. */
   size?: IconTileSize;
   tone?: IconTileTone;
+  /** `rounded` = square with rounded corners, `circle` = round badge. */
+  shape?: IconTileShape;
   class?: string;
 }
 
 type Props = IconTileProps;
 
 const SIZE_CLASSES: Record<IconTileSize, string> = {
-  md: 'size-10 rounded-lg',
-  lg: 'size-12 rounded-xl',
+  md: 'size-10',
+  lg: 'size-12',
+  xl: 'size-14',
 };
 
-const ICON_SIZES: Record<IconTileSize, number> = { md: 22, lg: 24 };
+const RADIUS_CLASSES: Record<IconTileSize, string> = {
+  md: 'rounded-lg',
+  lg: 'rounded-xl',
+  xl: 'rounded-2xl',
+};
+
+const ICON_SIZES: Record<IconTileSize, number> = { md: 22, lg: 24, xl: 28 };
 
 const TONE_CLASSES: Record<IconTileTone, string> = {
   light: 'bg-surface-container-high text-primary',
   solid: 'bg-primary-container text-on-primary',
+  primary: 'bg-primary text-on-primary shadow-md',
 };
 
-const { icon, size = 'md', tone = 'light', class: className } = Astro.props;
+const { icon, size = 'md', tone = 'light', shape = 'rounded', class: className } = Astro.props;
 ---
 
 <span
   class:list={[
     'inline-flex shrink-0 items-center justify-center',
     SIZE_CLASSES[size],
+    shape === 'circle' ? 'rounded-full' : RADIUS_CLASSES[size],
     TONE_CLASSES[tone],
     className,
   ]}

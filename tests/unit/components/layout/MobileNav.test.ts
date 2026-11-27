@@ -51,7 +51,7 @@ describe('MobileNav', () => {
       ['Inicio', '/#inicio'],
       ['Nosotros', '/#nosotros'],
       ['Productos', '/#productos'],
-      ['Ingeniería', '/#ingenieria'],
+      ['Aliados', '/#aliados'],
       ['Contacto', '/#contacto'],
     ]);
     expect(drawer).not.toContain('Solicitar cotización');

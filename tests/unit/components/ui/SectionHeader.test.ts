@@ -55,6 +55,16 @@ describe('SectionHeader', () => {
     );
   });
 
+  it('appends lead classes to the lead paragraph', async () => {
+    const html = await renderAstro(SectionHeader, {
+      props: { heading: 'Contact', lead: 'Lead text', leadClass: 'lg:whitespace-nowrap' },
+    });
+
+    expect(classesOf(html, 'p')).toEqual(
+      expect.arrayContaining(['leading-relaxed', 'lg:whitespace-nowrap']),
+    );
+  });
+
   it('renders the lead slot when it needs inline markup', async () => {
     const html = await renderAstro(SectionHeader, {
       props: { heading: 'Integrated policy' },

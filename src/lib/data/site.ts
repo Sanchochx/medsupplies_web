@@ -3,7 +3,6 @@ import {
   type CompanyInfo,
   type DivisionBanner,
   type HeroCopy,
-  type LegalLink,
   type MissionVision,
   type NavItem,
   type SocialLink,
@@ -18,7 +17,8 @@ export interface ContactChannels {
   address: { text: string; note: string };
   phones: readonly ContactLink[];
   emails: readonly ContactLink[];
-  hours: { text: string; note: string };
+  /** Google Maps search query of the location (see `getMapEmbedUrl`). */
+  mapQuery: string;
 }
 
 // wa.me requires the full international number as digits only (E.164 without the `+`).
@@ -32,19 +32,19 @@ export function getNavItems(): readonly NavItem[] {
   return SITE_DATA.navItems;
 }
 
-export function getLegalLinks(): readonly LegalLink[] {
-  return SITE_DATA.legalLinks;
-}
-
 export function getContactChannels(): ContactChannels {
-  const { address, addressNote, phones, emails, businessHours, emergencySupport } =
-    SITE_DATA.contact;
+  const { address, addressNote, phones, emails, mapQuery } = SITE_DATA.contact;
   return {
     address: { text: address, note: addressNote },
     phones: phones.map(({ display, e164 }) => ({ label: display, href: `tel:${e164}` })),
     emails: emails.map((email) => ({ label: email, href: `mailto:${email}` })),
-    hours: { text: businessHours, note: emergencySupport },
+    mapQuery,
   };
+}
+
+/** Keyless Google Maps embed URL (`output=embed`) for the given search query. */
+export function getMapEmbedUrl(query: string = SITE_DATA.contact.mapQuery): string {
+  return `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
 }
 
 export function getSocialLinks(): readonly SocialLink[] {

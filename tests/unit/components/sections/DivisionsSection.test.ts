@@ -118,7 +118,7 @@ describe('DivisionsSection', () => {
     );
   });
 
-  it('mirrors the supplies controls: chevron circle and label on the left, circle first', async () => {
+  it('mirrors the supplies chevron to the left edge of the banner', async () => {
     const [, supplies] = cards(await renderSection());
     const cue =
       /<div aria-hidden="true" class="pointer-events-none absolute inset-0">[\s\S]*?<\/svg>/.exec(
@@ -128,20 +128,14 @@ describe('DivisionsSection', () => {
     expect(cue).toMatch(
       /pointer-events-none absolute inset-0">\s*<div class="[^"]*\bjustify-start\b/,
     );
-    // DOM order is label then circle; reversing the row puts the circle at the left edge.
-    expect(cue).toMatch(/<span class="inline-flex items-center [^"]*\bflex-row-reverse\b/);
     expect(cue).toMatch(/group-data-\[state=open\]\/division:rotate-180/);
-    const [hospital] = cards(await renderSection());
-    expect(hospital).not.toMatch(/\bflex-row-reverse\b/);
   });
 
-  it('shows "Cerrar panel" beside the chevron only while each panel is open', async () => {
+  it('shows only the chevron as the open/close cue, with no "Cerrar panel" label', async () => {
     const [hospital, supplies] = cards(await renderSection());
 
     for (const card of [hospital, supplies]) {
-      expect(card).toMatch(
-        /<span class="hidden [^"]*group-data-\[state=open\]\/division:inline">\s*Cerrar panel\s*<\/span>/,
-      );
+      expect(card).not.toContain('Cerrar panel');
     }
   });
 

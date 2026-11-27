@@ -79,11 +79,12 @@ const { microSpecs } = getHeroCopy();
 
       {/*
         Fixed-width columns, stacked on phones: with content-sized items the second one moved
-        (a layout shift) when the first grew as Inter replaced the fallback font.
+        (a layout shift) when the first grew as Inter replaced the fallback font. Wide enough for
+        each spec to stay on one line.
       */}
-      <ul class="grid gap-x-6 gap-y-space-xs pt-space-sm text-label-sm text-surface-variant sm:max-w-sm sm:grid-cols-2">
+      <ul class="grid gap-x-6 gap-y-space-xs pt-space-sm text-label-sm text-surface-variant sm:max-w-lg sm:grid-cols-2">
         {microSpecs.map((spec) => (
-          <li class="flex items-center justify-center gap-1.5">
+          <li class="flex items-center justify-center gap-1.5 whitespace-nowrap">
             <span aria-hidden="true" class="size-2 rounded-full bg-primary-fixed-dim" />
             {spec}
           </li>

@@ -47,7 +47,7 @@ describe('SiteHeader', () => {
       ['Inicio', '/#inicio'],
       ['Nosotros', '/#nosotros'],
       ['Productos', '/#productos'],
-      ['Ingeniería', '/#ingenieria'],
+      ['Aliados', '/#aliados'],
       ['Contacto', '/#contacto'],
     ]);
   });
