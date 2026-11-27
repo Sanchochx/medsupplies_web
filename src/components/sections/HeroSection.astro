@@ -17,7 +17,7 @@ const { microSpecs } = getHeroCopy();
 <section
   id="inicio"
   aria-labelledby={HEADING_ID}
-  class="focus-ring-inverse relative w-full overflow-hidden bg-scrim py-space-xl lg:py-24"
+  class="focus-ring-inverse relative flex min-h-screen-below-header w-full items-center overflow-hidden bg-scrim pt-space-xl pb-fab-clearance"
 >
   {/*
     The photo stays underneath the video: it is the LCP element, it fills the frame while the
@@ -58,15 +58,12 @@ const { microSpecs } = getHeroCopy();
         Tecnología médica y Farmacéutica en Colombia
       </Chip>
 
-      <h1
-        id={HEADING_ID}
-        class="text-start font-heading text-headline-xl leading-[1.1] tracking-tight text-surface-bright lg:text-display-lg"
-      >
-        <span class="text-primary-container">Medsupplies Ingeniería S.A.S.</span> soluciones
+      <h1 id={HEADING_ID} class="text-start font-heading text-hero-title text-surface-bright">
+        <span class="text-primary-container">Medsupplies Ingeniería S.A.S</span> soluciones
         integrales con Dispositivos Médicos, Productos Farmacéuticos e Ingeniería Especializada
       </h1>
 
-      <p class="max-w-2xl text-body-lg leading-relaxed text-surface-variant">
+      <p class="max-w-2xl text-hero-lead text-surface-variant">
         Distribuimos tecnología médica de vanguardia e insumos hospitalarios en Colombia, con el
         respaldo de soporte técnico, cumplimiento normativo y excelencia operativa.
       </p>

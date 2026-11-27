@@ -93,6 +93,20 @@
   --text-display-lg--letter-spacing: -0.025em;
   --text-display-lg--font-weight: 700;
 
+  /*
+   * Hero title/lead: fluid in both axes. The `vh` term shrinks the title on short screens
+   * (1366×768, 1280×720) so header + hero fit one screen without changing the copy.
+   */
+  --text-hero-title: clamp(1.75rem, min(4vw, 5.5vh) + 0.5rem, 3.5rem);
+  --text-hero-title--line-height: 1.15;
+  --text-hero-title--letter-spacing: -0.025em;
+  --text-hero-title--font-weight: 700;
+
+  --text-hero-lead: clamp(1rem, 0.85rem + 0.6vh, 1.125rem);
+  --text-hero-lead--line-height: 1.6;
+  --text-hero-lead--letter-spacing: 0;
+  --text-hero-lead--font-weight: 400;
+
   --text-display-lg-mobile: 2.25rem;
   --text-display-lg-mobile--line-height: 2.75rem;
   --text-display-lg-mobile--letter-spacing: -0.02em;
@@ -183,6 +197,9 @@
   /* Fixed header height; also used as the scroll offset for anchored sections. */
   --spacing-header: 5rem;
 
+  /* Bottom clearance so the floating WhatsApp button (56px + offset) does not cover content. */
+  --spacing-fab-clearance: 5rem;
+
   --container-page: 82.5rem; /* 1320px */
 }
 
@@ -255,6 +272,16 @@
  */
 @utility focus-ring-inverse {
   --focus-ring-color: var(--color-primary-fixed);
+}
+
+/*
+ * Exactly one screen below the fixed header. `vh` first as the fallback for browsers without
+ * `svh`; `svh` keeps mobile toolbars from pushing the next section into view. A min-height, so
+ * the hero grows instead of clipping when its content is taller (short or narrow screens).
+ */
+@utility min-h-screen-below-header {
+  min-height: calc(100vh - var(--spacing-header));
+  min-height: calc(100svh - var(--spacing-header));
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -24,6 +24,7 @@ async function renderAllVariants(): Promise<string> {
     ),
     renderAstro(Chip),
     renderAstro(Chip, { props: { variant: 'eyebrow', icon: 'verified' } }),
+    renderAstro(Chip, { props: { variant: 'inverse', icon: 'verified' } }),
     ...(['light', 'primary'] as const).flatMap((tone) =>
       (['md', 'lg'] as const).map((leadSize) =>
         renderAstro(SectionHeader, {

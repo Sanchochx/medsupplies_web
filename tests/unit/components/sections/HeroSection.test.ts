@@ -24,12 +24,21 @@ describe('HeroSection', () => {
     );
   });
 
+  it('fills the screen below the header and centers its content vertically', async () => {
+    const section = /^<section[^>]*>/.exec(await renderHero())?.[0] ?? '';
+
+    // min-height (not height) so the hero grows instead of clipping on short screens.
+    expect(section).toMatch(/\bmin-h-screen-below-header\b/);
+    expect(section).toMatch(/\bflex\b[^"]*\bitems-center\b/);
+    expect(section).not.toMatch(/[" ]h-(screen|\[)/);
+  });
+
   it('renders a single light h1 with the company name highlighted', async () => {
     const html = await renderHero();
     const h1 = /<h1[^>]*>[\s\S]*?<\/h1>/.exec(html)?.[0] ?? '';
 
     expect(html.match(/<h1/g)).toHaveLength(1);
-    expect(h1).toMatch(/class="[^"]*\btext-headline-xl\b[^"]*\blg:text-display-lg\b/);
+    expect(h1).toMatch(/class="[^"]*\btext-hero-title\b/);
     // Centered as a block by the parent, but its lines align to the left edge.
     expect(h1).toMatch(/class="text-start /);
     expect(h1).toContain(

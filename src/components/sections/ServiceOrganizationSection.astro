@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+import sectionBackground from '../../assets/images/image_generica.png';
 import { getServiceOrganization } from '../../lib/data';
 import { Container, SectionHeader } from '../ui';
 import DivisionCard from './DivisionCard.astro';
@@ -16,13 +18,30 @@ const lastOddIndex = divisions.length % 2 === 1 ? divisions.length - 1 : -1;
  */
 const ITEM_SLOTS = Math.max(...divisions.map(({ items }) => items.length));
 const gridVars = `--division-items: ${ITEM_SLOTS}; --division-rows: ${ITEM_SLOTS + 3};`;
+
+/*
+ * The photo behind the section is decorative and always sits under a 75% veil of the section
+ * colour. 75% is the floor: even over a pure-black pixel the lead text (on-surface-variant) keeps ~4.7:1.
+ */
 ---
 
 <section
   id="organizacion"
   aria-labelledby={HEADING_ID}
-  class="w-full bg-surface-container-low py-space-xl lg:py-24"
+  class="relative isolate w-full overflow-hidden bg-surface-container-low py-space-xl lg:py-24"
 >
+  <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
+    <Image
+      src={sectionBackground}
+      alt=""
+      widths={[640, 1024, 1672]}
+      sizes="100vw"
+      loading="lazy"
+      class="absolute inset-0 size-full object-cover"
+    />
+    <div class="absolute inset-0 bg-surface-container-low/75"></div>
+  </div>
+
   <Container class="flex flex-col gap-margin lg:gap-16">
     <!-- Same highlighted band as "POLÍTICA INTEGRADA"; uppercase is visual only, the copy stays as written. -->
     <SectionHeader

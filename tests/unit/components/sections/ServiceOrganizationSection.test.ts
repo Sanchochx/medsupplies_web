@@ -55,9 +55,21 @@ describe('ServiceOrganizationSection', () => {
   it('renders only the division cards below the header, with no org-chart node or connector', async () => {
     const html = await renderSection();
 
-    expect(html).not.toContain('<img');
+    // The only image is the decorative section background.
+    expect(html.match(/<img\b/g)).toHaveLength(1);
     expect(html).not.toContain('border-dashed');
     expect(cards(html)).toHaveLength(3);
+  });
+
+  it('puts the generic photo behind the section under a translucent veil, hidden from assistive tech', async () => {
+    const html = await renderSection();
+
+    expect(html).toMatch(
+      /<div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10"><img [^>]*image_generica[^>]*\balt\b(?!=)[^>]*loading="lazy"[^>]*class="absolute inset-0 size-full object-cover">/,
+    );
+    expect(html).toContain('<div class="absolute inset-0 bg-surface-container-low/75"></div>');
+    // Cards are only slightly translucent so the photo hints through without hurting legibility.
+    expect(html.match(/<article class="[^"]*\bbg-surface-container-lowest\/90\b/g)).toHaveLength(3);
   });
 
   it('keeps heading levels in order: one h2, an h3 per card and h4 sub-items', async () => {

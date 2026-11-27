@@ -26,4 +26,17 @@ describe('Chip', () => {
     expect(html).toMatch(/<svg [^>]*aria-hidden="true"/);
     expect(html.indexOf('<svg')).toBeLessThan(html.indexOf('Biomedical technology'));
   });
+
+  it('renders the inverse variant as a translucent white pill with white text and an icon', async () => {
+    const html = await renderAstro(Chip, {
+      props: { variant: 'inverse', icon: 'verified' },
+      slots: { default: 'Total quality' },
+    });
+
+    expect(html).toMatch(/class="[^"]*\bborder-on-primary\/25\b[^"]*\bbg-on-primary\/12\b/);
+    expect(html).toContain('text-label-lg');
+    expect(html).toContain('text-on-primary');
+    expect(html).not.toContain('text-label-sm');
+    expect(html).toMatch(/<svg [^>]*aria-hidden="true"/);
+  });
 });

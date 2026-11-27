@@ -1,0 +1,74 @@
+---
+import { Image } from 'astro:assets';
+import logoFuturistic from '../../assets/images/logo_futuristic.png';
+import { Chip, Container, type IconName } from '../ui';
+
+export interface Statement {
+  title: string;
+  text: string;
+  highlightIcon: IconName;
+  highlight: string;
+}
+
+export interface MissionVisionPanelProps {
+  /** Rendered side by side from `lg`, separated by a divider; stacked below. */
+  statements: readonly [Statement, Statement];
+}
+
+type Props = MissionVisionPanelProps;
+
+const { statements } = Astro.props;
+const [first, second] = statements;
+
+/*
+ * White text over the blue gradient keeps >= 4.5:1 everywhere: body text at 90% opacity reaches
+ * 4.6:1 even under the corner glow (capped at 10% white, top-left only), and the chips sit at the
+ * bottom, away from the glow, at ~5:1. Keep these opacities when retouching the panel.
+ *
+ * The logo photo behind the band is decorative and always sits under a 92-95% blue veil, so the
+ * contrast above still holds over its brightest letters; the root gradient is the fallback while it
+ * loads.
+ *
+ * The band is full-bleed (the blue spans the viewport) while its content keeps the page container.
+ */
+---
+
+<div class="focus-ring-inverse relative isolate w-full overflow-hidden bg-linear-to-br from-primary to-on-primary-fixed-variant py-12 text-on-primary lg:py-16 xl:py-20">
+  <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
+    <Image
+      src={logoFuturistic}
+      alt=""
+      widths={[640, 1024, 1672]}
+      sizes="100vw"
+      loading="lazy"
+      class="absolute inset-0 size-full object-cover"
+    />
+    <div class="absolute inset-0 bg-linear-to-br from-primary/92 to-on-primary-fixed-variant/95"></div>
+    <div class="absolute -top-40 -left-40 size-112 rounded-full bg-radial from-on-primary/10 to-transparent to-70%"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(var(--color-on-primary)_1px,transparent_1px)] bg-size-[22px_22px] opacity-[0.07]"></div>
+  </div>
+
+  <Container class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_auto_1fr] lg:gap-12 xl:gap-16">
+    {[first, second].map(({ title, text, highlightIcon, highlight }, index) => (
+      <>
+        {index === 1 && (
+          <div
+            aria-hidden="true"
+            class="h-px bg-linear-to-r from-transparent via-on-primary/30 to-transparent lg:h-auto lg:w-px lg:bg-linear-to-b"
+          />
+        )}
+        <article class="flex flex-col gap-space-md">
+          <h3 class="font-heading text-headline-md font-bold lg:text-headline-lg">{title}</h3>
+          <p class="flex-1 text-body-lg leading-relaxed text-on-primary/90">{text}</p>
+          <Chip
+            variant="inverse"
+            icon={highlightIcon}
+            class="mt-space-sm self-start max-sm:rounded-2xl"
+          >
+            {highlight}
+          </Chip>
+        </article>
+      </>
+    ))}
+  </Container>
+</div>

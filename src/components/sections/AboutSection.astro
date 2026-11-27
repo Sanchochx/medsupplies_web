@@ -1,14 +1,7 @@
 ---
 import { getMissionVision } from '../../lib/data';
-import { Container, Icon, IconTile, SectionHeader, type IconName } from '../ui';
-
-interface StatementCard {
-  icon: IconName;
-  title: string;
-  text: string;
-  footerIcon: IconName;
-  footer: string;
-}
+import { Container, SectionHeader } from '../ui';
+import MissionVisionPanel, { type Statement } from './MissionVisionPanel.astro';
 
 const HEADING_ID = 'about-heading';
 const POLICY_HEADING_ID = 'integrated-policy-heading';
@@ -22,20 +15,18 @@ const HEADING_ONE_LINE = 'lg:whitespace-nowrap lg:text-[clamp(1.75rem,4vw_-_0.37
 
 const { mission, vision } = getMissionVision();
 
-const cards: StatementCard[] = [
+const statements: [Statement, Statement] = [
   {
-    icon: 'flag',
     title: 'Nuestra Misión',
     text: mission,
-    footerIcon: 'query-stats',
-    footer: 'Meta 2028: 10 empleos y 8% del mercado regional',
+    highlightIcon: 'query-stats',
+    highlight: 'Meta 2028: 10 empleos y 8% del mercado regional',
   },
   {
-    icon: 'visibility',
     title: 'Nuestra Visión',
     text: vision,
-    footerIcon: 'verified',
-    footer: 'Calidad total a precios competitivos',
+    highlightIcon: 'verified',
+    highlight: 'Calidad total a precios competitivos',
   },
 ];
 ---
@@ -43,9 +34,9 @@ const cards: StatementCard[] = [
 <section
   id="nosotros"
   aria-labelledby={HEADING_ID}
-  class="w-full bg-surface-container-lowest py-space-xl lg:py-24"
+  class="flex w-full flex-col gap-margin bg-surface-container-lowest py-space-xl lg:gap-16 lg:py-24"
 >
-  <Container class="flex flex-col gap-margin lg:gap-16">
+  <Container>
     <SectionHeader
       headingId={HEADING_ID}
       heading="INGENIERÍA Y SUMINISTROS QUE FACILITAN SU VIDA"
@@ -54,23 +45,11 @@ const cards: StatementCard[] = [
       headingClass={HEADING_ONE_LINE}
       lead="En 2015 nace FESIQ Ingeniería, un grupo interdisciplinario de profesionales que comparte conceptos y herramientas para que sus clientes adopten nuevas prácticas de gestión. En los últimos 10 años la empresa incursionó en un nuevo campo y FESIQ fue absorbida por Medsupplies & Ingeniería S.A.S., que hoy ofrece, además de ingeniería, suministros para el sector salud y la industria de alimentos. Nos apoyamos en la calidad humana, la experiencia profesional y la preparación académica para brindar el mejor servicio."
     />
+  </Container>
 
-    <ul class="grid grid-cols-1 gap-gutter md:grid-cols-2">
-      {cards.map(({ icon, title, text, footerIcon, footer }) => (
-        <li class="flex flex-col justify-between rounded-2xl bg-surface-container-low p-space-lg shadow-sm transition-shadow duration-200 hover:shadow-md">
-          <div class="flex flex-col gap-space-sm">
-            <IconTile icon={icon} size="lg" class="mb-2" />
-            <h3 class="font-heading text-headline-sm font-bold text-on-surface">{title}</h3>
-            <p class="text-body-md leading-relaxed text-on-surface-variant">{text}</p>
-          </div>
-          <p class="mt-space-md flex items-center gap-2 pt-space-sm text-label-md text-primary">
-            <Icon name={footerIcon} size={18} />
-            {footer}
-          </p>
-        </li>
-      ))}
-    </ul>
+  <MissionVisionPanel statements={statements} />
 
+  <Container>
     <SectionHeader
       as="h3"
       headingId={POLICY_HEADING_ID}

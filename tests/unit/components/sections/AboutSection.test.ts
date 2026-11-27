@@ -8,8 +8,8 @@ async function renderAbout(): Promise<string> {
   return renderAstro(AboutSection);
 }
 
-function cards(html: string): string[] {
-  return [...html.matchAll(/<li [\s\S]*?<\/li>/g)].map(([card]) => card);
+function statements(html: string): string[] {
+  return [...html.matchAll(/<article [\s\S]*?<\/article>/g)].map(([statement]) => statement);
 }
 
 describe('AboutSection', () => {
@@ -17,7 +17,7 @@ describe('AboutSection', () => {
     const html = await renderAbout();
 
     expect(html).toMatch(
-      /^<section id="nosotros" aria-labelledby="about-heading" class="[^"]*\bbg-surface-container-lowest py-space-xl lg:py-24"/,
+      /^<section id="nosotros" aria-labelledby="about-heading" class="[^"]*\bbg-surface-container-lowest py-space-xl lg:gap-16 lg:py-24"/,
     );
   });
 
@@ -33,35 +33,77 @@ describe('AboutSection', () => {
     expect(html).toMatch(/<h2 id="about-heading" class="[^"]*\blg:whitespace-nowrap\b/);
   });
 
-  it('renders the mission and vision cards with h3 titles, data-file texts and footers', async () => {
+  it('renders mission and vision as two articles with h3 titles, data-file texts and highlight chips', async () => {
     const { mission, vision } = getMissionVision();
-    const [missionCard = '', visionCard = ''] = cards(await renderAbout());
+    const [missionHalf = '', visionHalf = ''] = statements(await renderAbout());
 
-    expect(missionCard).toMatch(/<h3[^>]*>Nuestra Misión<\/h3>/);
-    expect(missionCard).toContain(mission);
-    expect(missionCard).toContain('Meta 2028: 10 empleos y 8% del mercado regional');
-    expect(visionCard).toMatch(/<h3[^>]*>Nuestra Visión<\/h3>/);
-    expect(visionCard).toContain(vision);
-    expect(visionCard).toContain('Calidad total a precios competitivos');
+    expect(missionHalf).toMatch(/<h3[^>]*>\s*Nuestra Misión\s*<\/h3>/);
+    expect(missionHalf).toContain(mission);
+    expect(missionHalf).toMatch(
+      /<span class="[^"]*\brounded-full\b[^"]*\bbg-on-primary\/12\b[^"]*">[\s\S]*Meta 2028: 10 empleos y 8% del mercado regional/,
+    );
+    expect(visionHalf).toMatch(/<h3[^>]*>\s*Nuestra Visión\s*<\/h3>/);
+    expect(visionHalf).toContain(vision);
+    expect(visionHalf).toContain('Calidad total a precios competitivos');
   });
 
-  it('renders tinted rounded cards that lift on hover, with the footer pinned to the bottom', async () => {
-    for (const card of cards(await renderAbout())) {
-      expect(card).toMatch(
-        /^<li class="flex flex-col justify-between rounded-2xl bg-surface-container-low [^"]*shadow-sm [^"]*hover:shadow-md"/,
-      );
-      expect(card.match(/<svg /g)).toHaveLength(2);
+  it('places both halves on one full-width blue band, with white text and no title icons', async () => {
+    const html = await renderAbout();
+
+    // The band is a direct child of the section (outside any page container); only its content
+    // is constrained to the container width.
+    expect(html).toMatch(
+      /<\/div>\s*<div class="focus-ring-inverse relative isolate w-full overflow-hidden bg-linear-to-br from-primary to-on-primary-fixed-variant [^"]*\btext-on-primary\b[^"]*">\s*<div aria-hidden="true"[\s\S]*?<\/div>\s*<div class="mx-auto w-full max-w-page /,
+    );
+    expect(html).not.toContain('rounded-3xl');
+    for (const half of statements(html)) {
+      expect(half).toContain('text-on-primary/90');
+      // Only the chip icon remains (no icon tile, no watermark), hidden from assistive tech.
+      expect(half.match(/<svg /g)).toHaveLength(1);
+      expect(half).toMatch(/<svg [^>]*aria-hidden="true"/);
     }
   });
 
-  it('lays the cards out in 1 column below md and 2 from md', async () => {
-    expect(await renderAbout()).toMatch(/<ul class="grid grid-cols-1 gap-gutter md:grid-cols-2">/);
+  it('shows the futuristic logo behind the band, decorative, lazy and under a translucent blue veil', async () => {
+    const html = await renderAbout();
+    const layers =
+      /<div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">([\s\S]*?)<div class="mx-auto/.exec(
+        html,
+      )?.[1] ?? '';
+
+    expect(layers).toMatch(/<img [^>]*src="[^"]*logo_futuristic[^"]*"/);
+    expect(layers).toMatch(/<img [^>]*\balt(="")?[\s>]/);
+    expect(layers).toMatch(/<img [^>]*loading="lazy"/);
+    expect(layers).toMatch(/<img [^>]*class="[^"]*\bobject-cover\b/);
+    // The veil comes after the image so it paints on top of it.
+    expect(layers).toMatch(
+      /<img [\s\S]*<div class="absolute inset-0 bg-linear-to-br from-primary\/92 to-on-primary-fixed-variant\/95"><\/div>/,
+    );
+  });
+
+  it('stacks the halves below lg and splits them with a divider that turns vertical from lg', async () => {
+    const html = await renderAbout();
+
+    expect(html).toMatch(
+      /<div class="[^"]*\bmax-w-page\b[^"]*grid-cols-1 gap-8 lg:grid-cols-\[1fr_auto_1fr\]/,
+    );
+    const divider = /<div aria-hidden="true" class="([^"]*)"><\/div>\s*<article/.exec(html)?.[1];
+    expect(divider).toContain('h-px');
+    expect(divider).toContain('lg:w-px');
+    expect(divider).toContain('via-on-primary/30');
+    expect(html.indexOf('Nuestra Misión')).toBeLessThan(html.indexOf('Nuestra Visión'));
+  });
+
+  it('keeps the decorative layers out of the accessibility tree', async () => {
+    expect(await renderAbout()).toMatch(
+      /<div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">/,
+    );
   });
 
   it('closes with the integrated policy: a highlighted h3 and a lead with the company name in blue', async () => {
     const html = await renderAbout();
     // Whitespace is normalized because the source paragraph is wrapped by Prettier.
-    const policy = html.slice(html.lastIndexOf('</ul>')).replace(/\s+/g, ' ');
+    const policy = html.slice(html.lastIndexOf('</article>')).replace(/\s+/g, ' ');
 
     expect(policy).toMatch(
       /<h3 id="integrated-policy-heading"[^>]*>\s*<span[^>]*\bbg-primary\b[^>]*>\s*POLÍTICA INTEGRADA\s*<\/span>\s*<\/h3>/,
