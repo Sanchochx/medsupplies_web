@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import DivisionsSection from '../../../../src/components/sections/DivisionsSection.astro';
 import { getDivisionBanners } from '../../../../src/lib/data';
+import {
+  DIVISION_BANNER_INTRO,
+  divisionBannerIntro,
+  introStepStyle,
+} from '../../../../src/lib/motion/introTimeline';
 import { compileTailwind, extractClasses } from '../../helpers/compileTailwind';
 import { renderAstro } from '../../helpers/renderAstro';
 
@@ -37,9 +42,11 @@ describe('DivisionsSection', () => {
     expect(html).not.toContain('Arquitectura operativa');
     const banners = getDivisionBanners();
     expect(html.match(/<h2\b/g)).toHaveLength(banners.length);
-    // Every division photo is in the markup (the loop renders all its slides).
+    // Every division photo is in the markup (the loop renders all its slides), plus one faint
+    // background photo per panel.
     const photoCount = banners.reduce((total, { panel }) => total + (panel?.images.length ?? 0), 0);
-    expect(html.match(/<img\b/g)).toHaveLength(banners.length + photoCount);
+    const panelCount = banners.filter(({ panel }) => panel).length;
+    expect(html.match(/<img\b/g)).toHaveLength(banners.length + photoCount + panelCount);
   });
 
   it('renders one article per banner from siteData, in order, with its h2 title', async () => {
@@ -51,7 +58,7 @@ describe('DivisionsSection', () => {
       const banner = banners[index];
       expect(card).toMatch(
         new RegExp(
-          `<h2 id="division-${banner?.id}-title"[^>]*>\\s*(<button[^>]*>\\s*)?${banner?.title}\\s*(</button>\\s*)?</h2>`,
+          `<h2 id="division-${banner?.id}-title"[^>]*>\\s*(<button[^>]*>\\s*)?<span class="block"[^>]*>\\s*${banner?.title}\\s*</span>\\s*(</button>\\s*)?</h2>`,
         ),
       );
     });
@@ -97,7 +104,7 @@ describe('DivisionsSection', () => {
     const [, , engineering] = cards(await renderSection());
 
     expect(engineering).toMatch(
-      /<h2 id="division-engineering-title"[^>]*>\s*División Ingeniería\s*<\/h2>/,
+      /<h2 id="division-engineering-title"[^>]*>\s*<span class="block"[^>]*>\s*División Ingeniería\s*<\/span>\s*<\/h2>/,
     );
     expect(engineering).not.toMatch(/<button\b|data-division-panel|<svg\b|aria-controls/);
     expect(engineering).not.toContain('group-hover/banner:brightness-115');
@@ -202,5 +209,44 @@ describe('DivisionsSection', () => {
       return !new RegExp(`${pattern}[\\s:{,[)]`).test(css);
     });
     expect(missing).toEqual([]);
+  });
+});
+
+describe('division banner entrance', () => {
+  it('maps the wipe and title direction from the text side: 1 and 3 right to left, 2 left to right', () => {
+    const intros = getDivisionBanners().map(({ textSide }) => divisionBannerIntro(textSide));
+
+    expect(intros.map(({ wipe }) => wipe)).toEqual(['wipe', 'wipe-ltr', 'wipe']);
+    expect(intros.map(({ title }) => title.x)).toEqual([-32, 32, -32]);
+  });
+
+  it('makes each article a view sequence of a staggered list, clipping only the banner', async () => {
+    const html = await renderSection();
+
+    expect(html).toMatch(
+      new RegExp(
+        `<ul [^>]*data-divisions-list data-intro-group data-intro-stagger="${DIVISION_BANNER_INTRO.stagger}"`,
+      ),
+    );
+    for (const [index, card] of cards(html).entries()) {
+      const { wipe, title } = divisionBannerIntro(getDivisionBanners()[index]?.textSide ?? 'left');
+      expect(card).toMatch(/^<article [^>]*data-intro-root data-intro-trigger="view"/);
+      // The wipe sits on the banner (the article's first child), never on the panel.
+      expect(card).toMatch(
+        new RegExp(`^<article [^>]*>\\s*<div class="group/banner[^"]*" data-intro="${wipe}"`),
+      );
+      expect(card.match(/data-intro="wipe/g)).toHaveLength(1);
+      expect(card).toContain(`<span class="block" data-intro style="${introStepStyle(title)}">`);
+    }
+  });
+
+  it('settles the photo without fading it and pops in the chevron after the title', async () => {
+    const [hospital] = cards(await renderSection());
+
+    expect(hospital).toMatch(
+      /<img [^>]*data-intro(="true")? style="object-position: [^;"]+; [^"]*--intro-opacity: 1; --intro-scale: 1.06"/,
+    );
+    expect(hospital).toContain(`style="${introStepStyle(DIVISION_BANNER_INTRO.chevron)}"`);
+    expect(DIVISION_BANNER_INTRO.chevron.delay).toBeGreaterThan(DIVISION_BANNER_INTRO.title.delay);
   });
 });

@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import SiteHeader from '../../../../src/components/layout/SiteHeader.astro';
+import {
+  SITE_CHROME_INTRO,
+  introStepStyle,
+  navLinkIntro,
+} from '../../../../src/lib/motion/introTimeline';
 import { compileTailwind, extractClasses } from '../../helpers/compileTailwind';
 import { renderAstro } from '../../helpers/renderAstro';
 
@@ -50,6 +55,31 @@ describe('SiteHeader', () => {
       ['Aliados', '/#aliados'],
       ['Contacto', '/#contacto'],
     ]);
+  });
+
+  it('plays its own intro on page load: the bar slides down, then logo and links drop in', async () => {
+    const html = await renderHeader();
+    const header = /<header [^>]*>/.exec(html)?.[0] ?? '';
+    const brand = /<a href="\/#inicio"[^>]*>/.exec(html)?.[0] ?? '';
+    const links = [...navMarkup(html).matchAll(/<a [^>]*>/g)].map(([tag]) => tag);
+    const toggle = /<button [^>]*data-mobile-drawer-toggle[^>]*>/.exec(html)?.[0] ?? '';
+
+    expect(header).toContain('data-intro-root data-intro-trigger="load" data-intro');
+    expect(header).toContain(`style="${introStepStyle(SITE_CHROME_INTRO.bar)}"`);
+    expect(brand).toContain(`style="${introStepStyle(SITE_CHROME_INTRO.logo)}"`);
+    expect(links).toHaveLength(5);
+    links.forEach((link, index) => {
+      expect(link).toContain('data-intro');
+      expect(link).toContain(`style="${introStepStyle(navLinkIntro(index))}"`);
+    });
+    expect(toggle).toContain(`style="${introStepStyle(SITE_CHROME_INTRO.link)}"`);
+  });
+
+  it('keeps the drawer links out of the intro (the drawer is closed on load)', async () => {
+    const html = await renderHeader();
+    const drawer = html.slice(html.indexOf('<dialog'), html.indexOf('</dialog>'));
+
+    expect(drawer).not.toContain('data-intro');
   });
 
   it('marks no link as current without JavaScript', async () => {

@@ -1,7 +1,13 @@
 ---
 import { Image } from 'astro:assets';
 import logoFuturistic from '../../assets/images/logo_futuristic.png';
+import {
+  MISSION_VISION_INTRO,
+  SIDE_BY_SIDE_MEDIA,
+  introStepStyle,
+} from '../../lib/motion/introTimeline';
 import { Chip, Container, type IconName } from '../ui';
+import Typewriter from '../ui/Typewriter.astro';
 
 export interface Statement {
   title: string;
@@ -20,6 +26,14 @@ type Props = MissionVisionPanelProps;
 const { statements } = Astro.props;
 const [first, second] = statements;
 
+const BAND_ID = 'mission-vision-band';
+const { band, titles, texts, highlight: highlightStep } = MISSION_VISION_INTRO;
+// Each half with its entrance steps; the text id lets the chip wait for that text to be typed.
+const halves = [
+  { ...first, textId: 'mission-text', titleStep: titles[0], typing: texts[0] },
+  { ...second, textId: 'vision-text', titleStep: titles[1], typing: texts[1] },
+];
+
 /*
  * White text over the blue gradient keeps >= 4.5:1 everywhere: body text at 90% opacity reaches
  * 4.6:1 even under the corner glow (capped at 10% white, top-left only), and the chips sit at the
@@ -30,45 +44,85 @@ const [first, second] = statements;
  * loads.
  *
  * The band is full-bleed (the blue spans the viewport) while its content keeps the page container.
+ *
+ * Entrance (timings in MISSION_VISION_INTRO): the band wipes in from the right when it enters the
+ * viewport; each half is its own sequence that follows the band (together with it when side by
+ * side, on its own entry when stacked), and each chip pops in when its text finishes typing.
+ * The sequence sits on an unclipped wrapper because IntersectionObserver measures the visible
+ * (clipped) area: a band waiting fully clipped would never be reported as in view.
  */
 ---
 
-<div class="focus-ring-inverse relative isolate w-full overflow-hidden bg-linear-to-br from-primary to-on-primary-fixed-variant py-12 text-on-primary lg:py-16 xl:py-20">
-  <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
-    <Image
-      src={logoFuturistic}
-      alt=""
-      widths={[640, 1024, 1672]}
-      sizes="100vw"
-      loading="lazy"
-      class="absolute inset-0 size-full object-cover"
-    />
-    <div class="absolute inset-0 bg-linear-to-br from-primary/92 to-on-primary-fixed-variant/95"></div>
-    <div class="absolute -top-40 -left-40 size-112 rounded-full bg-radial from-on-primary/10 to-transparent to-70%"></div>
-    <div class="absolute inset-0 bg-[radial-gradient(var(--color-on-primary)_1px,transparent_1px)] bg-size-[22px_22px] opacity-[0.07]"></div>
-  </div>
+<div id={BAND_ID} data-intro-root data-intro-trigger="view">
+  <div
+    class="focus-ring-inverse relative isolate w-full overflow-hidden bg-linear-to-br from-primary to-on-primary-fixed-variant py-12 text-on-primary lg:py-16 xl:py-20"
+    data-intro="wipe"
+    style={introStepStyle(band)}
+  >
+    <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
+      <Image
+        src={logoFuturistic}
+        alt=""
+        widths={[640, 1024, 1672]}
+        sizes="100vw"
+        loading="lazy"
+        class="absolute inset-0 size-full object-cover"
+      />
+      <div class="absolute inset-0 bg-linear-to-br from-primary/92 to-on-primary-fixed-variant/95"></div>
+      <div class="absolute -top-40 -left-40 size-112 rounded-full bg-radial from-on-primary/10 to-transparent to-70%"></div>
+      <div class="absolute inset-0 bg-[radial-gradient(var(--color-on-primary)_1px,transparent_1px)] bg-size-[22px_22px] opacity-[0.07]"></div>
+    </div>
 
-  <Container class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_auto_1fr] lg:gap-12 xl:gap-16">
-    {[first, second].map(({ title, text, highlightIcon, highlight }, index) => (
-      <>
-        {index === 1 && (
-          <div
-            aria-hidden="true"
-            class="h-px bg-linear-to-r from-transparent via-on-primary/30 to-transparent lg:h-auto lg:w-px lg:bg-linear-to-b"
-          />
-        )}
-        <article class="flex flex-col gap-space-md">
-          <h3 class="font-heading text-headline-md font-bold lg:text-headline-lg">{title}</h3>
-          <p class="flex-1 text-body-lg leading-relaxed text-on-primary/90">{text}</p>
-          <Chip
-            variant="inverse"
-            icon={highlightIcon}
-            class="mt-space-sm self-start max-sm:rounded-2xl"
+    <Container class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_auto_1fr] lg:gap-12 xl:gap-16">
+      {halves.map(({ title, text, highlightIcon, highlight, textId, titleStep, typing }, index) => (
+        <>
+          {index === 1 && (
+            <div
+              aria-hidden="true"
+              class="h-px bg-linear-to-r from-transparent via-on-primary/30 to-transparent lg:h-auto lg:w-px lg:bg-linear-to-b"
+            />
+          )}
+          <article
+            class="flex flex-col gap-space-md"
+            data-intro-root
+            data-intro-trigger="view"
+            data-intro-parent={BAND_ID}
+            data-intro-sync-media={SIDE_BY_SIDE_MEDIA}
           >
-            {highlight}
-          </Chip>
-        </article>
-      </>
-    ))}
-  </Container>
+            <h3
+              class="font-heading text-headline-md font-bold lg:text-headline-lg"
+              data-intro
+              style={introStepStyle(titleStep)}
+            >
+              {title}
+            </h3>
+            <Typewriter
+              id={textId}
+              text={text}
+              trigger="view"
+              delay={typing.delay}
+              speed={typing.speed}
+              class="flex-1 text-body-lg leading-relaxed text-on-primary/90"
+            />
+            <Chip
+              variant="inverse"
+              icon={highlightIcon}
+              class="mt-space-sm self-start max-sm:rounded-2xl"
+              data-intro
+              data-intro-after={textId}
+              style={introStepStyle(highlightStep)}
+            >
+              {highlight}
+            </Chip>
+          </article>
+        </>
+      ))}
+    </Container>
+  </div>
 </div>
+
+<script>
+  import { initIntros } from '../../lib/motion/introSequence';
+
+  initIntros();
+</script>

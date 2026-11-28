@@ -26,6 +26,11 @@ function whatsAppLink(html: string): string {
   return /<a [^>]*href="https:\/\/wa\.me\/[^"]*"[^>]*>[\s\S]*?<\/a>/.exec(html)?.[0] ?? '';
 }
 
+/** The painted text: the visually hidden copies dropped, then every tag. */
+function painted(html: string): string {
+  return html.replace(/<span class="sr-only">[\s\S]*?<\/span>/g, '').replace(/<[^>]+>/g, '');
+}
+
 function iframe(html: string): string {
   return /<iframe [^>]*>/.exec(html)?.[0] ?? '';
 }
@@ -52,14 +57,14 @@ describe('ContactSection', () => {
   it('uses the shared highlighted, centered section heading', async () => {
     const html = await renderContact();
 
-    expect(html).toMatch(/<h2 id="contact-heading" class="[^"]*\buppercase\b[^"]*">/);
-    expect(html).toMatch(/<span class="[^"]*\bbg-primary\b[^"]*">Contáctenos<\/span>/);
+    expect(html).toMatch(/<h2 id="contact-heading" [^>]*class="[^"]*\buppercase\b[^"]*">/);
+    expect(html).toMatch(/<span class="[^"]*\bbg-primary\b[^"]*">Contáctanos<\/span>/);
     expect(html).not.toContain('<form');
   });
 
   it('keeps the lead on a single line from lg', async () => {
     expect(await renderContact()).toMatch(
-      /<p class="[^"]*\blg:max-w-none lg:whitespace-nowrap\b[^"]*">\s*Atención personalizada/,
+      /<p class="[^"]*\blg:max-w-none lg:whitespace-nowrap\b[^"]*"[^>]*><span class="sr-only">Atención personalizada/,
     );
   });
 
@@ -67,7 +72,7 @@ describe('ContactSection', () => {
     const html = await renderContact();
 
     expect(html.indexOf('<ul')).toBeLessThan(html.indexOf('<iframe'));
-    expect(html).toMatch(/<div class="[^"]*\blg:order-first lg:col-span-6\b[^"]*">\s*<iframe/);
+    expect(html).toMatch(/<div class="[^"]*\blg:order-first lg:col-span-6\b[^"]*"[^>]*>\s*<iframe/);
   });
 
   it('renders the phone, email and address rows from the data layer', async () => {
@@ -80,7 +85,16 @@ describe('ContactSection', () => {
     expect(hrefs(phoneRow).every((href) => href.startsWith('tel:+'))).toBe(true);
     expect(hrefs(emailRow).every((href) => href.startsWith('mailto:'))).toBe(true);
     for (const { label } of [...phones, ...emails]) {
-      expect(phoneRow + emailRow).toContain(`>${label}</a>`);
+      expect(phoneRow + emailRow).toContain(`aria-label="${label}"`);
+      expect((phoneRow + emailRow).replaceAll('<wbr>', '')).toContain(
+        `<span class="sr-only">${label}</span>`,
+      );
+    }
+    // On narrow cards an email wraps after its "@", not mid-word.
+    for (const { label } of emails) {
+      const [user = '', domain = ''] = label.split('@');
+      expect(emailRow).toContain(`<span class="sr-only">${user}@<wbr>${domain}</span>`);
+      expect(emailRow).toMatch(/<\/span><wbr><span data-typewriter-word>/);
     }
     expect(addressRow).toMatch(/<address [^>]*>[\s\S]*?<\/address>/);
     expect(/<address [\s\S]*?<\/address>/.exec(addressRow)?.[0]).toContain(address.text);
@@ -122,7 +136,7 @@ describe('ContactSection', () => {
 
   it('reserves the map height so loading it causes no layout shift', async () => {
     expect(await renderContact()).toMatch(
-      /<div class="relative h-80 [^"]*\boverflow-hidden rounded-2xl bg-surface-container-high\b[^"]*\blg:min-h-90\b[^"]*">\s*<iframe/,
+      /<div class="relative h-80 [^"]*\boverflow-hidden rounded-2xl bg-surface-container-high\b[^"]*\blg:min-h-90\b[^"]*"[^>]*>\s*<iframe/,
     );
   });
 
@@ -135,12 +149,11 @@ describe('ContactSection', () => {
     expect(link).toMatch(/class="[^"]*\bbg-primary text-on-primary\b[^"]*\bw-full\b/);
     expect(link).toMatch(/<svg [^>]*aria-hidden="true"/);
     expect(link).toContain(WHATSAPP_ICON_PATH);
-    expect(
-      link
-        .replace(/<[^>]+>/g, '')
-        .replace(/\s+/g, ' ')
-        .trim(),
-    ).toBe('Escríbanos por WhatsApp (abre WhatsApp en una pestaña nueva)');
+    expect(link).toContain(
+      'aria-label="Escríbanos por WhatsApp (abre WhatsApp en una pestaña nueva)"',
+    );
+    expect(painted(link)).toBe('Escríbanos por WhatsApp');
+    expect(link).toContain('<span class="sr-only"> (abre WhatsApp en una pestaña nueva)</span>');
   });
 
   it('is the last section of the page and links WhatsApp from it and the floating button only', async () => {
@@ -151,6 +164,97 @@ describe('ContactSection', () => {
     expect(page.lastIndexOf('<section ')).toBe(contactStart);
     expect(page.match(/href="https:\/\/wa\.me\//g)).toHaveLength(2);
     expect(page.indexOf('wa.me/')).toBeGreaterThan(contactStart);
+  });
+
+  describe('entrance', () => {
+    function openTag(html: string, pattern: RegExp): string {
+      return pattern.exec(html)?.[0] ?? '';
+    }
+
+    it('makes the section a scroll-triggered sequence that clips the horizontal slides', async () => {
+      const section = openTag(await renderContact(), /^<section [^>]*>/);
+
+      expect(section).toMatch(/ data-intro-root\b/);
+      expect(section).toContain('data-intro-trigger="view"');
+      expect(section).toMatch(/class="[^"]*\boverflow-x-clip\b/);
+    });
+
+    it('fades the background photo in, and times the heading and lead with the section', async () => {
+      const html = await renderContact();
+
+      expect(openTag(html, /<img [^>]*>/)).toMatch(/data-intro[^>]*--intro-duration: 1200ms/);
+      expect(openTag(html, /<h2 [^>]*>/)).toMatch(/ data-intro style="[^"]*--intro-y: 24px/);
+      // The header is not a sequence of its own: it belongs to the section's.
+      expect(html.match(/data-intro-root/g)).toHaveLength(3);
+      expect(openTag(html, /<p [^>]*data-typewriter[^>]*>/)).toMatch(
+        /data-typewriter-speed="21" data-typewriter-delay="300" data-typewriter-trigger="view"/,
+      );
+    });
+
+    it('slides the map in from the left and the card from the right, following the section', async () => {
+      const html = await renderContact();
+      const card = openTag(html, /<div class="[^"]*\bxl:col-span-5\b[^>]*>/);
+      const map = openTag(html, /<div class="[^"]*\bxl:col-span-7\b[^>]*>/);
+
+      for (const element of [card, map]) {
+        expect(element).toContain('data-intro-parent="contacto"');
+        expect(element).toContain('data-intro-sync-media="(min-width: 64rem)"');
+      }
+      expect(card).toMatch(/--intro-delay: 500ms;[^"]*--intro-x: 32px/);
+      expect(map).toMatch(/--intro-delay: 400ms;[^"]*--intro-x: -32px;[^"]*--intro-scale: 0\.98/);
+      // Only the container moves: the iframe keeps loading lazily, untouched.
+      expect(iframe(html)).not.toContain('data-intro');
+    });
+
+    it('chains the rows: each badge and text waits for the text typed before it', async () => {
+      const html = await renderContact();
+      const typewriters = [...html.matchAll(/<span id="(contact-[^"]+)"[^>]*>/g)].map(
+        ([tag, id]) => ({ id, after: /data-typewriter-after="([^"]+)"/.exec(tag)?.[1] }),
+      );
+      const badgesAfter = [...html.matchAll(/<span class="[^"]*\bsize-14\b[^>]*>/g)].map(
+        ([tag]) => /data-intro-after="([^"]+)"/.exec(tag)?.[1],
+      );
+
+      expect(typewriters).toEqual([
+        { id: 'contact-phone-0', after: undefined },
+        { id: 'contact-email-0', after: 'contact-phone-0' },
+        { id: 'contact-address', after: 'contact-email-0' },
+        { id: 'contact-address-note', after: 'contact-address' },
+      ]);
+      expect(badgesAfter).toEqual([undefined, 'contact-phone-0', 'contact-email-0']);
+      expect(openTag(whatsAppLink(html), /^<a [^>]*>/)).toContain(
+        'data-intro-after="contact-address-note"',
+      );
+      expect(whatsAppLink(html)).toMatch(
+        /<span data-typewriter[^>]*data-typewriter-after="contact-address-note"/,
+      );
+    });
+
+    it('types each link inside its <a>, which keeps its href and gets its full text as label', async () => {
+      const { phones, emails } = getContactChannels();
+      const html = await renderContact();
+
+      for (const { label, href } of [...phones, ...emails]) {
+        const escape = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const link = new RegExp(
+          `<a href="${escape(href)}" aria-label="${escape(label)}" class="[^"]*">[\\s\\S]*?</a>`,
+        ).exec(html)?.[0];
+        expect(link).toBeDefined();
+        expect(link).toMatch(/<span id="contact-[^"]+" data-typewriter[^>]*data-typewriter-break>/);
+        expect(painted(link ?? '')).toBe(label);
+        expect(link).not.toContain('pointer-events');
+      }
+    });
+
+    it('keeps the address, typed, inside its <address> element', async () => {
+      const { address } = getContactChannels();
+      const element = /<address [\s\S]*?<\/address>/.exec(await renderContact())?.[0] ?? '';
+
+      expect(element.match(/data-typewriter=/g)).toHaveLength(2);
+      expect(element).toContain(`<span class="sr-only">${address.text}</span>`);
+      expect(element).toContain(`<span class="sr-only">${address.note}</span>`);
+      expect(painted(element)).toBe(address.text + address.note);
+    });
   });
 
   it('only uses utilities that exist in the design system', async () => {

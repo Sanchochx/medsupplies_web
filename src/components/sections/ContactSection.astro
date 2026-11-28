@@ -2,24 +2,63 @@
 import { Image } from 'astro:assets';
 import backgroundImage from '../../assets/images/image_generica.png';
 import { getCompanyInfo, getContactChannels, getMapEmbedUrl, getWhatsAppUrl } from '../../lib/data';
+import {
+  CONTACT_INTRO,
+  SIDE_BY_SIDE_MEDIA,
+  contactCardChain,
+  introStepStyle,
+} from '../../lib/motion/introTimeline';
 import { Button, Container, IconTile, SectionHeader } from '../ui';
+import Typewriter from '../ui/Typewriter.astro';
 
+const SECTION_ID = 'contacto';
 const HEADING_ID = 'contact-heading';
+const WHATSAPP_LABEL = 'Escríbanos por WhatsApp';
+const NEW_TAB_NOTE = '(abre WhatsApp en una pestaña nueva)';
 
 const { address, phones, emails, mapQuery } = getContactChannels();
 const whatsAppUrl = getWhatsAppUrl();
 const mapUrl = getMapEmbedUrl(mapQuery);
 const { legalName } = getCompanyInfo();
 
+// One typewriter per line, chained row by row (phones, emails, address).
+const chain = contactCardChain([
+  phones.map((_, index) => `contact-phone-${index}`),
+  emails.map((_, index) => `contact-email-${index}`),
+  ['contact-address', 'contact-address-note'],
+]);
+const [phoneRow, emailRow, addressRow] = chain.rows;
+const linkRows = [
+  { icon: 'call', links: phones, row: phoneRow },
+  { icon: 'mail', links: emails, row: emailRow },
+] as const;
+const [addressLine, addressNote] = addressRow?.lines ?? [];
+
 // min-h-11 keeps every link at the 44px minimum tap target, even when the text is one line.
 const LINK_CLASS =
   'inline-flex min-h-11 items-center self-start rounded-sm font-heading text-body-md font-bold wrap-anywhere xl:text-body-lg text-on-surface underline-offset-4 hover:text-primary hover:underline';
+
+/*
+ * Entrance (timings in CONTACT_INTRO): the section is the sequence; the map and the card are
+ * sequences of their own that start with it side by side, or on their own entry when stacked.
+ * overflow-x-clip keeps their horizontal slide from widening the page on small screens.
+ * Typed links keep their href and get the full text as aria-label, since the typed copy is
+ * aria-hidden.
+ */
+const followSection = {
+  'data-intro-root': '',
+  'data-intro-trigger': 'view',
+  'data-intro-parent': SECTION_ID,
+  'data-intro-sync-media': SIDE_BY_SIDE_MEDIA,
+} as const;
 ---
 
 <section
-  id="contacto"
+  id={SECTION_ID}
   aria-labelledby={HEADING_ID}
-  class="relative isolate w-full bg-surface-container-low py-space-xl lg:py-24"
+  class="relative isolate w-full overflow-x-clip bg-surface-container-low py-space-xl lg:py-24"
+  data-intro-root
+  data-intro-trigger="view"
 >
   {/* Decorative photo under a light veil, so the heading, lead and cards stay legible. */}
   <Image
@@ -29,51 +68,107 @@ const LINK_CLASS =
     sizes="100vw"
     loading="lazy"
     class="absolute inset-0 -z-10 size-full object-cover"
+    data-intro
+    style={introStepStyle(CONTACT_INTRO.photo)}
   />
   <div aria-hidden="true" class="absolute inset-0 -z-10 bg-surface-container-low/80"></div>
   <Container class="flex flex-col gap-space-xl">
     <SectionHeader
       headingId={HEADING_ID}
-      heading="Contáctenos"
+      heading="Contáctanos"
       highlight
       align="center"
       headingClass="uppercase"
       lead="Atención personalizada para hospitales, clínicas, laboratorios clínicos y centros especializados en toda Colombia."
       leadSize="md"
       leadClass="lg:max-w-none lg:whitespace-nowrap"
+      intro={CONTACT_INTRO.header}
+      introRoot={false}
     />
 
     {/* Card first in the DOM (and on small screens); from lg the map moves to the left column. */}
     <div class="grid grid-cols-1 gap-space-md lg:grid-cols-12 lg:gap-space-lg">
-      <div class="flex min-w-0 flex-col gap-space-lg rounded-2xl bg-surface-container-lowest p-space-lg shadow-md md:p-space-xl lg:col-span-6 xl:col-span-5">
+      <div
+        class="flex min-w-0 flex-col gap-space-lg rounded-2xl bg-surface-container-lowest p-space-lg shadow-md md:p-space-xl lg:col-span-6 xl:col-span-5"
+        {...followSection}
+        data-intro
+        style={introStepStyle(CONTACT_INTRO.card)}
+      >
         <ul class="flex flex-col gap-space-lg">
+          {linkRows.map(({ icon, links, row }) => (
+            <li class="flex items-center gap-space-md">
+              <IconTile
+                icon={icon}
+                size="xl"
+                shape="circle"
+                tone="primary"
+                data-intro
+                data-intro-after={row?.badgeAfter}
+                style={row && introStepStyle(row.badge)}
+              />
+              <div class="flex min-w-0 flex-col">
+                {links.map(({ label, href }, index) => {
+                  const typing = row?.lines[index];
+                  // On narrow cards an email wraps after its "@", not mid-word.
+                  const [user, domain] = label.split('@');
+                  return (
+                    <a href={href} aria-label={label} class={LINK_CLASS}>
+                      <Typewriter
+                        as="span"
+                        trigger="view"
+                        id={typing?.id}
+                        after={typing?.after}
+                        delay={typing?.delay}
+                        speed={typing?.speed}
+                        breakWords
+                      >
+                        {domain === undefined ? (
+                          label
+                        ) : (
+                          <Fragment>
+                            {`${user}@`}
+                            <wbr />
+                            {domain}
+                          </Fragment>
+                        )}
+                      </Typewriter>
+                    </a>
+                  );
+                })}
+              </div>
+            </li>
+          ))}
           <li class="flex items-center gap-space-md">
-            <IconTile icon="call" size="xl" shape="circle" tone="primary" />
-            <div class="flex min-w-0 flex-col">
-              {phones.map(({ label, href }) => (
-                <a href={href} class={LINK_CLASS}>
-                  {label}
-                </a>
-              ))}
-            </div>
-          </li>
-          <li class="flex items-center gap-space-md">
-            <IconTile icon="mail" size="xl" shape="circle" tone="primary" />
-            <div class="flex min-w-0 flex-col">
-              {emails.map(({ label, href }) => (
-                <a href={href} class={LINK_CLASS}>
-                  {label}
-                </a>
-              ))}
-            </div>
-          </li>
-          <li class="flex items-center gap-space-md">
-            <IconTile icon="location-on" size="xl" shape="circle" tone="primary" />
+            <IconTile
+              icon="location-on"
+              size="xl"
+              shape="circle"
+              tone="primary"
+              data-intro
+              data-intro-after={addressRow?.badgeAfter}
+              style={addressRow && introStepStyle(addressRow.badge)}
+            />
             <address class="flex min-w-0 flex-col not-italic">
-              <span class="font-heading text-body-md font-bold text-on-surface">
-                {address.text}
-              </span>
-              <span class="text-body-sm font-medium text-primary">{address.note}</span>
+              <Typewriter
+                as="span"
+                text={address.text}
+                trigger="view"
+                id={addressLine?.id}
+                after={addressLine?.after}
+                delay={addressLine?.delay}
+                speed={addressLine?.speed}
+                class="font-heading text-body-md font-bold text-on-surface"
+              />
+              <Typewriter
+                as="span"
+                text={address.note}
+                trigger="view"
+                id={addressNote?.id}
+                after={addressNote?.after}
+                delay={addressNote?.delay}
+                speed={addressNote?.speed}
+                class="text-body-sm font-medium text-primary"
+              />
             </address>
           </li>
         </ul>
@@ -83,20 +178,36 @@ const LINK_CLASS =
           href={whatsAppUrl}
           target="_blank"
           rel="noopener noreferrer"
+          aria-label={`${WHATSAPP_LABEL} ${NEW_TAB_NOTE}`}
           size="lg"
           iconStart="whatsapp"
           fullWidth
           class="mt-auto"
+          data-intro
+          data-intro-after={chain.buttonAfter}
+          style={introStepStyle(chain.button)}
         >
           <span>
-            Escríbanos por WhatsApp
-            <span class="sr-only"> (abre WhatsApp en una pestaña nueva)</span>
+            <Typewriter
+              as="span"
+              text={WHATSAPP_LABEL}
+              trigger="view"
+              after={chain.buttonAfter}
+              delay={chain.label.delay}
+              speed={chain.label.speed}
+            />
+            <span class="sr-only">{` ${NEW_TAB_NOTE}`}</span>
           </span>
         </Button>
       </div>
 
       {/* The container reserves the height (no layout shift); the tinted background shows while the map loads. */}
-      <div class="relative h-80 min-w-0 overflow-hidden rounded-2xl bg-surface-container-high shadow-md lg:order-first lg:col-span-6 lg:h-auto lg:min-h-90 xl:col-span-7">
+      <div
+        class="relative h-80 min-w-0 overflow-hidden rounded-2xl bg-surface-container-high shadow-md lg:order-first lg:col-span-6 lg:h-auto lg:min-h-90 xl:col-span-7"
+        {...followSection}
+        data-intro
+        style={introStepStyle(CONTACT_INTRO.map)}
+      >
         <iframe
           src={mapUrl}
           title={`Mapa de ubicación de ${legalName} en ${mapQuery}`}
@@ -109,3 +220,9 @@ const LINK_CLASS =
     </div>
   </Container>
 </section>
+
+<script>
+  import { initIntros } from '../../lib/motion/introSequence';
+
+  initIntros();
+</script>

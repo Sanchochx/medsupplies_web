@@ -143,6 +143,7 @@ export const HOSPITAL_PANEL: DivisionPanel = {
       kind: 'products',
       tabLabel: 'Laboratorio y esterilización',
       title: 'Línea de laboratorio, desinfección y esterilización',
+      columns: 2,
       items: [
         'Indicadores biológicos',
         'Indicadores químicos',

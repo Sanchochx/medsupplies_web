@@ -1,5 +1,6 @@
 ---
 import { getMissionVision } from '../../lib/data';
+import { HISTORY_INTRO, POLICY_INTRO } from '../../lib/motion/introTimeline';
 import { Container, SectionHeader } from '../ui';
 import MissionVisionPanel, { type Statement } from './MissionVisionPanel.astro';
 
@@ -43,6 +44,7 @@ const statements: [Statement, Statement] = [
       highlight
       align="center"
       headingClass={HEADING_ONE_LINE}
+      intro={HISTORY_INTRO}
       lead="En 2015 nace FESIQ Ingeniería, un grupo interdisciplinario de profesionales que comparte conceptos y herramientas para que sus clientes adopten nuevas prácticas de gestión. En los últimos 10 años la empresa incursionó en un nuevo campo y FESIQ fue absorbida por Medsupplies & Ingeniería S.A.S., que hoy ofrece, además de ingeniería, suministros para el sector salud y la industria de alimentos. Nos apoyamos en la calidad humana, la experiencia profesional y la preparación académica para brindar el mejor servicio."
     />
   </Container>
@@ -60,6 +62,7 @@ const statements: [Statement, Statement] = [
       heading="POLÍTICA INTEGRADA"
       highlight
       align="center"
+      intro={POLICY_INTRO}
     >
       <Fragment slot="lead">
         Para <span class="font-semibold text-primary">Medsupplies &amp; Ingeniería S.A.S.</span>, la

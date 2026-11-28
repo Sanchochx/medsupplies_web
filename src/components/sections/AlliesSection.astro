@@ -44,7 +44,7 @@ const allies = getAllies().map((ally, index) => ({
   >
     <div
       data-marquee-track
-      class="flex w-max group-focus-within:[animation-play-state:paused] group-hover:[animation-play-state:paused] group-data-offscreen:[animation-play-state:paused] motion-safe:animate-marquee motion-reduce:w-full"
+      class="flex w-max group-focus-within:[animation-play-state:paused] group-data-offscreen:[animation-play-state:paused] motion-safe:animate-marquee motion-reduce:w-full"
     >
       {[false, true].map((isCopy) => (
         <ul
@@ -117,6 +117,15 @@ const allies = getAllies().map((ally, index) => ({
   @media (prefers-reduced-motion: reduce) {
     [data-marquee-slot] {
       padding-block: calc(var(--marquee-gap) * 0.25px);
+    }
+  }
+
+  /* The static grid fits two logos per row on phones (2 × (128 + 24) = 304px ≤ 320px). */
+  @media (prefers-reduced-motion: reduce) and (width < 48rem) {
+    [data-marquee] {
+      --marquee-slot-width: 128;
+      --marquee-slot-height: 56;
+      --marquee-gap: 24;
     }
   }
 </style>

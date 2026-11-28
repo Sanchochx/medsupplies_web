@@ -32,13 +32,46 @@ const appleTouchIcon = await getImage({
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {/*
+      Before any paint: content that JS animates in (hero intro, typewriter) is only hidden under
+      `.js`, so without JavaScript it is simply visible, and with it there is no flash.
+    */}
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+    {/*
+      A reload (F5) starts again at the top of the page: the browser would otherwise restore the
+      scroll position or jump back to the last `#anchor`. Only reloads: a link to `/#contacto`
+      still lands on its section, and back/forward keeps its position. It must run in the <head>,
+      before the browser scrolls to the fragment.
+    */}
+    <script is:inline>
+      (() => {
+        const [navigation] = performance.getEntriesByType('navigation');
+        if (!navigation || navigation.type !== 'reload') return;
+        // Instant: `scroll-behavior: smooth` on <html> would otherwise glide up from the anchor.
+        const toTop = () => window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        history.scrollRestoration = 'manual';
+        if (location.hash) {
+          history.replaceState(history.state, '', location.pathname + location.search);
+          // The browser may still jump to the anchor of the URL it loaded; undo that before it
+          // paints. Disarmed on load, so it never swallows the visitor's own first scroll.
+          window.addEventListener('scroll', toTop, { once: true });
+          window.addEventListener('load', () => window.removeEventListener('scroll', toTop), {
+            once: true,
+          });
+        }
+        toTop();
+      })();
+    </script>
     <title>{title}</title>
     <link rel="icon" type="image/png" sizes="32x32" href={favicon.src} />
     <link rel="apple-touch-icon" sizes="180x180" href={appleTouchIcon.src} />
     <Font cssVariable="--font-inter" preload={[{ weight: 400 }]} />
     <Font cssVariable="--font-plus-jakarta-sans" preload={[{ weight: 700 }]} />
   </head>
-  <body>
+  {/* A column at least one screen tall, so the footer sits at the bottom on short pages. */}
+  <body class="flex min-h-svh flex-col">
     {/* Parked above the viewport (not `sr-only`, whose reset fights the padding) until focused. */}
     <a
       href="#main-content"
@@ -51,7 +84,7 @@ const appleTouchIcon = await getImage({
       tabindex="-1" lets the skip link move keyboard focus here, not just the scroll position.
       The outline is dropped only for this programmatic target: <main> is not an interactive control.
     */}
-    <main id="main-content" tabindex="-1" class="pt-header focus:outline-none">
+    <main id="main-content" tabindex="-1" class="pt-header flex-1 focus:outline-none">
       <slot />
     </main>
     <slot name="footer" />

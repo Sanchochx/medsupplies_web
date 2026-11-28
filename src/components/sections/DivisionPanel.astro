@@ -1,5 +1,8 @@
 ---
+import { Image } from 'astro:assets';
+import productsBackground from '../../assets/images/fondo_productos.png';
 import type { DivisionPanel } from '../../lib/data';
+import { divisionPanelMotionStyle } from '../../lib/motion/panelMotionTimeline';
 import { Container } from '../ui';
 import DivisionLine from './DivisionLine.astro';
 import DivisionLineTabs from './DivisionLineTabs.astro';
@@ -30,6 +33,9 @@ const hasPhotos = panel.images.length > 0;
  * division and these attributes together; the row animates `0fr` → `1fr`. Inside, the first line
  * is selected; lineTabs.ts switches lines. The division's photo loop sits beside every line (above
  * it on small screens), so it keeps running when the tab changes.
+ * Content motion (panelMotion.ts, lineMotion.ts): every open replays the entrance of the
+ * `[data-motion]` elements; the inline style carries the shared timings (panelMotionTimeline.ts).
+ * `data-line-viewport` is the line area whose height animates on a line change.
  */}
 <div
   id={id}
@@ -39,14 +45,30 @@ const hasPhotos = panel.images.length > 0;
   inert
   data-division-panel
   class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-350 ease-out group-data-[state=open]/division:grid-rows-[1fr]"
+  style={divisionPanelMotionStyle()}
 >
   <div class="min-h-0 overflow-hidden">
-    <div class="bg-surface-container-low py-space-lg lg:py-space-xl">
+    {/*
+      Decorative warehouse photo, kept faint under a 95% veil of the panel color so the lines,
+      chips and tabs keep their contrast. Lazy: it only loads once a panel opens.
+    */}
+    <div class="relative isolate bg-surface-container-low py-space-lg lg:py-space-xl">
+      <Image
+        src={productsBackground}
+        alt=""
+        widths={[640, 1024, 1672]}
+        sizes="100vw"
+        loading="lazy"
+        decoding="async"
+        data-panel-background
+        class="absolute inset-0 -z-10 size-full object-cover"
+      />
+      <div aria-hidden="true" class="absolute inset-0 -z-10 bg-surface-container-low/95"></div>
       <Container class="flex flex-col gap-space-lg lg:gap-space-xl" data-line-tabs>
         <DivisionLineTabs labelledBy={labelledBy} lines={lines} />
-        <div class="grid items-start gap-space-lg md:grid-cols-3 lg:gap-space-xl">
-          {hasPhotos && <DivisionPhotoLoop images={panel.images} />}
-          <div class:list={[hasPhotos ? 'md:col-span-2' : 'md:col-span-3']}>
+        <div class="grid items-start gap-space-lg md:grid-cols-5 lg:gap-space-xl">
+          {hasPhotos && <DivisionPhotoLoop images={panel.images} class="md:col-span-2" />}
+          <div class:list={[hasPhotos ? 'md:col-span-3' : 'md:col-span-5']} data-line-viewport>
             {lines.map(({ line, tabId, panelId }, index) => (
               <DivisionLine
                 line={line}

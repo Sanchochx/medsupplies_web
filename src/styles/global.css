@@ -200,8 +200,11 @@
   --spacing-margin: 3rem;
   --spacing-margin-mobile: 1.25rem;
 
-  /* Fixed header height; also used as the scroll offset for anchored sections. */
-  --spacing-header: 5rem;
+  /*
+   * Fixed header height; also used as the scroll offset for anchored sections. 4rem on phones and
+   * tablets (more room for content, notably in landscape), 5rem from lg (see the override below).
+   */
+  --spacing-header: 4rem;
 
   /* Bottom clearance so the floating WhatsApp button (56px + offset) does not cover content. */
   --spacing-fab-clearance: 5rem;
@@ -260,6 +263,180 @@
   }
 }
 
+/*
+ * INTRO SEQUENCES — entrance animations driven by lib/motion/introSequence.ts, with every timing
+ * in lib/motion/introTimeline.ts (written on each element as `--intro-*`). Only while JS is on
+ * (`js` class set in the <head>) and motion is allowed: each `[data-intro]` element waits, paused on
+ * its first keyframe, until it gets `data-intro-state="playing"`. `backwards` fill: once an
+ * animation ends it stops applying, so the final state is the untouched design (and hover
+ * transforms are not overridden). Only opacity, transform and clip-path change: nothing reflows.
+ * `data-intro="wipe"` reveals the element from right to left with clip-path instead, and
+ * `"wipe-ltr"` from left to right. `--intro-offset`, set on a sequence root by a staggered group
+ * (introStagger.ts), is inherited and pushes back every delay inside it.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-intro] {
+    --intro-tx: var(--intro-x, 0px);
+    --intro-ty: var(--intro-y, 0px);
+    animation: intro-enter var(--intro-duration, 0ms) var(--intro-ease, ease-out)
+      calc(var(--intro-delay, 0ms) + var(--intro-offset, 0ms)) backwards paused;
+
+    /* Side-by-side layouts may enter differently (e.g. horizontally instead of rising). */
+    @variant lg {
+      --intro-tx: var(--intro-lg-x, var(--intro-x, 0px));
+      --intro-ty: var(--intro-lg-y, var(--intro-y, 0px));
+    }
+  }
+
+  .js [data-intro='wipe'] {
+    animation-name: intro-wipe;
+  }
+
+  .js [data-intro='wipe-ltr'] {
+    animation-name: intro-wipe-ltr;
+  }
+
+  .js [data-intro][data-intro-state='playing'] {
+    animation-play-state: running;
+  }
+
+  .js [data-intro][data-intro-state='done'] {
+    animation: none;
+  }
+}
+
+@keyframes intro-enter {
+  from {
+    opacity: var(--intro-opacity, 0);
+    transform: translate(var(--intro-tx), var(--intro-ty)) scale(var(--intro-scale, 1));
+  }
+}
+
+@keyframes intro-wipe {
+  from {
+    clip-path: inset(0 0 0 100%);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@keyframes intro-wipe-ltr {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
+/*
+ * DIVISION PANEL CONTENT — replayed on every open (lib/divisions/panelMotion.ts) and, shorter, on
+ * every line change (lineMotion.ts). Timings live in lib/motion/panelMotionTimeline.ts and reach
+ * these rules as `--motion-*` properties on the panel and on each `[data-motion]` element.
+ * Panel `data-motion-state`: `closed` holds the content at its start pose; `entering` transitions
+ * it to rest, staggered; `open` matches no rule (the untouched design, no will-change);
+ * `leaving` fades it out quickly. Line changes, only while the panel is open, through
+ * `data-line-motion` on `[data-line-tabs]`: `leaving` fades the shown line out, `preparing` puts
+ * the incoming line at its start pose, `entering` brings it in from the side `data-direction`
+ * names. The photo tile is shared by every line and is left alone, so its loop goes on. Only opacity and transform change, besides the line area's height.
+ * Under reduced motion none of this applies and the script swaps everything instantly.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  [data-motion] {
+    --motion-from: translateY(var(--motion-rise, 0px));
+    --motion-line-from: var(--motion-from);
+  }
+
+  [data-motion='photo'] {
+    --motion-from: translateX(calc(-1 * var(--motion-shift, 0px)))
+      scale(var(--motion-photo-scale, 1));
+  }
+
+  [data-motion='chip'] {
+    --motion-line-from: translateX(var(--motion-line-x, 0px));
+  }
+
+  [data-motion-state='closed'] [data-motion] {
+    opacity: 0;
+    transform: var(--motion-from);
+    transition: none;
+  }
+
+  [data-motion-state='entering'] [data-motion] {
+    transition-property: opacity, transform;
+    transition-duration: var(--motion-duration, 0ms);
+    transition-timing-function: var(--motion-ease, ease-out);
+    transition-delay: var(--motion-open-delay, 0ms);
+    will-change: opacity, transform;
+  }
+
+  [data-motion-state='entering'] [data-motion='footer'] {
+    transition-delay: var(--motion-footer-delay, 0ms);
+  }
+
+  [data-motion-state='leaving'] [data-motion] {
+    opacity: 0;
+    transition-property: opacity, transform;
+    transition-duration: var(--motion-leave-duration, 0ms);
+    transition-timing-function: var(--motion-leave-ease, ease-in);
+  }
+
+  [data-motion-state='open'] [data-line-motion] {
+    --motion-line-x: var(--motion-shift, 0px);
+  }
+
+  [data-motion-state='open'] [data-line-motion][data-direction='prev'] {
+    --motion-line-x: calc(-1 * var(--motion-shift, 0px));
+  }
+
+  [data-motion-state='open'] [data-line-motion='leaving'] [role='tabpanel'] [data-motion] {
+    opacity: 0;
+    transition: opacity var(--motion-leave-duration, 0ms) var(--motion-leave-ease, ease-in);
+  }
+
+  [data-motion-state='open'] [data-line-motion='preparing'] [role='tabpanel'] [data-motion] {
+    opacity: 0;
+    transform: var(--motion-line-from);
+    transition: none;
+  }
+
+  [data-motion-state='open'] [data-line-motion='entering'] [role='tabpanel'] [data-motion] {
+    transition-property: opacity, transform;
+    transition-duration: var(--motion-line-duration, 0ms);
+    transition-timing-function: var(--motion-ease, ease-out);
+    transition-delay: var(--motion-line-delay, 0ms);
+    will-change: opacity, transform;
+  }
+
+  /* Clipped only while resizing, with room left for focus rings. */
+  [data-line-viewport][data-resizing] {
+    overflow: clip;
+    overflow-clip-margin: 0.5rem;
+    transition: height var(--motion-resize-duration, 0ms) var(--motion-ease, ease-out);
+  }
+
+  /* `scale` (not `transform`), so it never fights the entrance transitions. */
+  [data-motion-state] [role='tab'][aria-selected='true'] {
+    animation: motion-tab-select var(--motion-tab-duration, 0ms) var(--motion-ease, ease-out);
+  }
+}
+
+@keyframes motion-tab-select {
+  from {
+    scale: var(--motion-tab-scale, 1);
+  }
+}
+
+/* Desktop header height; every `--spacing-header` consumer (bar, offsets, hero) follows it. */
+@layer theme {
+  @media (width >= 64rem) {
+    :root {
+      --spacing-header: 5rem;
+    }
+  }
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -306,6 +483,22 @@
 @utility min-h-screen-below-header {
   min-height: calc(100vh - var(--spacing-header));
   min-height: calc(100svh - var(--spacing-header));
+}
+
+/*
+ * For a page's first section: pulled up under the fixed header and one full screen tall, so the
+ * header's slide-in intro uncovers the section itself, not a band of page background where
+ * <main> reserves the header's space. Pair it with `pt-under-header-*`, which adds the header
+ * height back to the top padding so the content still starts below the bar.
+ */
+@utility extend-under-header {
+  margin-top: calc(-1 * var(--spacing-header));
+  min-height: 100vh;
+  min-height: 100svh;
+}
+
+@utility pt-under-header-* {
+  padding-top: calc(var(--spacing-header) + --value(--spacing-*));
 }
 
 /*

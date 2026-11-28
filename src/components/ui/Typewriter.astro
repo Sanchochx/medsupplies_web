@@ -1,0 +1,154 @@
+---
+import {
+  TYPEWRITER_DEFAULTS,
+  escapeHtml,
+  splitTypewriterHtml,
+  type TypewriterTrigger,
+} from '../../lib/typewriter/typewriter';
+
+export type TypewriterTag = 'p' | 'span' | 'div' | 'h2' | 'h3';
+
+export interface TypewriterProps {
+  /** Plain text. Omit it to type the default slot instead, which may hold inline markup and `<br>`. */
+  text?: string;
+  as?: TypewriterTag;
+  /** Milliseconds per character. */
+  speed?: number;
+  /** Milliseconds between the trigger (page load, or the sequence start for `view`) and typing. */
+  delay?: number;
+  trigger?: TypewriterTrigger;
+  /** Thin blinking caret after the last typed character, faded out at the end. */
+  caret?: boolean;
+  /** Lets other elements wait for this one (`data-intro-after`, `typewriter:complete`). */
+  id?: string;
+  /**
+   * Id of the typewriter this one follows: it starts when that one completes, and `delay` counts
+   * from then instead of from the trigger.
+   */
+  after?: string;
+  /**
+   * Lets a word break mid-word where it does not fit, as `wrap-anywhere` does (a long email
+   * address). By default every word stays whole. It has no caret: in Chromium the caret's
+   * positioned pseudo-element moves those mid-word breaks, so the text would reflow while typing.
+   */
+  breakWords?: boolean;
+  class?: string;
+}
+
+type Props = TypewriterProps;
+
+const {
+  text,
+  as: Element = 'p',
+  speed = TYPEWRITER_DEFAULTS.speed,
+  delay = TYPEWRITER_DEFAULTS.delay,
+  trigger = TYPEWRITER_DEFAULTS.trigger,
+  caret = true,
+  id,
+  after,
+  breakWords = false,
+  class: className,
+} = Astro.props;
+
+// Rendered slot HTML is trusted (it comes from our own templates); plain text is escaped.
+const hasCaret = caret && !breakWords;
+const html = text === undefined ? (await Astro.slots.render('default')).trim() : escapeHtml(text);
+const typedHtml = splitTypewriterHtml(html);
+---
+
+{/*
+  Screen readers get the content once, from the visually hidden copy (inline markup included); the
+  per-character copy that is animated is hidden from them (split text is read letter by letter in
+  some of them). No aria-live: the content does not change, only how it is painted.
+*/}
+<Element
+  id={id}
+  class={className}
+  data-typewriter
+  data-typewriter-speed={speed}
+  data-typewriter-delay={delay}
+  data-typewriter-trigger={trigger}
+  data-typewriter-caret={hasCaret ? '' : undefined}
+  data-typewriter-after={after}
+  data-typewriter-break={breakWords ? '' : undefined}
+>
+  <span class="sr-only" set:html={html} />
+  <span aria-hidden="true" set:html={typedHtml} />
+</Element>
+
+<script>
+  import { initTypewriters } from '../../lib/typewriter/typewriter';
+
+  initTypewriters();
+</script>
+
+<style is:global>
+  /*
+   * Characters still to type are transparent but keep their place, so the text has its final size
+   * and wraps from the first frame. Hidden only when JS runs (`js` class set in the <head>), so the
+   * text is fully visible without JavaScript; never with display/visibility, so nothing reflows.
+   */
+  [data-typewriter-word] {
+    white-space: nowrap;
+  }
+
+  /* The text is laid out in full from the first frame, so a word broken here never moves. */
+  [data-typewriter-break] [data-typewriter-word] {
+    white-space: normal;
+  }
+
+  .js [data-typewriter] [data-typewriter-char] {
+    opacity: 0;
+    transition: opacity var(--typewriter-char-fade, 90ms) linear;
+  }
+
+  .js [data-typewriter] [data-typewriter-char][data-typed],
+  .js [data-typewriter][data-typewriter-state='done'] [data-typewriter-char] {
+    opacity: 1;
+  }
+
+  [data-typewriter][data-typewriter-caret] [data-typewriter-caret-at] {
+    position: relative;
+  }
+
+  /* Absolutely positioned and zero-width in flow: the caret never pushes the text. */
+  [data-typewriter][data-typewriter-caret] [data-typewriter-caret-at]::after {
+    content: '';
+    position: absolute;
+    inset-block: 0.15em;
+    inset-inline-start: calc(100% + 0.08em);
+    width: 2px;
+    border-radius: 1px;
+    background-color: currentColor;
+    animation: typewriter-caret-blink 1s steps(1, end) infinite;
+  }
+
+  [data-typewriter][data-typewriter-state='done'] [data-typewriter-caret-at]::after {
+    animation: typewriter-caret-out 400ms ease-out forwards;
+  }
+
+  @keyframes typewriter-caret-blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes typewriter-caret-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .js [data-typewriter] [data-typewriter-char] {
+      opacity: 1;
+    }
+
+    [data-typewriter] [data-typewriter-caret-at]::after {
+      display: none;
+    }
+  }
+</style>

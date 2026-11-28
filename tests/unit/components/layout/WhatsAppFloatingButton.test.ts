@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import WhatsAppFloatingButton from '../../../../src/components/layout/WhatsAppFloatingButton.astro';
+import { SITE_CHROME_INTRO, introStepStyle } from '../../../../src/lib/motion/introTimeline';
 import { compileTailwind, extractClasses } from '../../helpers/compileTailwind';
 import { renderAstro } from '../../helpers/renderAstro';
 
@@ -7,8 +8,12 @@ async function renderButton(): Promise<string> {
   return renderAstro(WhatsAppFloatingButton);
 }
 
-function classesOf(html: string): string[] {
-  return (/class="([^"]+)"/.exec(html)?.[1] ?? '').split(' ');
+function wrapperClasses(html: string): string[] {
+  return (/^<div class="([^"]+)"/.exec(html)?.[1] ?? '').split(' ');
+}
+
+function buttonClasses(html: string): string[] {
+  return (/<a [^>]*class="([^"]+)"/.exec(html)?.[1] ?? '').split(' ');
 }
 
 describe('WhatsAppFloatingButton', () => {
@@ -16,7 +21,7 @@ describe('WhatsAppFloatingButton', () => {
     const html = await renderButton();
 
     expect(html).toMatch(
-      /^<a href="https:\/\/wa\.me\/573114472353" target="_blank" rel="noopener noreferrer"/,
+      /<a href="https:\/\/wa\.me\/573114472353" target="_blank" rel="noopener noreferrer"/,
     );
   });
 
@@ -32,12 +37,13 @@ describe('WhatsAppFloatingButton', () => {
   });
 
   it('is a green round button fixed to the bottom right corner', async () => {
-    expect(classesOf(await renderButton())).toEqual(
+    const html = await renderButton();
+
+    expect(wrapperClasses(html)).toEqual(
+      expect.arrayContaining(['fixed', 'right-space-md', 'bottom-space-md', 'z-40']),
+    );
+    expect(buttonClasses(html)).toEqual(
       expect.arrayContaining([
-        'fixed',
-        'right-space-md',
-        'bottom-space-md',
-        'z-40',
         'size-14',
         'rounded-full',
         'bg-whatsapp',
@@ -47,8 +53,16 @@ describe('WhatsAppFloatingButton', () => {
     );
   });
 
+  it('pops in on page load, from a wrapper so the float animation is untouched', async () => {
+    const wrapper = /^<div [^>]*>/.exec(await renderButton())?.[0] ?? '';
+
+    expect(wrapper).toContain('data-intro-root data-intro-trigger="load" data-intro');
+    expect(wrapper).toContain(`style="${introStepStyle(SITE_CHROME_INTRO.whatsApp)}"`);
+    expect(wrapperClasses(await renderButton())).not.toContain('motion-safe:animate-float');
+  });
+
   it('floats only when motion is allowed, and pauses on hover', async () => {
-    const classes = classesOf(await renderButton());
+    const classes = buttonClasses(await renderButton());
 
     expect(classes).toContain('motion-safe:animate-float');
     expect(classes).not.toContain('animate-float');

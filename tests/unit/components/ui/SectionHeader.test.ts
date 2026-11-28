@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import SectionHeader from '../../../../src/components/ui/SectionHeader.astro';
+import { HISTORY_INTRO } from '../../../../src/lib/motion/introTimeline';
 import { renderAstro } from '../../helpers/renderAstro';
 
 /** Class list of the first `<tag>` element in the markup. */
@@ -97,5 +98,19 @@ describe('SectionHeader', () => {
     expect(classesOf(html, 'div')).toEqual(expect.arrayContaining(['items-center', 'text-center']));
     expect(classesOf(html, 'h3')).toContain('text-on-primary');
     expect(html).toMatch(/<p class="[^"]*text-body-md[^"]*\btext-primary-fixed\b/);
+  });
+
+  it('with an intro, is a sequence of its own unless it joins the enclosing one', async () => {
+    const props = { heading: 'Contáctanos', lead: 'Atención personalizada', intro: HISTORY_INTRO };
+    const own = await renderAstro(SectionHeader, { props });
+    const joined = await renderAstro(SectionHeader, { props: { ...props, introRoot: false } });
+
+    expect(own).toMatch(/^<div class="[^"]*" data-intro-root data-intro-trigger="view">/);
+    expect(joined).not.toContain('data-intro-root');
+    // The heading and the typed lead animate either way.
+    for (const html of [own, joined]) {
+      expect(html).toMatch(/<h2 data-intro style="[^"]*--intro-y: 24px/);
+      expect(html).toMatch(/<p [^>]*data-typewriter[^>]*data-typewriter-trigger="view"/);
+    }
   });
 });

@@ -92,6 +92,11 @@ export interface DivisionProductLine extends DivisionLineBase {
   kind: 'products';
   /** Product names, in display order. Names only, no descriptions. */
   items: readonly string[];
+  /**
+   * Columns of the product list from `sm` up (one column on phones). Defaults to 1; long lists
+   * use 2 so the panel does not grow too tall.
+   */
+  columns?: 1 | 2;
 }
 
 export interface DivisionServiceItem {

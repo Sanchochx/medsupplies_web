@@ -39,4 +39,14 @@ describe('Chip', () => {
     expect(html).not.toContain('text-label-sm');
     expect(html).toMatch(/<svg [^>]*aria-hidden="true"/);
   });
+  it('forwards extra attributes to the pill', async () => {
+    const html = await renderAstro(Chip, {
+      props: { 'data-intro': true, style: '--intro-delay: 0ms' },
+      slots: { default: 'Label' },
+    });
+
+    expect(html).toMatch(
+      /^<span class="inline-flex[^"]*" data-intro(="true")? style="--intro-delay: 0ms">/,
+    );
+  });
 });

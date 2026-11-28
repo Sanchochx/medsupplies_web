@@ -1,15 +1,18 @@
 ---
 import { getNavItems } from '../../lib/data';
+import { introStepStyle, navLinkIntro } from '../../lib/motion/introTimeline';
 
 const navItems = getNavItems();
 ---
 
 <nav aria-label="Principal" class="hidden items-center gap-space-md xl:flex">
-  {navItems.map(({ label, href }) => (
+  {navItems.map(({ label, href }, index) => (
     <a
       href={href}
       data-section-link
       class="rounded-lg px-space-sm py-space-xs text-label-lg text-on-surface-variant transition-colors duration-150 not-aria-[current=true]:hover:text-primary aria-[current=true]:bg-primary-container aria-[current=true]:text-on-primary"
+      data-intro
+      style={introStepStyle(navLinkIntro(index))}
     >
       {label}
     </a>

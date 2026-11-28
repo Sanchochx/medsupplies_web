@@ -1,4 +1,5 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
 import Icon from './Icon.astro';
 import type { IconName } from './iconNames';
 
@@ -6,7 +7,7 @@ export type IconTileSize = 'md' | 'lg' | 'xl';
 export type IconTileTone = 'light' | 'solid' | 'primary';
 export type IconTileShape = 'rounded' | 'circle';
 
-export interface IconTileProps {
+export interface IconTileProps extends Omit<HTMLAttributes<'span'>, 'class'> {
   icon: IconName;
   /** `md` = 40px, `lg` = 48px, `xl` = 56px. */
   size?: IconTileSize;
@@ -38,7 +39,14 @@ const TONE_CLASSES: Record<IconTileTone, string> = {
   primary: 'bg-primary text-on-primary shadow-md',
 };
 
-const { icon, size = 'md', tone = 'light', shape = 'rounded', class: className } = Astro.props;
+const {
+  icon,
+  size = 'md',
+  tone = 'light',
+  shape = 'rounded',
+  class: className,
+  ...attrs
+} = Astro.props;
 ---
 
 <span
@@ -49,6 +57,7 @@ const { icon, size = 'md', tone = 'light', shape = 'rounded', class: className }
     TONE_CLASSES[tone],
     className,
   ]}
+  {...attrs}
 >
   <Icon name={icon} size={ICON_SIZES[size]} />
 </span>

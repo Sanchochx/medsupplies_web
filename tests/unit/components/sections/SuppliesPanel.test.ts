@@ -15,7 +15,7 @@ async function renderPanel(): Promise<string> {
 function tabPanels(html: string): string[] {
   return [
     ...html.matchAll(
-      /<div role="tabpanel"[\s\S]*?(?=<div role="tabpanel"|<div class="flex flex-col gap-space-md border-t)/g,
+      /<div role="tabpanel"[\s\S]*?(?=<div role="tabpanel"|<div [^>]*data-motion="footer")/g,
     ),
   ].map(([panel]) => panel);
 }
@@ -58,7 +58,7 @@ describe('Supplies division panel', () => {
     const [, disposables] = tabPanels(await renderPanel());
 
     expect(disposables).toMatch(
-      /<\/h3>\s*<p class="[^"]*">Provienen de recursos naturales renovables\. Reducen las emisiones de CO2,[^<]*otros envases\.<\/p>/,
+      /<\/h3>\s*<p class="[^"]*"[^>]*>\s*Provienen de recursos naturales renovables\. Reducen las emisiones de CO2,[^<]*otros envases\.\s*<\/p>/,
     );
     expect(disposables).not.toContain('registro INVIMA');
   });
@@ -71,7 +71,7 @@ describe('Supplies division panel', () => {
     for (const panel of tabPanels(html)) expect(panel).not.toMatch(/<img\b/);
   });
 
-  it('ends with the quote button, like the hospital panel', async () => {
-    expect(await renderPanel()).toMatch(/<a [^>]*href="\/#contacto"[^>]*>\s*Solicitar cotización/);
+  it('has no quote button, like the hospital panel', async () => {
+    expect(await renderPanel()).not.toContain('Solicitar cotización');
   });
 });

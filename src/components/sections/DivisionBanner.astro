@@ -1,6 +1,11 @@
 ---
 import { Image } from 'astro:assets';
 import type { DivisionBanner } from '../../lib/data';
+import {
+  DIVISION_BANNER_INTRO,
+  divisionBannerIntro,
+  introStepStyle,
+} from '../../lib/motion/introTimeline';
 import { Container, Icon } from '../ui';
 
 export interface DivisionBannerProps {
@@ -17,6 +22,7 @@ const { banner, titleId, panelId } = Astro.props;
 const { title, image, imagePosition, textSide } = banner;
 const isRight = textSide === 'right';
 const expandable = panelId !== undefined;
+const intro = divisionBannerIntro(textSide);
 
 // Full-bleed banner: the largest candidate is the photo's own width (sources are ~1.5–1.7k wide).
 const WIDTHS = [...new Set([640, 960, 1280, image.width].filter((width) => width <= image.width))];
@@ -35,8 +41,17 @@ const OVERLAY =
  * `::after` covers the whole banner, so the entire banner is the click and focus target.
  * The banner fills its row; while a panel is open (`data-locked` on the list) its height is
  * pinned to the closed-state value instead.
+ *
+ * Entrance (DIVISION_BANNER_INTRO, played by the sequence on the division's article): only this
+ * element is clipped by the wipe, never the panel below it, and the clip ends with the animation,
+ * so focus rings and the panel are never cut. The title moves inside the button rather than the
+ * heading: a transformed heading would contain the button's banner-wide `::after` mid-animation.
  */}
-<div class="group/banner relative isolate flex flex-1 overflow-hidden bg-on-primary-fixed group-data-locked/divisions:h-division-banner">
+<div
+  class="group/banner relative isolate flex flex-1 overflow-hidden bg-on-primary-fixed group-data-locked/divisions:h-division-banner"
+  data-intro={intro.wipe}
+  style={introStepStyle(DIVISION_BANNER_INTRO.wipe)}
+>
   <Image
     src={image}
     alt=""
@@ -49,7 +64,8 @@ const OVERLAY =
       // Only a clickable banner reacts to hover.
       expandable && 'transition-[filter] duration-200 ease-out group-hover/banner:brightness-115',
     ]}
-    style={`object-position: ${imagePosition}`}
+    data-intro
+    style={`object-position: ${imagePosition}; ${introStepStyle(DIVISION_BANNER_INTRO.image)}`}
   />
   {/* Duotone: multiplying by the brand blue unifies the three photos into one tint. */}
   <span aria-hidden="true" class="absolute inset-0 -z-10 bg-primary/25 mix-blend-multiply"></span>
@@ -66,7 +82,11 @@ const OVERLAY =
     ]}
   >
     <h2 id={titleId} class="font-heading text-banner-title text-on-primary">
-      {!expandable && title}
+      {!expandable && (
+        <span class="block" data-intro style={introStepStyle(intro.title)}>
+          {title}
+        </span>
+      )}
       {expandable && (
         <button
           type="button"
@@ -80,7 +100,9 @@ const OVERLAY =
             isRight ? 'text-right' : 'text-left',
           ]}
         >
-          {title}
+          <span class="block" data-intro style={introStepStyle(intro.title)}>
+            {title}
+          </span>
         </button>
       )}
     </h2>
@@ -98,7 +120,11 @@ const OVERLAY =
           isRight ? 'justify-start' : 'justify-end',
         ]}
       >
-        <span class="inline-flex size-11 items-center justify-center rounded-full bg-on-primary/20 text-on-primary ring-1 ring-on-primary/30 backdrop-blur-sm transition-transform duration-350 ease-out group-data-[state=open]/division:rotate-180 md:size-14">
+        <span
+          class="inline-flex size-11 items-center justify-center rounded-full bg-on-primary/20 text-on-primary ring-1 ring-on-primary/30 backdrop-blur-sm transition-transform duration-350 ease-out group-data-[state=open]/division:rotate-180 md:size-14"
+          data-intro
+          style={introStepStyle(DIVISION_BANNER_INTRO.chevron)}
+        >
           <Icon name="expand-more" size={28} />
         </span>
       </Container>

@@ -85,7 +85,7 @@ describe('AlliesSection', () => {
     }
   });
 
-  it('animates the track only when motion is allowed, pausing on hover, focus and off screen', async () => {
+  it('animates the track only when motion is allowed, keeping it moving on hover and pausing on focus and off screen', async () => {
     const html = await renderAllies();
     const marquee = openingTag(html, 'data-marquee');
     const track = openingTag(html, 'data-marquee-track');
@@ -94,7 +94,7 @@ describe('AlliesSection', () => {
     expect(marquee).toMatch(/\bgroup\b[^"]*\boverflow-hidden\b[^"]*\bmask-x-from-91%/);
     expect(track).toContain('motion-safe:animate-marquee');
     expect(track).not.toMatch(/[" ]animate-marquee\b/);
-    expect(track).toContain('group-hover:[animation-play-state:paused]');
+    expect(track).not.toContain('group-hover:');
     expect(track).toContain('group-focus-within:[animation-play-state:paused]');
     expect(track).toContain('group-data-offscreen:[animation-play-state:paused]');
   });

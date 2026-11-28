@@ -1,5 +1,6 @@
 ---
 import { getDivisionBanners } from '../../lib/data';
+import { DIVISION_BANNER_INTRO } from '../../lib/motion/introTimeline';
 import DivisionBanner from './DivisionBanner.astro';
 import DivisionPanel from './DivisionPanel.astro';
 
@@ -12,6 +13,9 @@ const banners = getDivisionBanners();
  * three banners land exactly between the header and the bottom of the screen. There is no
  * visible section title; each banner title is an `h2`.
  * Opening a division's panel lets the section grow past one screen (see divisionPanels.ts).
+ * Each division is an entrance sequence (its banner wipes in, see DivisionBanner); the list
+ * staggers the banners that enter the viewport together. The sequence sits on the unclipped
+ * article, while only the banner is clipped.
  */}
 <section
   id="productos"
@@ -22,6 +26,8 @@ const banners = getDivisionBanners();
   <ul
     class="group/divisions grid flex-1 grid-rows-divisions gap-space-sm data-locked:grid-rows-none"
     data-divisions-list
+    data-intro-group
+    data-intro-stagger={DIVISION_BANNER_INTRO.stagger}
   >
     {banners.map((banner) => {
       const articleId = `division-${banner.id}`;
@@ -33,6 +39,8 @@ const banners = getDivisionBanners();
             id={articleId}
             data-division={banner.id}
             data-state="closed"
+            data-intro-root
+            data-intro-trigger="view"
             class="group/division flex w-full flex-col"
           >
             <DivisionBanner banner={banner} titleId={titleId} panelId={panelId} />
@@ -50,7 +58,9 @@ const banners = getDivisionBanners();
   import { initDivisionPanels } from '../../lib/divisions/divisionPanels';
   import { initLineTabs } from '../../lib/divisions/lineTabs';
   import { initPhotoRotators } from '../../lib/divisions/photoRotation';
+  import { initIntros } from '../../lib/motion/introSequence';
 
+  initIntros();
   initDivisionPanels();
   initLineTabs();
   initPhotoRotators();

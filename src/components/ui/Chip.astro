@@ -1,10 +1,11 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
 import Icon from './Icon.astro';
 import type { IconName } from './iconNames';
 
 export type ChipVariant = 'tag' | 'eyebrow' | 'inverse' | 'soft';
 
-export interface ChipProps {
+export interface ChipProps extends Omit<HTMLAttributes<'span'>, 'class'> {
   /**
    * `tag`: small muted label. `eyebrow`: solid primary uppercase pill with an optional icon (hero).
    * `inverse`: translucent white pill with white text, for blue/dark surfaces.
@@ -26,10 +27,13 @@ const VARIANT_CLASSES: Record<ChipVariant, string> = {
   soft: 'gap-2 bg-primary-fixed px-3 py-1 text-label-sm text-on-primary-fixed-variant font-semibold uppercase tracking-wider',
 };
 
-const { variant = 'tag', icon, class: className } = Astro.props;
+const { variant = 'tag', icon, class: className, ...attrs } = Astro.props;
 ---
 
-<span class:list={['inline-flex items-center rounded-full', VARIANT_CLASSES[variant], className]}>
+<span
+  class:list={['inline-flex items-center rounded-full', VARIANT_CLASSES[variant], className]}
+  {...attrs}
+>
   {icon && <Icon name={icon} size={18} />}
   <slot />
 </span>

@@ -9,6 +9,8 @@
  *
  * Slide states drive the CSS: `active` is shown; `next` is displayed at opacity 0, so only the
  * upcoming image lazy-loads; `leaving` fades out; `idle` is `display: none` and is not loaded.
+ *
+ * The loop belongs to the whole division: changing the product line leaves it running as is.
  */
 
 export const ROTATOR_SELECTOR = '[data-photo-rotator]';

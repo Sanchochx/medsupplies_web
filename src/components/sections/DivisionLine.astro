@@ -1,6 +1,7 @@
 ---
 import type { DivisionLine } from '../../lib/data';
 import { formatLineLabel } from '../../lib/divisions/lineTabs';
+import { PANEL_MOTION_DELAYS, panelMotionDelayStyle } from '../../lib/motion/panelMotionTimeline';
 import { Chip, Icon, IconTile } from '../ui';
 
 export interface DivisionLineProps {
@@ -17,6 +18,10 @@ export interface DivisionLineProps {
 type Props = DivisionLineProps;
 
 const { line, index, id, tabId, hidden = false } = Astro.props;
+const PILL_STYLE = panelMotionDelayStyle(PANEL_MOTION_DELAYS.pill());
+const TITLE_STYLE = panelMotionDelayStyle(PANEL_MOTION_DELAYS.title());
+const chipStyle = (position: number): string =>
+  panelMotionDelayStyle(PANEL_MOTION_DELAYS.chip(position));
 ---
 
 {/* `tabindex="0"` lets keyboard users reach the panel, which has no focusable content of its own. */}
@@ -29,33 +34,67 @@ const { line, index, id, tabId, hidden = false } = Astro.props;
   class="flex flex-col gap-space-md rounded-2xl focus-visible:outline-offset-4"
 >
   <div class="flex flex-col items-start gap-space-sm">
-    <Chip variant="soft">{formatLineLabel(index)}</Chip>
-    <h3 class="font-heading text-headline-md font-bold text-on-primary-fixed">{line.title}</h3>
+    <Chip variant="soft" data-motion="pill" style={PILL_STYLE}>
+      {formatLineLabel(index)}
+    </Chip>
+    <h3
+      class="font-heading text-headline-md font-bold text-on-primary-fixed"
+      data-motion="title"
+      style={TITLE_STYLE}
+    >
+      {line.title}
+    </h3>
     {line.badge && (
-      <span class="inline-flex items-center gap-1.5 rounded-full bg-surface-container-lowest px-3 py-1 text-label-md text-on-primary-fixed-variant ring-1 ring-primary-fixed-dim">
+      <span
+        class="inline-flex items-center gap-1.5 rounded-full bg-surface-container-lowest px-3 py-1 text-label-md text-on-primary-fixed-variant ring-1 ring-primary-fixed-dim"
+        data-motion="title"
+        style={TITLE_STYLE}
+      >
         <Icon name="verified" size={16} class="text-primary" />
         {line.badge}
       </span>
     )}
     {line.description && (
-      <p class="max-w-prose text-body-md text-on-surface-variant">{line.description}</p>
+      <p
+        class="max-w-prose text-body-md text-on-surface-variant"
+        data-motion="title"
+        style={TITLE_STYLE}
+      >
+        {line.description}
+      </p>
     )}
   </div>
 
-  {/* Grid rows stretch their cells, so chips in the same row keep the same height; names wrap. */}
+  {/*
+   * Products are plain text beside their icon, no card, in a single column (two from `sm` up when
+   * the line asks for it). Names wrap; the icon (18px) stays on the first line (20px line height).
+   */}
   {line.kind === 'products' ? (
-    <ul class="grid grid-cols-1 gap-space-sm sm:grid-cols-2 xl:grid-cols-3">
-      {line.items.map((item) => (
-        <li class="flex items-center gap-space-sm rounded-xl bg-surface-container-high px-space-md py-3 text-body-sm font-medium text-on-primary-fixed">
-          <Icon name="check-circle" size={18} class="text-primary" />
+    <ul
+      class:list={[
+        'grid grid-cols-1 gap-3',
+        line.columns === 2 && 'sm:grid-cols-2 sm:gap-x-space-lg',
+      ]}
+    >
+      {line.items.map((item, position) => (
+        <li
+          class="flex items-start gap-space-sm text-body-sm font-medium text-on-primary-fixed"
+          data-motion="chip"
+          style={chipStyle(position)}
+        >
+          <Icon name="check-circle" size={18} class="mt-px shrink-0 text-primary" />
           <span>{item}</span>
         </li>
       ))}
     </ul>
   ) : (
     <ul class="grid grid-cols-1 gap-space-sm sm:grid-cols-2 sm:gap-space-md">
-      {line.items.map(({ name, icon }) => (
-        <li class="flex items-center gap-space-md rounded-xl bg-surface-container-lowest p-space-sm pr-space-md text-body-md font-medium text-on-primary-fixed shadow-sm">
+      {line.items.map(({ name, icon }, position) => (
+        <li
+          class="flex items-center gap-space-md rounded-xl bg-surface-container-lowest p-space-sm pr-space-md text-body-md font-medium text-on-primary-fixed shadow-sm"
+          data-motion="chip"
+          style={chipStyle(position)}
+        >
           <IconTile icon={icon} />
           <span>{name}</span>
         </li>

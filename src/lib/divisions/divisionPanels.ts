@@ -10,7 +10,10 @@
  * Opening a banner while another panel is open closes that panel (animated) and opens the new one
  * at once; the page scrolls to the clicked banner only after the close has finished, when its
  * final position is known, so it ends just below the fixed header without a mid-way jump.
+ *
+ * Each open replays the content's entrance and each close fades it out (panelMotion.ts).
  */
+import { createPanelMotion, type PanelMotion } from './panelMotion';
 
 export const DIVISIONS_SELECTOR = '[data-divisions]';
 export const DIVISIONS_LIST_SELECTOR = '[data-divisions-list]';
@@ -81,6 +84,17 @@ export function initDivisionPanels(root: Document = document): DivisionPanelsCon
 
   const divisions = collectDivisions(list);
   if (divisions.length === 0) return null;
+  const motions = new Map<string, PanelMotion>(
+    divisions.map((division) => [division.id, createPanelMotion(division.panel, view)]),
+  );
+
+  /** The state attributes and the content motion, together. */
+  const applyState = (division: DivisionParts, open: boolean): void => {
+    setDivisionState(division, open);
+    const motion = motions.get(division.id);
+    if (open) motion?.open();
+    else motion?.close();
+  };
 
   const listeners = new AbortController();
   const { signal } = listeners;
@@ -149,7 +163,7 @@ export function initDivisionPanels(root: Document = document): DivisionPanelsCon
     cancelScroll();
     if (nextId === null) {
       openId = null;
-      setDivisionState(target, false);
+      applyState(target, false);
       scheduleUnlock(target.panel);
       return;
     }
@@ -158,9 +172,9 @@ export function initDivisionPanels(root: Document = document): DivisionPanelsCon
     list.setAttribute(LOCKED_ATTRIBUTE, '');
     const closingMs = previous ? transitionMs(previous.panel) : 0;
     if (closingMs > 0) pinInPlace(target.article);
-    if (previous) setDivisionState(previous, false);
+    if (previous) applyState(previous, false);
     openId = nextId;
-    setDivisionState(target, true);
+    applyState(target, true);
 
     if (closingMs === 0) {
       scrollToBanner(target.article);
@@ -186,6 +200,7 @@ export function initDivisionPanels(root: Document = document): DivisionPanelsCon
     destroy: () => {
       cancelUnlock();
       cancelScroll();
+      motions.forEach((motion) => motion.destroy());
       listeners.abort();
     },
   };

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import HeroSection from '../../../../src/components/sections/HeroSection.astro';
 import { compileTailwind, extractClasses } from '../../helpers/compileTailwind';
+import { TYPEWRITER_DEFAULTS } from '../../../../src/lib/typewriter/typewriter';
 import { renderAstro } from '../../helpers/renderAstro';
 
 async function renderHero(): Promise<string> {
@@ -24,11 +25,13 @@ describe('HeroSection', () => {
     );
   });
 
-  it('fills the screen below the header and centers its content vertically', async () => {
+  it('fills the screen from under the header and centers its content vertically', async () => {
     const section = /^<section[^>]*>/.exec(await renderHero())?.[0] ?? '';
 
+    // Starts under the header, so the header's slide-in reveals the hero, not the page background;
     // min-height (not height) so the hero grows instead of clipping on short screens.
-    expect(section).toMatch(/\bmin-h-screen-below-header\b/);
+    expect(section).toMatch(/\bextend-under-header\b/);
+    expect(section).toMatch(/\bpt-under-header-space-xl\b/);
     expect(section).toMatch(/\bflex\b[^"]*\bitems-center\b/);
     expect(section).not.toMatch(/[" ]h-(screen|\[)/);
   });
@@ -41,16 +44,17 @@ describe('HeroSection', () => {
     expect(h1).toMatch(/class="[^"]*\btext-hero-title\b/);
     // Centered as a block by the parent, but its lines align to the left edge.
     expect(h1).toMatch(/class="text-start /);
-    expect(h1).toContain(
-      '<span class="text-primary-container">Medsupplies Ingeniería S.A.S.</span>',
-    );
+    const brand = /<span class="text-primary-container"[^>]*>([\s\S]*?<\/span>)<\/span>/.exec(
+      h1,
+    )?.[1];
+    expect(brand?.replace(/<[^>]+>/g, '')).toBe('Medsupplies Ingeniería S.A.S');
     expect(
       h1
         .replace(/<[^>]+>/g, '')
         .replace(/\s+/g, ' ')
         .trim(),
     ).toBe(
-      'Medsupplies Ingeniería S.A.S. soluciones integrales con Dispositivos Médicos, Productos Farmacéuticos e Ingeniería Especializada',
+      'Medsupplies Ingeniería S.A.S soluciones integrales con Dispositivos Médicos, Productos Farmacéuticos e Ingeniería Especializada',
     );
   });
 
@@ -71,7 +75,10 @@ describe('HeroSection', () => {
       /<a [^>]*href="\/#productos"[^>]*>[\s\S]*?Ver portafolio de productos\s*<\/a>/,
     );
     expect(html).not.toMatch(/href="[^"]*[?&]type=/);
-    expect(html).toMatch(/class="flex flex-wrap [^"]*"/);
+    // Stacked at one shared width on phones, side by side from sm.
+    expect(html).toMatch(
+      /class="flex w-full max-w-sm flex-col [^"]*\bsm:flex-row sm:flex-wrap\b[^"]*"/,
+    );
   });
 
   it('lists the micro-specs from the data file', async () => {
@@ -133,7 +140,58 @@ describe('HeroSection', () => {
     expect(html).toMatch(
       /<div class="mx-auto flex max-w-4xl flex-col items-center gap-space-md text-center">/,
     );
-    expect(html).toMatch(/class="flex flex-wrap items-center justify-center /);
+    expect(html).toMatch(/class="[^"]*\bsm:items-center sm:justify-center\b[^"]*"/);
+  });
+
+  describe('load sequence', () => {
+    const tag = (html: string, pattern: RegExp): string => pattern.exec(html)?.[0] ?? '';
+    const timing = (delay: number, duration: number, y = 0): string =>
+      `--intro-delay: ${delay}ms; --intro-duration: ${duration}ms; --intro-ease: cubic-bezier(0.22, 1, 0.36, 1); --intro-x: 0px; --intro-y: ${y}px`;
+
+    it('is an intro sequence that plays on load', async () => {
+      const section = tag(await renderHero(), /^<section[^>]*>/);
+
+      expect(section).toContain('data-intro-root data-intro-trigger="load"');
+    });
+
+    it('fades the badge in first', async () => {
+      const badge = tag(
+        await renderHero(),
+        /<span class="inline-flex items-center rounded-full[^>]*>/,
+      );
+
+      expect(badge).toMatch(/\sdata-intro(="true")?[\s>]/);
+      expect(badge).toContain(timing(0, 500));
+    });
+
+    it('raises the title in two blocks, word by word so the lines wrap as before', async () => {
+      const h1 = tag(await renderHero(), /<h1[^>]*>[\s\S]*?<\/h1>/);
+      const words = h1.match(/<span class="inline-block" data-intro>[^<]+<\/span>/g) ?? [];
+
+      expect(words).toHaveLength(13);
+      expect(h1).toContain(`<span class="text-primary-container" style="${timing(150, 700, 24)}`);
+      expect(h1).toContain(`</span> <span style="${timing(300, 700, 24)}`);
+    });
+
+    it('types the lead with the typewriter, starting on load at 700ms', async () => {
+      const lead = tag(await renderHero(), /<p [^>]*>/);
+
+      expect(lead).toContain('class="max-w-2xl text-hero-lead text-surface-variant"');
+      expect(lead).toMatch(/\sdata-typewriter(="true")?[\s>]/);
+      expect(lead).toContain('data-typewriter-delay="700"');
+      expect(lead).toContain(`data-typewriter-speed="${TYPEWRITER_DEFAULTS.speed}"`);
+      expect(lead).toContain('data-typewriter-trigger="load"');
+    });
+
+    it('raises the buttons, 100ms apart, then fades in the micro-specs', async () => {
+      const html = await renderHero();
+
+      expect(tag(html, /<a [^>]*href="\/#contacto"[^>]*>/)).toContain(timing(1400, 600, 20));
+      expect(tag(html, /<a [^>]*href="\/#productos"[^>]*>/)).toContain(timing(1500, 600, 20));
+      const specs = tag(html, /<ul [^>]*>/);
+      expect(specs).toMatch(/\sdata-intro[\s>]/);
+      expect(specs).toContain(timing(1600, 500));
+    });
   });
 
   it('only uses utilities that exist in the design system', async () => {

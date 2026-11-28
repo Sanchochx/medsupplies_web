@@ -39,6 +39,10 @@ describe('SiteFooter', () => {
     );
   });
 
+  it('keeps the stacked logo at its own width instead of stretching it across the column', async () => {
+    expect(await renderFooter()).toMatch(/<img [^>]*class="h-10 w-auto self-start md:self-auto"/);
+  });
+
   it('only uses utilities that exist in the design system', async () => {
     const classes = extractClasses(await renderFooter());
     const css = await compileTailwind(classes);

@@ -2,7 +2,13 @@
 import { Image } from 'astro:assets';
 import heroImage from '../../assets/images/placeholders/hero-laboratory.webp';
 import { getHeroCopy } from '../../lib/data';
+import {
+  HERO_INTRO_STEPS,
+  HERO_LEAD_TYPEWRITER,
+  introStepStyle,
+} from '../../lib/motion/introTimeline';
 import { Button, Chip, Container } from '../ui';
+import Typewriter from '../ui/Typewriter.astro';
 
 const HEADING_ID = 'hero-heading';
 // WebM (VP9) first: Firefox on Linux may only have OpenH264, which stalls on non-Baseline H.264.
@@ -11,13 +17,25 @@ const HERO_VIDEO_SOURCES = [
   { src: '/videos/video_fondo.mp4', type: 'video/mp4' },
 ] as const;
 
+const TITLE_BRAND = 'Medsupplies Ingeniería S.A.S';
+const TITLE_REST =
+  'soluciones integrales con Dispositivos Médicos, Productos Farmacéuticos e Ingeniería Especializada';
+const LEAD =
+  'Distribuimos tecnología médica de vanguardia e insumos hospitalarios en Colombia, con el respaldo de soporte técnico, cumplimiento normativo y excelencia operativa.';
+
+// Each title word is its own inline-block so it can be translated (inline boxes cannot), while the
+// spaces between words stay plain text: the lines wrap exactly as unsplit text would.
+const toWords = (text: string): string[] => text.split(' ');
+
 const { microSpecs } = getHeroCopy();
 ---
 
 <section
   id="inicio"
   aria-labelledby={HEADING_ID}
-  class="focus-ring-inverse relative flex min-h-screen-below-header w-full items-center overflow-hidden bg-scrim pt-space-xl pb-fab-clearance"
+  class="focus-ring-inverse relative extend-under-header flex w-full items-center overflow-hidden bg-scrim pt-under-header-space-xl pb-fab-clearance"
+  data-intro-root
+  data-intro-trigger="load"
 >
   {/*
     The photo stays underneath the video: it is the LCP element, it fills the frame while the
@@ -54,25 +72,64 @@ const { microSpecs } = getHeroCopy();
 
   <Container class="relative z-10">
     <div class="mx-auto flex max-w-4xl flex-col items-center gap-space-md text-center">
-      <Chip variant="eyebrow" icon="verified-user">
+      <Chip
+        variant="eyebrow"
+        icon="verified-user"
+        data-intro
+        style={introStepStyle(HERO_INTRO_STEPS.badge)}
+      >
         Tecnología médica y Farmacéutica en Colombia
       </Chip>
 
       <h1 id={HEADING_ID} class="text-start font-heading text-hero-title text-surface-bright">
-        <span class="text-primary-container">Medsupplies Ingeniería S.A.S</span> soluciones
-        integrales con Dispositivos Médicos, Productos Farmacéuticos e Ingeniería Especializada
+        <span class="text-primary-container" style={introStepStyle(HERO_INTRO_STEPS.titleBrand)}>
+          {toWords(TITLE_BRAND).map((word, index) => (
+            <Fragment>
+              {index > 0 && ' '}
+              <span class="inline-block" data-intro>
+                {word}
+              </span>
+            </Fragment>
+          ))}
+        </span>{' '}
+        <span style={introStepStyle(HERO_INTRO_STEPS.titleRest)}>
+          {toWords(TITLE_REST).map((word, index) => (
+            <Fragment>
+              {index > 0 && ' '}
+              <span class="inline-block" data-intro>
+                {word}
+              </span>
+            </Fragment>
+          ))}
+        </span>
       </h1>
 
-      <p class="max-w-2xl text-hero-lead text-surface-variant">
-        Distribuimos tecnología médica de vanguardia e insumos hospitalarios en Colombia, con el
-        respaldo de soporte técnico, cumplimiento normativo y excelencia operativa.
-      </p>
+      <Typewriter
+        text={LEAD}
+        delay={HERO_LEAD_TYPEWRITER.delay}
+        speed={HERO_LEAD_TYPEWRITER.speed}
+        trigger="load"
+        class="max-w-2xl text-hero-lead text-surface-variant"
+      />
 
-      <div class="flex flex-wrap items-center justify-center gap-space-sm pt-space-xs">
-        <Button href="/#contacto" variant="primary" iconStart="assignment">
+      {/* Stacked at one shared width on phones; side by side from sm. */}
+      <div class="flex w-full max-w-sm flex-col gap-space-sm pt-space-xs sm:w-auto sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:justify-center">
+        <Button
+          href="/#contacto"
+          variant="primary"
+          iconStart="assignment"
+          data-intro
+          style={introStepStyle(HERO_INTRO_STEPS.primaryCta)}
+        >
           Solicitar cotización
         </Button>
-        <Button href="/#productos" variant="neutral" iconStart="inventory-2">
+        <Button
+          href="/#productos"
+          variant="neutral"
+          iconStart="inventory-2"
+          data-intro
+          style={introStepStyle(HERO_INTRO_STEPS.secondaryCta)}
+        >
           Ver portafolio de productos
         </Button>
       </div>
@@ -82,7 +139,11 @@ const { microSpecs } = getHeroCopy();
         (a layout shift) when the first grew as Inter replaced the fallback font. Wide enough for
         each spec to stay on one line.
       */}
-      <ul class="grid gap-x-6 gap-y-space-xs pt-space-sm text-label-sm text-surface-variant sm:max-w-lg sm:grid-cols-2">
+      <ul
+        class="grid gap-x-6 gap-y-space-xs pt-space-sm text-label-sm text-surface-variant sm:max-w-lg sm:grid-cols-2"
+        data-intro
+        style={introStepStyle(HERO_INTRO_STEPS.microSpecs)}
+      >
         {microSpecs.map((spec) => (
           <li class="flex items-center justify-center gap-1.5 whitespace-nowrap">
             <span aria-hidden="true" class="size-2 rounded-full bg-primary-fixed-dim" />
@@ -96,6 +157,8 @@ const { microSpecs } = getHeroCopy();
 
 <script>
   import { initLoopingVideos } from '../../lib/media/loopingVideo';
+  import { initIntros } from '../../lib/motion/introSequence';
 
+  initIntros();
   initLoopingVideos();
 </script>

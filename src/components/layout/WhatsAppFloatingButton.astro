@@ -1,21 +1,38 @@
 ---
 import { getWhatsAppUrl } from '../../lib/data';
+import { SITE_CHROME_INTRO, introStepStyle } from '../../lib/motion/introTimeline';
 import { Icon } from '../ui';
 
 const whatsAppUrl = getWhatsAppUrl();
 ---
 
 {/*
+  The wrapper holds the position and the load intro (a pop-in): the button's own `animation` is
+  the float, and one element cannot run both.
   Floats over every section, so the focus indicator must read on light, blue and black
   backgrounds alike: a white ring hugging the button plus a dark outline around it.
   The float animation runs only under `motion-safe` and pauses on hover so the target holds still.
 */}
-<a
-  href={whatsAppUrl}
-  target="_blank"
-  rel="noopener noreferrer"
-  aria-label="Escríbanos por WhatsApp (abre WhatsApp en una pestaña nueva)"
-  class="fixed right-space-md bottom-space-md z-40 inline-flex size-14 items-center justify-center rounded-full bg-whatsapp text-on-primary shadow-xl [--focus-ring-color:var(--color-on-surface)] transition-colors duration-200 hover:bg-whatsapp-hover hover:[animation-play-state:paused] focus-visible:shadow-[0_0_0_2px_var(--color-surface-container-lowest)] motion-safe:animate-float sm:right-space-lg sm:bottom-space-lg"
+<div
+  class="fixed right-space-md bottom-space-md z-40 sm:right-space-lg sm:bottom-space-lg"
+  data-intro-root
+  data-intro-trigger="load"
+  data-intro
+  style={introStepStyle(SITE_CHROME_INTRO.whatsApp)}
 >
-  <Icon name="whatsapp" size={30} />
-</a>
+  <a
+    href={whatsAppUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Escríbanos por WhatsApp (abre WhatsApp en una pestaña nueva)"
+    class="flex size-14 items-center justify-center rounded-full bg-whatsapp text-on-primary shadow-xl [--focus-ring-color:var(--color-on-surface)] transition-colors duration-200 hover:bg-whatsapp-hover hover:[animation-play-state:paused] focus-visible:shadow-[0_0_0_2px_var(--color-surface-container-lowest)] motion-safe:animate-float"
+  >
+    <Icon name="whatsapp" size={30} />
+  </a>
+</div>
+
+<script>
+  import { initIntros } from '../../lib/motion/introSequence';
+
+  initIntros();
+</script>

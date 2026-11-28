@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import logo from '../../assets/images/logo.png';
 import { getCompanyInfo } from '../../lib/data';
+import { SITE_CHROME_INTRO, introStepStyle } from '../../lib/motion/introTimeline';
 import { Container } from '../ui';
 import MainNav from './MainNav.astro';
 import MobileNav from './MobileNav.astro';
@@ -9,12 +10,25 @@ import MobileNav from './MobileNav.astro';
 const { legalName } = getCompanyInfo();
 ---
 
+{/*
+  Its own load-triggered intro (the bar slides down, then logo and links drop in). The drawer
+  <dialog> inside is opened in the top layer, so the bar's transform never offsets it.
+*/}
 <header
   data-site-header
   class="fixed inset-x-0 top-0 z-50 h-header border-b border-outline-variant/40 bg-surface-container-lowest"
+  data-intro-root
+  data-intro-trigger="load"
+  data-intro
+  style={introStepStyle(SITE_CHROME_INTRO.bar)}
 >
   <Container class="flex h-full items-center justify-between gap-gutter">
-    <a href="/#inicio" class="flex shrink-0 items-center rounded-lg">
+    <a
+      href="/#inicio"
+      class="flex shrink-0 items-center rounded-lg"
+      data-intro
+      style={introStepStyle(SITE_CHROME_INTRO.logo)}
+    >
       {/* The logo already contains the company name, so it replaces the text wordmark. */}
       <Image
         src={logo}
@@ -33,3 +47,9 @@ const { legalName } = getCompanyInfo();
     <MobileNav />
   </Container>
 </header>
+
+<script>
+  import { initIntros } from '../../lib/motion/introSequence';
+
+  initIntros();
+</script>

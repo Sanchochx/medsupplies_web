@@ -2,8 +2,10 @@
  * Line tabs inside a division panel (ARIA tabs pattern, automatic activation): one tab per product
  * line, Left/Right/Home/End move between tabs with roving `tabindex`, and the footer's prev/next
  * buttons step through the same selection. Every tab panel is in the HTML; the script only flips
- * which one is shown.
+ * which one is shown. The tabs, counter and arrows update at once; the tab panels change through
+ * lineMotion.ts, which animates the change while the panel is open. Focus never moves on its own.
  */
+import { createLineMotion, lineDirection } from './lineMotion';
 
 export const LINE_TABS_SELECTOR = '[data-line-tabs]';
 export const TAB_SELECTOR = '[role="tab"]';
@@ -85,17 +87,22 @@ function initOne(root: HTMLElement): LineTabsController | null {
     tabs.findIndex((tab) => tab.getAttribute('aria-selected') === 'true'),
     0,
   );
+  const motion = createLineMotion(
+    root,
+    panels.filter((panel) => panel !== null),
+    selectedIndex,
+  );
 
   const select = (index: number, { focusTab = false } = {}): void => {
     if (index < 0 || index >= count) return;
+    const direction = lineDirection(selectedIndex, index);
     selectedIndex = index;
     tabs.forEach((tab, position) => {
       const isSelected = position === index;
       tab.setAttribute('aria-selected', String(isSelected));
       tab.tabIndex = isSelected ? 0 : -1;
-      const panel = panels[position];
-      if (panel) panel.hidden = !isSelected;
     });
+    motion.show(index, direction);
     if (prev) prev.disabled = index === 0;
     if (next) next.disabled = index === count - 1;
     if (counter) counter.textContent = lineCounterText(index, count);
@@ -139,7 +146,10 @@ function initOne(root: HTMLElement): LineTabsController | null {
       return selectedIndex;
     },
     select,
-    destroy: () => listeners.abort(),
+    destroy: () => {
+      motion.destroy();
+      listeners.abort();
+    },
   };
 }
 

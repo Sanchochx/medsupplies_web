@@ -27,7 +27,7 @@ function tabs(html: string): string[] {
 function tabPanels(html: string): string[] {
   return [
     ...html.matchAll(
-      /<div role="tabpanel"[\s\S]*?(?=<div role="tabpanel"|<div class="flex flex-col gap-space-md border-t)/g,
+      /<div role="tabpanel"[\s\S]*?(?=<div role="tabpanel"|<div [^>]*data-motion="footer")/g,
     ),
   ].map(([panel]) => panel);
 }
@@ -44,8 +44,22 @@ describe('DivisionPanel', () => {
   it('attaches to the banner with no blue line between them', async () => {
     const html = await renderPanel();
 
-    expect(html).toMatch(/<div class="bg-surface-container-low py-space-lg/);
+    expect(html).toMatch(/<div class="relative isolate bg-surface-container-low py-space-lg/);
     expect(html).not.toMatch(/\bborder-t-2\b|\bborder-primary\b/);
+  });
+
+  it('shows the warehouse photo faintly behind the content, under a 95% veil of the panel color', async () => {
+    const html = await renderPanel();
+    const background = /<img [^>]*data-panel-background[^>]*>/.exec(html)?.[0] ?? '';
+
+    expect(html.match(/data-panel-background/g)).toHaveLength(1);
+    expect(background).toMatch(/\salt(="")?[\s>]/);
+    expect(background).toContain('loading="lazy"');
+    expect(background).toContain('fondo_productos');
+    expect(background).toMatch(/class="absolute inset-0 -z-10 size-full object-cover"/);
+    expect(html).toMatch(
+      /data-panel-background[^>]*>\s*<div aria-hidden="true" class="absolute inset-0 -z-10 bg-surface-container-low\/95">/,
+    );
   });
 
   it('renders a tab list named by the division title, one tab per line, the first selected', async () => {
@@ -91,13 +105,33 @@ describe('DivisionPanel', () => {
       const names = line.kind === 'products' ? line.items : line.items.map(({ name }) => name);
 
       expect(panel).toMatch(
-        new RegExp(`<span class="[^"]*\\buppercase\\b[^"]*">Línea ${number}</span>`),
+        new RegExp(`<span class="[^"]*\\buppercase\\b[^"]*"[^>]*>\\s*Línea ${number}\\s*</span>`),
       );
-      expect(panel).toMatch(new RegExp(`<h3 class="[^"]*">\\s*${line.title}\\s*</h3>`));
+      expect(panel).toMatch(new RegExp(`<h3 class="[^"]*"[^>]*>\\s*${line.title}\\s*</h3>`));
       const chips = [...panel.matchAll(/<li [^>]*>[\s\S]*?<span>([^<]*)<\/span>\s*<\/li>/g)].map(
         ([, name]) => name,
       );
       expect(chips).toEqual(names);
+    });
+  });
+
+  it('shows products as plain text beside their icon, without a card, in one column unless the line asks for two', async () => {
+    const panels = tabPanels(await renderPanel());
+
+    hospitalPanel().lines.forEach((line, index) => {
+      if (line.kind !== 'products') return;
+      const list = /<ul class="([^"]*)"/.exec(panels[index] ?? '')?.[1] ?? '';
+      expect(list).toMatch(/\bgrid-cols-1\b/);
+      if (line.columns === 2) expect(list).toMatch(/\bsm:grid-cols-2\b/);
+      else expect(list).not.toMatch(/\b\w+:grid-cols-/);
+      const items = [
+        ...(panels[index] ?? '').matchAll(/<li class="([^"]*)"[^>]*>([\s\S]*?)<\/li>/g),
+      ];
+      expect(items).toHaveLength(line.items.length);
+      for (const [, classes = '', content = ''] of items) {
+        expect(classes).not.toMatch(/\b(bg-|rounded|shadow|ring-|border\b|p[xy]?-)/);
+        expect(content).toMatch(/<svg\b/);
+      }
     });
   });
 
@@ -117,7 +151,7 @@ describe('DivisionPanel', () => {
     for (const panel of tabPanels(html)) expect(panel).not.toMatch(/<img\b/);
     // The loop comes before the tab panels: on top on small screens, on the left from md.
     expect(html.indexOf('data-division-photo')).toBeLessThan(html.indexOf('role="tabpanel"'));
-    expect(html.match(/<img\b/g)).toHaveLength(count);
+    expect(html.match(/<img\b(?![^>]*data-panel-background)/g)).toHaveLength(count);
     expect(html.match(/data-slide\b/g)).toHaveLength(count);
     const states = [...html.matchAll(/data-state="([a-z]+)"/g)].map(([, state]) => state);
     expect(states.slice(0, 3)).toEqual(['active', 'next', 'idle']);
@@ -129,6 +163,8 @@ describe('DivisionPanel', () => {
       /<div class="[^"]*" data-division-photo[\s\S]*?(?=<div class="md:col-span)/.exec(html)?.[0] ??
       '';
 
+    expect(loop).toMatch(/data-division-photo/);
+    expect(loop).not.toMatch(/\bborder(-\d)?\b/);
     expect(loop).not.toMatch(/\b(bg-surface-container-lowest|shadow-md|bg-radial|rounded-2xl)\b/);
     expect(loop).not.toMatch(/<button\b|data-slide-dot|data-rotation-toggle|placeholder/);
     for (const img of loop.match(/<img [^>]*>/g) ?? []) {
@@ -146,7 +182,7 @@ describe('DivisionPanel', () => {
     expect(html).not.toMatch(/Administración parenteral|venoclisis|alta rotación/i);
   });
 
-  it('ends with the line counter, prev/next arrows (prev disabled) and the quote button', async () => {
+  it('ends with the line counter and prev/next arrows (prev disabled), without a quote button', async () => {
     const html = await renderPanel();
     const count = hospitalPanel().lines.length;
 
@@ -161,7 +197,12 @@ describe('DivisionPanel', () => {
     expect(prev).toMatch(/\sdisabled[\s>]/);
     expect(next).toContain('aria-label="Línea siguiente"');
     expect(next).not.toMatch(/\sdisabled[\s>]/);
-    for (const arrow of [prev, next]) expect(arrow).toMatch(/\bsize-11\b/);
-    expect(html).toMatch(/<a [^>]*href="\/#contacto"[^>]*>\s*Solicitar cotización/);
+    for (const arrow of [prev, next]) {
+      expect(arrow).toMatch(/\bsize-11\b/);
+      // Blue buttons with white arrows.
+      expect(arrow).toMatch(/\bbg-primary\b/);
+      expect(arrow).toMatch(/\btext-on-primary\b/);
+    }
+    expect(html).not.toContain('Solicitar cotización');
   });
 });

@@ -1,5 +1,6 @@
 ---
 import type { DivisionLine } from '../../lib/data';
+import { PANEL_MOTION_DELAYS, panelMotionDelayStyle } from '../../lib/motion/panelMotionTimeline';
 
 export interface DivisionLineTab {
   line: DivisionLine;
@@ -37,7 +38,9 @@ const { labelledBy, lines } = Astro.props;
       aria-selected={index === 0 ? 'true' : 'false'}
       aria-controls={panelId}
       tabindex={index === 0 ? 0 : -1}
-      class="min-h-11 shrink-0 cursor-pointer rounded-full bg-surface-container-high px-space-md text-label-lg whitespace-nowrap text-on-surface-variant transition-colors duration-200 ease-out hover:bg-surface-container-highest focus-visible:outline-offset-4 aria-selected:bg-primary aria-selected:text-on-primary aria-selected:ring-4 aria-selected:ring-primary/25"
+      class="min-h-11 shrink-0 cursor-pointer rounded-full bg-surface-container-high px-space-md text-label-lg whitespace-nowrap text-on-surface-variant transition duration-200 ease-out hover:bg-surface-container-highest focus-visible:outline-offset-4 aria-selected:bg-primary aria-selected:text-on-primary aria-selected:ring-4 aria-selected:ring-primary/25"
+      data-motion="tab"
+      style={panelMotionDelayStyle(PANEL_MOTION_DELAYS.tab(index))}
     >
       {line.tabLabel}
     </button>

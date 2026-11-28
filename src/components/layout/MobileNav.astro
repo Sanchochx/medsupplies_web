@@ -1,5 +1,6 @@
 ---
 import { getNavItems } from '../../lib/data';
+import { SITE_CHROME_INTRO, introStepStyle } from '../../lib/motion/introTimeline';
 import { Icon } from '../ui';
 
 const DRAWER_ID = 'mobile-nav-drawer';
@@ -15,6 +16,8 @@ const navItems = getNavItems();
   aria-expanded="false"
   aria-controls={DRAWER_ID}
   class="inline-flex size-11 cursor-pointer items-center justify-center rounded-lg text-on-surface transition-colors duration-150 hover:bg-surface-container-high xl:hidden"
+  data-intro
+  style={introStepStyle(SITE_CHROME_INTRO.link)}
 >
   <Icon name="menu" />
 </button>
@@ -28,18 +31,18 @@ const navItems = getNavItems();
   id={DRAWER_ID}
   data-mobile-drawer
   aria-labelledby={TITLE_ID}
-  class="fixed inset-y-0 right-0 left-auto m-0 h-dvh max-h-none w-full max-w-xs translate-x-full bg-surface-container-lowest text-on-surface shadow-xl transition-[translate,overlay,display] transition-discrete duration-300 ease-out backdrop:bg-inverse-surface/60 backdrop:opacity-0 backdrop:transition-[opacity,overlay,display] backdrop:transition-discrete backdrop:duration-300 open:translate-x-0 open:backdrop:opacity-100 motion-reduce:transition-none motion-reduce:backdrop:transition-none starting:open:translate-x-full starting:open:backdrop:opacity-0"
+  class="fixed inset-y-0 right-0 left-auto m-0 h-dvh max-h-none w-full max-w-xs translate-x-full bg-primary text-on-primary shadow-xl focus-ring-inverse transition-[translate,overlay,display] transition-discrete duration-300 ease-out backdrop:bg-inverse-surface/60 backdrop:opacity-0 backdrop:transition-[opacity,overlay,display] backdrop:transition-discrete backdrop:duration-300 open:translate-x-0 open:backdrop:opacity-100 motion-reduce:transition-none motion-reduce:backdrop:transition-none starting:open:translate-x-full starting:open:backdrop:opacity-0"
 >
   <div class="flex h-full flex-col gap-space-lg overflow-y-auto p-space-lg">
     <div class="flex items-center justify-between">
-      <p id={TITLE_ID} class="font-heading text-headline-sm text-on-surface">
+      <p id={TITLE_ID} class="font-heading text-headline-sm text-on-primary">
         Menú
       </p>
       <button
         type="button"
         data-mobile-drawer-close
         aria-label="Cerrar menú"
-        class="inline-flex size-11 cursor-pointer items-center justify-center rounded-lg text-on-surface-variant transition-colors duration-150 hover:bg-surface-container-high hover:text-on-surface"
+        class="inline-flex size-11 cursor-pointer items-center justify-center rounded-lg text-on-primary transition-colors duration-150 hover:bg-on-primary/10"
       >
         <Icon name="close" />
       </button>
@@ -52,7 +55,7 @@ const navItems = getNavItems();
             <a
               href={href}
               data-section-link
-              class="flex min-h-11 items-center rounded-lg px-space-md text-body-lg font-semibold text-on-surface-variant transition-colors duration-150 not-aria-[current=true]:hover:bg-surface-container-low not-aria-[current=true]:hover:text-primary aria-[current=true]:bg-primary-container aria-[current=true]:text-on-primary"
+              class="flex min-h-11 items-center rounded-lg px-space-md text-body-lg font-semibold text-on-primary transition-colors duration-150 not-aria-[current=true]:hover:bg-on-primary/10 aria-[current=true]:bg-on-primary aria-[current=true]:text-primary"
             >
               {label}
             </a>

@@ -262,11 +262,12 @@ describe('initPhotoRotators', () => {
     expect(indexOf(element)).toBe(0);
   });
 
-  it('keeps looping when the line tab changes: the photos belong to the division', () => {
+  it('keeps looping, from the photo shown, when the line changes', () => {
     setup();
     const element = loop('hospital');
     setOnScreen(element, true);
     vi.advanceTimersByTime(INTERVAL_MS * 2);
+    expect(indexOf(element)).toBe(2);
 
     tabs[0]?.select(5);
     expect(indexOf(element)).toBe(2);

@@ -37,4 +37,14 @@ describe('IconTile', () => {
     expect(html).toContain('bg-primary text-on-primary shadow-md');
     expect(html).toContain('width="28"');
   });
+
+  it('forwards extra attributes to the tile', async () => {
+    const html = await renderAstro(IconTile, {
+      props: { icon: 'call', 'data-intro': true, style: '--intro-delay: 0ms' },
+    });
+
+    expect(html).toMatch(
+      /^<span class="inline-flex[^"]*" data-intro(="true")? style="--intro-delay: 0ms">/,
+    );
+  });
 });

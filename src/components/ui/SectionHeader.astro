@@ -1,4 +1,7 @@
 ---
+import { introStepStyle, type HeaderIntro } from '../../lib/motion/introTimeline';
+import Typewriter from './Typewriter.astro';
+
 export type SectionHeaderAlign = 'start' | 'center';
 export type SectionHeaderTone = 'light' | 'primary';
 export type SectionHeadingLevel = 'h1' | 'h2' | 'h3';
@@ -24,6 +27,16 @@ export interface SectionHeaderProps {
   headingClass?: string;
   /** Extra classes for the lead paragraph (e.g. keeping a lead on one line from a breakpoint). */
   leadClass?: string;
+  /**
+   * Scroll-triggered entrance, played once: the heading rises in and the lead is typed (inline
+   * markup and `<br>` kept). Without it the header is static.
+   */
+  intro?: HeaderIntro;
+  /**
+   * With `intro`: `false` joins the enclosing sequence (a `[data-intro-root]` ancestor) instead of
+   * starting one, so the heading and lead are timed with the rest of that section.
+   */
+  introRoot?: boolean;
   class?: string;
 }
 
@@ -48,11 +61,25 @@ const {
   highlight = false,
   headingClass,
   leadClass,
+  intro,
+  introRoot = true,
   class: className,
 } = Astro.props;
 
 const toneClasses = TONE_CLASSES[tone];
+const isIntroRoot = Boolean(intro) && introRoot;
 const hasLead = Boolean(lead) || Astro.slots.has('lead');
+const leadClasses = [
+  'leading-relaxed',
+  highlight && 'max-w-3xl',
+  leadSize === 'lg' ? 'text-body-lg' : 'text-body-md',
+  // The highlight band sits outside the heading's line box, so it needs extra room.
+  highlight ? 'mt-space-lg' : leadSize === 'lg' ? 'mt-space-sm' : 'mt-2',
+  toneClasses.lead,
+  leadClass,
+]
+  .filter(Boolean)
+  .join(' ');
 ---
 
 <div
@@ -62,9 +89,13 @@ const hasLead = Boolean(lead) || Astro.slots.has('lead');
     align === 'center' && 'mx-auto items-center text-center',
     className,
   ]}
+  data-intro-root={isIntroRoot ? '' : undefined}
+  data-intro-trigger={isIntroRoot ? 'view' : undefined}
 >
   <Heading
     id={headingId}
+    data-intro={intro ? '' : undefined}
+    style={intro ? introStepStyle(intro.heading) : undefined}
     class:list={[
       'font-heading text-headline-xl-mobile tracking-tight md:text-headline-xl',
       !highlight && toneClasses.heading,
@@ -80,19 +111,25 @@ const hasLead = Boolean(lead) || Astro.slots.has('lead');
       heading
     )}
   </Heading>
-  {hasLead && (
-    <p
-      class:list={[
-        'leading-relaxed',
-        highlight && 'max-w-3xl',
-        leadSize === 'lg' ? 'text-body-lg' : 'text-body-md',
-        // The highlight band sits outside the heading's line box, so it needs extra room.
-        highlight ? 'mt-space-lg' : leadSize === 'lg' ? 'mt-space-sm' : 'mt-2',
-        toneClasses.lead,
-        leadClass,
-      ]}
-    >
-      {lead ?? <slot name="lead" />}
-    </p>
-  )}
+  {hasLead &&
+    (intro ? (
+      <Typewriter
+        text={lead}
+        trigger="view"
+        delay={intro.lead.delay}
+        speed={intro.lead.speed}
+        class={leadClasses}
+      >
+        <slot name="lead" />
+      </Typewriter>
+    ) : (
+      <p class={leadClasses}>{lead ?? <slot name="lead" />}</p>
+    ))}
 </div>
+
+{/* Always bundled: an intro root stays hidden until this starts it. Idempotent, shared module. */}
+<script>
+  import { initIntros } from '../../lib/motion/introSequence';
+
+  initIntros();
+</script>
