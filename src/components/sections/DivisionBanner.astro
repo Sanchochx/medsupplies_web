@@ -42,9 +42,9 @@ const OVERLAY =
  * The banner fills its row; while a panel is open (`data-locked` on the list) its height is
  * pinned to the closed-state value instead.
  *
- * Entrance (DIVISION_BANNER_INTRO, played by the sequence on the division's article): only this
- * element is clipped by the wipe, never the panel below it, and the clip ends with the animation,
- * so focus rings and the panel are never cut. The title moves inside the button rather than the
+ * Entrance (DIVISION_BANNER_INTRO, played by the sequence on the division's article): the wipe's
+ * curtain (this element's `::after`, see global.css) covers only the banner, never the panel
+ * below it, and is removed once the sequence is done. The title moves inside the button rather than the
  * heading: a transformed heading would contain the button's banner-wide `::after` mid-animation.
  */}
 <div

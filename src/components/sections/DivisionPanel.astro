@@ -36,6 +36,10 @@ const hasPhotos = panel.images.length > 0;
  * Content motion (panelMotion.ts, lineMotion.ts): every open replays the entrance of the
  * `[data-motion]` elements; the inline style carries the shared timings (panelMotionTimeline.ts).
  * `data-line-viewport` is the line area whose height animates on a line change.
+ * Below md neither height animates (`max-md:transition-none` here, a media query in global.css
+ * for the line area): relaying out the page every frame stutters on phones, so the panel opens
+ * at once and its content's entrance (opacity/transform, on the compositor) is the motion.
+ * divisionPanels.ts reads the computed duration, so its timers follow.
  */}
 <div
   id={id}
@@ -44,7 +48,7 @@ const hasPhotos = panel.images.length > 0;
   aria-hidden="true"
   inert
   data-division-panel
-  class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-350 ease-out group-data-[state=open]/division:grid-rows-[1fr]"
+  class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-350 ease-out group-data-[state=open]/division:grid-rows-[1fr] max-md:transition-none"
   style={divisionPanelMotionStyle()}
 >
   <div class="min-h-0 overflow-hidden">

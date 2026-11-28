@@ -269,9 +269,13 @@
  * (`js` class set in the <head>) and motion is allowed: each `[data-intro]` element waits, paused on
  * its first keyframe, until it gets `data-intro-state="playing"`. `backwards` fill: once an
  * animation ends it stops applying, so the final state is the untouched design (and hover
- * transforms are not overridden). Only opacity, transform and clip-path change: nothing reflows.
- * `data-intro="wipe"` reveals the element from right to left with clip-path instead, and
- * `"wipe-ltr"` from left to right. `--intro-offset`, set on a sequence root by a staggered group
+ * transforms are not overridden). Only opacity and transform change, so every intro runs on the
+ * compositor: nothing reflows or repaints per frame.
+ * `data-intro="wipe"` reveals the element from right to left, and `"wipe-ltr"` from left to right:
+ * a curtain (`::after`) in the color behind the element (`--intro-wipe-cover`, the page color by
+ * default) shrinks off it with `scaleX`. Same look as animating `clip-path`, which browsers paint
+ * on the main thread every frame and made the full-width bands stutter on phones. The element
+ * must be positioned and must not use its own `::after`. `--intro-offset`, set on a sequence root by a staggered group
  * (introStagger.ts), is inherited and pushes back every delay inside it.
  */
 @media (prefers-reduced-motion: no-preference) {
@@ -288,20 +292,38 @@
     }
   }
 
-  .js [data-intro='wipe'] {
-    animation-name: intro-wipe;
+  .js :is([data-intro='wipe'], [data-intro='wipe-ltr']) {
+    animation: none;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background-color: var(--intro-wipe-cover, var(--color-surface-container-lowest));
+      transform: scaleX(0);
+      transform-origin: left;
+      animation: intro-curtain var(--intro-duration, 0ms) var(--intro-ease, ease-out)
+        calc(var(--intro-delay, 0ms) + var(--intro-offset, 0ms)) backwards paused;
+    }
   }
 
-  .js [data-intro='wipe-ltr'] {
-    animation-name: intro-wipe-ltr;
+  .js [data-intro='wipe-ltr']::after {
+    transform-origin: right;
   }
 
-  .js [data-intro][data-intro-state='playing'] {
+  .js [data-intro][data-intro-state='playing'],
+  .js :is([data-intro='wipe'], [data-intro='wipe-ltr'])[data-intro-state='playing']::after {
     animation-play-state: running;
   }
 
   .js [data-intro][data-intro-state='done'] {
     animation: none;
+  }
+
+  .js :is([data-intro='wipe'], [data-intro='wipe-ltr'])[data-intro-state='done']::after {
+    content: none;
   }
 }
 
@@ -312,21 +334,9 @@
   }
 }
 
-@keyframes intro-wipe {
+@keyframes intro-curtain {
   from {
-    clip-path: inset(0 0 0 100%);
-  }
-  to {
-    clip-path: inset(0);
-  }
-}
-
-@keyframes intro-wipe-ltr {
-  from {
-    clip-path: inset(0 100% 0 0);
-  }
-  to {
-    clip-path: inset(0);
+    transform: scaleX(1);
   }
 }
 
@@ -409,11 +419,17 @@
     will-change: opacity, transform;
   }
 
-  /* Clipped only while resizing, with room left for focus rings. */
-  [data-line-viewport][data-resizing] {
-    overflow: clip;
-    overflow-clip-margin: 0.5rem;
-    transition: height var(--motion-resize-duration, 0ms) var(--motion-ease, ease-out);
+  /*
+   * Clipped only while resizing, with room left for focus rings. From md only: a height
+   * transition relays out the page every frame, which stutters on phones, so there the line area
+   * takes its new height at once and the content entrance carries the motion.
+   */
+  @media (width >= 48rem) {
+    [data-line-viewport][data-resizing] {
+      overflow: clip;
+      overflow-clip-margin: 0.5rem;
+      transition: height var(--motion-resize-duration, 0ms) var(--motion-ease, ease-out);
+    }
   }
 
   /* `scale` (not `transform`), so it never fights the entrance transitions. */
