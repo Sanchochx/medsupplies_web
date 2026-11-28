@@ -26,6 +26,19 @@ describe('BaseLayout', () => {
     expect(html).toContain('<title>Test title</title>');
   });
 
+  it('describes the page for search engines and link previews with absolute URLs', async () => {
+    const html = await renderLayout();
+    const description =
+      'Dispositivos médicos, productos farmacéuticos e ingeniería especializada en Colombia.';
+
+    expect(html).toContain(`<meta name="description" content="${description}">`);
+    expect(html).toContain('<meta property="og:type" content="website">');
+    expect(html).toContain('<meta property="og:title" content="Test title">');
+    expect(html).toContain(`<meta property="og:description" content="${description}">`);
+    expect(html).toMatch(/<meta property="og:url" content="https:\/\/[^"]+\/[^"]*">/);
+    expect(html).toMatch(/<meta property="og:image" content="https:\/\/[^"]+\/og-image\.jpg">/);
+  });
+
   it('flags JavaScript on the root element before the page paints', async () => {
     const html = await renderLayout();
     const head = /<head>[\s\S]*?<\/head>/.exec(html)?.[0] ?? '';

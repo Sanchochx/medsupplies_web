@@ -7,11 +7,20 @@ import '../styles/global.css';
 export interface BaseLayoutProps {
   /** Document title shown in the browser tab. */
   title: string;
+  /** Meta and Open Graph description, in Spanish. Defaults to the site-wide one. */
+  description?: string;
 }
 
 type Props = BaseLayoutProps;
 
-const { title } = Astro.props;
+const DEFAULT_DESCRIPTION =
+  'Dispositivos médicos, productos farmacéuticos e ingeniería especializada en Colombia.';
+
+const { title, description = DEFAULT_DESCRIPTION } = Astro.props;
+
+// Link-preview crawlers (LinkedIn, WhatsApp…) only follow absolute URLs, hence `site` in astro.config.
+const url = new URL(Astro.url.pathname, Astro.site);
+const image = new URL('/og-image.jpg', Astro.site);
 
 // `contain` scales the round logo (not perfectly square) inside the box instead of cropping it.
 // No `background` on the favicon: Astro flattens the image with it, and a transparent flatten
@@ -65,6 +74,12 @@ const appleTouchIcon = await getImage({
       })();
     </script>
     <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={url} />
+    <meta property="og:image" content={image} />
     <link rel="icon" type="image/png" sizes="32x32" href={favicon.src} />
     <link rel="apple-touch-icon" sizes="180x180" href={appleTouchIcon.src} />
     <Font cssVariable="--font-inter" preload={[{ weight: 400 }]} />

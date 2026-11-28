@@ -9,6 +9,8 @@ const JAKARTA_FILES = '@fontsource/plus-jakarta-sans/files/plus-jakarta-sans-lat
 const INTER_FILES = '@fontsource/inter/files/inter-latin';
 
 export default defineConfig({
+  // Canonical origin: Open Graph tags need absolute URLs (`Astro.site` in BaseLayout).
+  site: 'https://medsupplies-web.sas-ingenieria.workers.dev',
   fonts: [
     {
       name: 'Plus Jakarta Sans',
